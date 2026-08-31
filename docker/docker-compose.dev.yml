@@ -15,6 +15,10 @@ services:
       - 3000:3000
     environment:
       # Override any of these via .env if you need custom paths or secrets
+      COREPACK_NPM_REGISTRY: https://registry.npmmirror.com
+      NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
+      # 跳过 pnpm run 前的依赖状态检查（避免重新拉取跨平台可选二进制）
+      PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false"
 
       MEILI_ADDR: ${MEILI_ADDR:-http://meilisearch:7700}
       BROWSER_WEB_URL: ${BROWSER_WEB_URL:-http://chrome:9222}
@@ -23,7 +27,12 @@ services:
       # You almost never want to change the value of the DATA_DIR variable.
       # If you want to mount a custom directory, change the volume mapping above instead.
       DATA_DIR: ${DATA_DIR:-/data}
-      # OPENAI_API_KEY: ...
+      # AI Chat
+      CHAT_ENABLED: ${CHAT_ENABLED:-false}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
+      CHAT_MODEL: ${CHAT_MODEL:-}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
 
       HOSTNAME: 0.0.0.0
       # https://github.com/vercel/next.js/issues/71622
@@ -72,12 +81,20 @@ services:
       - data:${DATA_DIR:-/data}
     working_dir: /app
     environment:
+      COREPACK_NPM_REGISTRY: https://registry.npmmirror.com
+      NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
+      PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false"
       DATA_DIR: ${DATA_DIR:-/data}
       MEILI_ADDR: ${MEILI_ADDR:-http://meilisearch:7700}
       BROWSER_WEB_URL: ${BROWSER_WEB_URL:-http://chrome:9222}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-super-secure-nextauth-secret}
-      # OPENAI_API_KEY: ...
+      # AI Chat
+      CHAT_ENABLED: ${CHAT_ENABLED:-false}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
+      CHAT_MODEL: ${CHAT_MODEL:-}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
     command:
       - pnpm
       - workers
@@ -94,6 +111,9 @@ services:
     restart: "no"
     working_dir: /app
     environment:
+      COREPACK_NPM_REGISTRY: https://registry.npmmirror.com
+      NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
+      PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false"
       DATA_DIR: ${DATA_DIR:-/data}
       MEILI_ADDR: ${MEILI_ADDR:-http://meilisearch:7700}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}

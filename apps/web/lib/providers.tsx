@@ -7,7 +7,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Session, SessionProvider } from "@/lib/auth/client";
 import { UserLocalSettingsCtx } from "@/lib/userLocalSettings/bookmarksLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
+import {
+  createTRPCClient,
+  httpBatchLink,
+  httpSubscriptionLink,
+  loggerLink,
+  splitLink,
+} from "@trpc/client";
 import superjson from "superjson";
 
 import type { ClientConfig } from "@karakeep/shared/config";
@@ -69,11 +75,17 @@ export default function Providers({
             process.env.NODE_ENV === "development" ||
             (op.direction === "down" && op.result instanceof Error),
         }),
-        httpBatchLink({
-          // TODO: Change this to be a full URL exposed as a client side setting
-          url: `/api/trpc`,
-          maxURLLength: TRPC_MAX_URL_LENGTH_INTERNAL,
-          transformer: superjson,
+        splitLink({
+          condition: (op) => op.type === "subscription",
+          true: httpSubscriptionLink({
+            url: `/api/trpc`,
+            transformer: superjson,
+          }),
+          false: httpBatchLink({
+            url: `/api/trpc`,
+            maxURLLength: TRPC_MAX_URL_LENGTH_INTERNAL,
+            transformer: superjson,
+          }),
         }),
       ],
     }),

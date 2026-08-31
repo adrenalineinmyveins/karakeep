@@ -68,6 +68,19 @@ export default function TabLayout() {
         <NativeTabs.Trigger.Label>Highlights</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="(chat)">
+        <NativeTabs.Trigger.Icon
+          sf="bubble.left.and.bubble.right.fill"
+          src={
+            <NativeTabs.Trigger.VectorIcon
+              family={MaterialCommunityIcons}
+              name="chat"
+            />
+          }
+        />
+        <NativeTabs.Trigger.Label>Chat</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger
         name="(search)"
         hidden={Platform.OS === "android"}

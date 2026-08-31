@@ -7,6 +7,12 @@ const withBundleAnalyzer = bundleAnalyzer({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
+  // 这两个包必须运行时从 node_modules 加载（不打进 bundle）：
+  // mermaid-to-drawnix 的依赖链（mermaid/dompurify）在模块求值期绑定 window，
+  // 一旦被 Turbopack 提前打进 server chunk，会在服务启动（无 window）时求值，
+  // 导致 dompurify 导出空实例（"addHook is not a function"）。
+  // 外部化后，tools.ts 里"先 ensureBrowserLikeEnv() 再动态 import"的顺序才能生效。
+  serverExternalPackages: ["@plait-board/mermaid-to-drawnix", "jsdom"],
   turbopack: {
     rules: {
       "*.svg": {

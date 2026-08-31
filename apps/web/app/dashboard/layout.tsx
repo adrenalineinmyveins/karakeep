@@ -15,12 +15,16 @@ import {
   ClipboardList,
   Highlighter,
   Home,
+  MessageCircle,
+  Paintbrush,
   Search,
   Tag,
 } from "lucide-react";
 
 import { PluginManager, PluginType } from "@karakeep/shared/plugins";
 import { tryCatch } from "@karakeep/shared/tryCatch";
+
+import serverConfig from "@karakeep/shared/config";
 
 export default async function Dashboard({
   children,
@@ -82,10 +86,24 @@ export default async function Dashboard({
         path: "/dashboard/highlights",
       },
       {
+        name: "画布",
+        icon: <Paintbrush size={18} />,
+        path: "/dashboard/canvas",
+      },
+      {
         name: t("common.archive"),
         icon: <Archive size={18} />,
         path: "/dashboard/archive",
       },
+      ...(serverConfig.chat.enabled
+        ? [
+            {
+              name: t("common.chat"),
+              icon: <MessageCircle size={18} />,
+              path: "/dashboard/chat",
+            },
+          ]
+        : []),
     ].flat();
 
   const mobileSidebar = (t: TFunction) => [

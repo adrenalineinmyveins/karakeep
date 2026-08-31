@@ -7,6 +7,7 @@ import "@karakeep/tailwind-config/globals.css";
 import type { Viewport } from "next";
 import React from "react";
 import Providers from "@/lib/providers";
+import GlobalErrorLogger from "@/components/GlobalErrorLogger";
 import { getUserLocalSettings } from "@/lib/userLocalSettings/userLocalSettings";
 import { getServerAuthSession } from "@/server/auth";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -55,6 +56,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className={inter.className}>
+        <GlobalErrorLogger />
         <NuqsAdapter>
           <Providers
             session={session}

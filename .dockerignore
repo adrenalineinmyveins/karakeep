@@ -9,6 +9,7 @@ README.md
 .turbo
 .git
 ./data
+.pnpm-store
 
 # Files that don't need to be included in the Docker image
 docs

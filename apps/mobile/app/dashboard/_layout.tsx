@@ -187,6 +187,14 @@ export default function Dashboard() {
         }}
       />
       <Stack.Screen
+        name="chats/[id]"
+        options={{
+          title: "对话",
+          headerBackTitle: "Back",
+          headerLargeTitle: false,
+        }}
+      />
+      <Stack.Screen
         name="settings/index"
         options={{
           ...formSheetSurfaceOptions,

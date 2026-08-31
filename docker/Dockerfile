@@ -1,11 +1,17 @@
 ################# Monolith Builder ##############
 FROM rust:1-bookworm AS monolith_builder
 
+# Use USTC apt mirror for reliable downloads in China
+RUN sed -i 's|deb.debian.org|mirrors.ustc.edu.cn|g; s|security.debian.org|mirrors.ustc.edu.cn|g' /etc/apt/sources.list.d/debian.sources /etc/apt/sources.list 2>/dev/null || true
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         libssl-dev \
         pkg-config \
-    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/*
+
+# Use USTC cargo mirror for faster downloads in China
+RUN mkdir -p /usr/local/cargo && \
+    printf '[source.crates-io]\nreplace-with = "ustc"\n\n[source.ustc]\nregistry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"\n' > /usr/local/cargo/config.toml \
     && cargo install monolith --locked
 
 ################# Base Builder ##############
@@ -14,10 +20,14 @@ FROM node:24-slim AS base
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+# Use npmmirror for faster downloads in China
+RUN npm config set registry https://registry.npmmirror.com
 
 # Keep Corepack current enough to verify modern pnpm release signatures.
 RUN npm install -g corepack@latest && corepack enable pnpm
 
+# Use USTC apt mirror for reliable downloads in China
+RUN sed -i 's|deb.debian.org|mirrors.ustc.edu.cn|g; s|security.debian.org|mirrors.ustc.edu.cn|g' /etc/apt/sources.list.d/debian.sources /etc/apt/sources.list 2>/dev/null || true
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         make \
@@ -50,18 +60,21 @@ COPY ./patches ./patches
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-RUN pnpm install --frozen-lockfile
+ENV COREPACK_NPM_REGISTRY=https://registry.npmmirror.com
+RUN printf 'registry=https://registry.npmmirror.com\nfetch-retries=10\nfetch-timeout=300000\nfetch-retry-mintimeout=20000\nfetch-retry-maxtimeout=300000\nnetwork-concurrency=4\n' > /app/.npmrc \
+    && pnpm install --frozen-lockfile --fetch-retries 10 --fetch-timeout 300000
 
 COPY . .
 
 # Build the db migration script
+# (verify-deps-before-run=false：依赖刚装好，避免 pnpm 重新校验并触发多余的 install)
 RUN cd packages/db && \
-    pnpm exec ncc build migrate.ts -o /db_migrations && \
+    pnpm --config.verify-deps-before-run=false exec ncc build migrate.ts -o /db_migrations && \
     cp -R drizzle /db_migrations
 
 
 # Compile the web app
-RUN (cd apps/web && pnpm exec next build --experimental-build-mode compile)
+RUN (cd apps/web && pnpm --config.verify-deps-before-run=false exec next build --experimental-build-mode compile)
 
 # Build the worker code
 RUN (cd apps/workers && pnpm --config.verify-deps-before-run=false build)
@@ -92,24 +105,29 @@ EXPOSE 3000
 ARG S6_OVERLAY_VERSION=3.2.1.0
 ARG TARGETARCH
 
-# Install wget and xz-utils needed for s6-overlay
+# Install curl for reliable downloads with retries
+# (USTC apt mirror for reliable downloads in China)
+RUN sed -i 's|deb.debian.org|mirrors.ustc.edu.cn|g; s|security.debian.org|mirrors.ustc.edu.cn|g' /etc/apt/sources.list.d/debian.sources /etc/apt/sources.list 2>/dev/null || true
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         ca-certificates \
-        wget \
+        curl \
         xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
-ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
-RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
+RUN curl --retry 10 --retry-delay 10 --retry-all-errors -fsSL \
+        -o /tmp/s6-overlay-noarch.tar.xz \
+        "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" \
+    && tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
     && case ${TARGETARCH} in \
             "amd64")  S6_ARCH=x86_64   ;; \
             "arm64")  S6_ARCH=aarch64  ;; \
         esac \
-    && echo https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz -O /tmp/s6-overlay-${S6_ARCH}.tar.xz \
-    && wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz -O /tmp/s6-overlay-${S6_ARCH}.tar.xz \
+    && curl --retry 10 --retry-delay 10 --retry-all-errors -fsSL \
+        -o /tmp/s6-overlay-${S6_ARCH}.tar.xz \
+        "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz" \
     && tar -C / -Jxpf /tmp/s6-overlay-${S6_ARCH}.tar.xz \
-    && rm -f /tmp/s6-overlay-${S6_ARCH}.tar.xz
+    && rm -f /tmp/s6-overlay-noarch.tar.xz /tmp/s6-overlay-${S6_ARCH}.tar.xz
 
 # Copy the s6-overlay config
 COPY --chmod=755 ./docker/root/etc/s6-overlay /etc/s6-overlay
@@ -117,6 +135,13 @@ COPY --chmod=755 ./docker/root/etc/s6-overlay /etc/s6-overlay
 ######################
 # Install runtime deps
 ######################
+# (USTC apt mirror + fetch retries: buildkit 并行构建时 Docker 内嵌 DNS 可能瞬时抖动)
+RUN sed -i 's|deb.debian.org|mirrors.ustc.edu.cn|g; s|security.debian.org|mirrors.ustc.edu.cn|g' /etc/apt/sources.list.d/debian.sources /etc/apt/sources.list 2>/dev/null || true \
+    && echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80-retries
+# 防 DNS 争抢：等待 base 阶段（pnpm install 等重网络任务）全部完成后才开始 apt。
+# BuildKit 各 stage 默认并行执行，并行网络负载曾导致 Docker 内嵌 DNS 查询失败
+# （Could not resolve 'mirrors.ustc.edu.cn'）。COPY --from 强制依赖 base 完整构建。
+COPY --from=base /app/package.json /tmp/.base-done
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         curl \
@@ -131,7 +156,7 @@ RUN case ${TARGETARCH} in \
         "arm64")  YTDLP_FILE=yt-dlp_linux_aarch64 ;; \
         *) echo "Unsupported arch: ${TARGETARCH}" && exit 1 ;; \
     esac \
-    && curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/${YTDLP_FILE} -o /usr/local/bin/yt-dlp \
+    && curl --retry 10 --retry-delay 10 --retry-all-errors -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/${YTDLP_FILE} -o /usr/local/bin/yt-dlp \
     && chmod +x /usr/local/bin/yt-dlp
 
 # yt-dlp >=2025.x requires a JavaScript runtime to extract YouTube formats.
@@ -156,6 +181,12 @@ COPY --from=base --chown=node:node /app/apps/web/.next/standalone ./
 COPY --from=base /app/apps/web/public ./apps/web/public
 COPY --from=base /db_migrations /db_migrations
 
+# Turbopack standalone 对 serverExternalPackages 外部包的 tracing 有缺口：
+# 只拷贝了 @plait-board/mermaid-to-drawnix 的 package.json（缺 dist/），
+# 运行时动态 import 会报 ERR_MODULE_NOT_FOUND。
+# 其余依赖（@plait/*、mermaid、slate、dompurify）tracing 均完整，无需补。
+COPY --from=base --chown=node:node /app/packages/trpc/node_modules/@plait-board/mermaid-to-drawnix/dist /app/node_modules/@plait-board/mermaid-to-drawnix/dist
+
 # Set the correct permission for prerender cache
 RUN mkdir -p ./apps/web/.next && chown node:node ./apps/web/.next
 
@@ -174,7 +205,9 @@ ENTRYPOINT ["/init"]
 
 FROM aio_builder AS aio
 
-RUN touch /etc/s6-overlay/s6-rc.d/user/contents.d/init-db-migration \
+# Windows 检出的 CRLF 行尾会让 s6-rc-compile 与 execline 脚本失效，统一转为 LF
+RUN find /etc/s6-overlay -type f -exec sed -i 's/\r$//' {} + \
+    && touch /etc/s6-overlay/s6-rc.d/user/contents.d/init-db-migration \
     /etc/s6-overlay/s6-rc.d/user/contents.d/svc-web \
     /etc/s6-overlay/s6-rc.d/user/contents.d/svc-workers
 
