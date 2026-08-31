@@ -7,6 +7,26 @@ import { Context, createCallerFactory } from "@karakeep/trpc";
 import { authenticateApiKey } from "@karakeep/trpc/auth";
 import { appRouter } from "@karakeep/trpc/routers/_app";
 
+// 用 API key 构造请求上下文（Bearer 鉴权，供移动端 WebView 等无 cookie 场景复用）
+export async function createContextFromApiKey(
+  token: string,
+  ip?: string | null,
+) {
+  const authResult = await authenticateApiKey(token, db);
+  return {
+    user: authResult.user,
+    auth: {
+      type: "apiKey" as const,
+      keyId: authResult.apiKey.keyId,
+      scopes: authResult.apiKey.scopes,
+    },
+    db,
+    req: {
+      ip: ip ?? null,
+    },
+  };
+}
+
 export async function createContextFromRequest(req: Request) {
   // TODO: This is a hack until we offer a proper REST API instead of the trpc based one.
   // Check if the request has an Authorization token, if it does, assume that API key authentication is requested.
@@ -17,19 +37,7 @@ export async function createContextFromRequest(req: Request) {
   if (authorizationHeader && authorizationHeader.startsWith("Bearer ")) {
     const token = authorizationHeader.split(" ")[1];
     try {
-      const authResult = await authenticateApiKey(token, db);
-      return {
-        user: authResult.user,
-        auth: {
-          type: "apiKey" as const,
-          keyId: authResult.apiKey.keyId,
-          scopes: authResult.apiKey.scopes,
-        },
-        db,
-        req: {
-          ip,
-        },
-      };
+      return await createContextFromApiKey(token, ip);
     } catch {
       // Fallthrough to cookie-based auth
     }

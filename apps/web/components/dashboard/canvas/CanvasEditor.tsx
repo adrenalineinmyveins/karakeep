@@ -57,7 +57,15 @@ type CanvasData = {
   modifiedAt: Date | null;
 };
 
-export default function CanvasEditor({ canvas }: { canvas: CanvasData }) {
+// embedded：独立路由模式（/canvas/[id]，无 dashboard 头部），
+// 全屏高度且不渲染返回按钮（主要供移动端 WebView 使用）
+export default function CanvasEditor({
+  canvas,
+  embedded = false,
+}: {
+  canvas: CanvasData;
+  embedded?: boolean;
+}) {
   const api = useTRPC();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -220,16 +228,24 @@ export default function CanvasEditor({ canvas }: { canvas: CanvasData }) {
   }, [title]);
 
   return (
-    <div className="flex h-[calc(100vh-64px)] flex-col">
+    <div
+      className={
+        embedded
+          ? "flex h-screen flex-col"
+          : "flex h-[calc(100vh-64px)] flex-col"
+      }
+    >
       <div className="flex items-center gap-3 border-b px-4 py-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={() => router.push("/dashboard/canvas")}
-        >
-          <ArrowLeft className="size-4" />
-        </Button>
+        {!embedded && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => router.push("/dashboard/canvas")}
+          >
+            <ArrowLeft className="size-4" />
+          </Button>
+        )}
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}

@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { MessageCircle, Plus, Trash2 } from "lucide-react-native";
+import { MessageCircle, Paintbrush, Plus, Trash2 } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -47,14 +47,24 @@ export default function ChatSessionList({
     <View className="flex-1">
       <View className="flex-row items-center justify-between border-b border-border px-4 py-3">
         <Text variant="heading">对话</Text>
-        <Button
-          variant="plain"
-          size="icon"
-          onPress={() => createSession.mutate({})}
-          accessibilityLabel="新建对话"
-        >
-          <Plus size={20} color="#007AFF" />
-        </Button>
+        <View className="flex-row items-center gap-1">
+          <Button
+            variant="plain"
+            size="icon"
+            onPress={() => router.push("/dashboard/canvas")}
+            accessibilityLabel="画布列表"
+          >
+            <Paintbrush size={20} color="#007AFF" />
+          </Button>
+          <Button
+            variant="plain"
+            size="icon"
+            onPress={() => createSession.mutate({})}
+            accessibilityLabel="新建对话"
+          >
+            <Plus size={20} color="#007AFF" />
+          </Button>
+        </View>
       </View>
 
       {sessions && sessions.length > 0 ? (

@@ -1,5 +1,6 @@
-import { Bot, User, Wrench } from "lucide-react-native";
-import { ActivityIndicator, Platform, PlatformColor, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Bot, Paintbrush, User, Wrench } from "lucide-react-native";
+import { ActivityIndicator, Platform, PlatformColor, Pressable, View } from "react-native";
 import Markdown from "react-native-markdown-display";
 
 import { Text } from "@/components/ui/Text";
@@ -7,8 +8,48 @@ import { cn } from "@/lib/utils";
 
 import type { ChatMessageInfo } from "@/lib/useChatSync";
 
+// 从消息中提取画布引用：
+// ① 实时回复的 toolCalls（create_canvas 工具结果 JSON，含标题）
+// ② 消息文本中的 /dashboard/canvas/{id} 链接（覆盖历史 toolResult 行的
+//   JSON 内容和模型回复里的 markdown 链接）
+function extractCanvasRefs(
+  message: ChatMessageInfo,
+): Array<{ id: string; title?: string }> {
+  const refs: Array<{ id: string; title?: string }> = [];
+  const seen = new Set<string>();
+  const add = (id: string, title?: string) => {
+    if (!seen.has(id)) {
+      seen.add(id);
+      refs.push({ id, title });
+    }
+  };
+
+  for (const tc of message.toolCalls ?? []) {
+    if (tc.toolName === "create_canvas" && tc.status === "end") {
+      try {
+        const raw =
+          typeof tc.result === "string" ? JSON.parse(tc.result) : tc.result;
+        if (raw && typeof raw.id === "string" && raw.editUrl) {
+          add(raw.id, typeof raw.title === "string" ? raw.title : undefined);
+        }
+      } catch {
+        // 非 JSON 结果，忽略
+      }
+    }
+  }
+
+  const linkRe = /\/dashboard\/canvas\/([A-Za-z0-9_-]+)/g;
+  let m: RegExpExecArray | null;
+  while ((m = linkRe.exec(message.content))) {
+    add(m[1]);
+  }
+  return refs;
+}
+
 export default function ChatMessage({ message }: { message: ChatMessageInfo }) {
   const isUser = message.role === "user";
+  const router = useRouter();
+  const canvasRefs = extractCanvasRefs(message);
 
   return (
     <View className={cn("flex-row gap-3", isUser && "flex-row-reverse")}>
@@ -63,6 +104,23 @@ export default function ChatMessage({ message }: { message: ChatMessageInfo }) {
             ))}
           </View>
         )}
+
+        {/* 画布入口卡片：点击用 WebView 打开 Web 画布页 */}
+        {canvasRefs.map((ref) => (
+          <Pressable
+            key={ref.id}
+            onPress={() => router.push(`/dashboard/canvas/${ref.id}`)}
+            className="flex-row items-center gap-2 rounded-xl border border-border bg-muted/30 px-3 py-2"
+          >
+            <Paintbrush size={14} color="#007AFF" />
+            <Text variant="footnote" className="flex-1" numberOfLines={1}>
+              {ref.title ?? "画布"}
+            </Text>
+            <Text variant="caption1" className="text-muted-foreground">
+              查看
+            </Text>
+          </Pressable>
+        ))}
       </View>
     </View>
   );

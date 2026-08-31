@@ -85,6 +85,19 @@ export default function Providers({
             url: `/api/trpc`,
             maxURLLength: TRPC_MAX_URL_LENGTH_INTERNAL,
             transformer: superjson,
+            headers() {
+              // 页面通过 ?apiKey= 查询参数访问时（移动端 WebView），
+              // 给客户端 tRPC 请求带上 Bearer 头，替代 cookie 会话
+              if (typeof window !== "undefined") {
+                const apiKey = new URLSearchParams(
+                  window.location.search,
+                ).get("apiKey");
+                if (apiKey) {
+                  return { Authorization: `Bearer ${apiKey}` };
+                }
+              }
+              return {};
+            },
           }),
         }),
       ],

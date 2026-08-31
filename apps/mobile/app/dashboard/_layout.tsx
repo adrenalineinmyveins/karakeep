@@ -195,6 +195,21 @@ export default function Dashboard() {
         }}
       />
       <Stack.Screen
+        name="canvas/index"
+        options={{
+          headerTitle: "画布",
+          headerBackTitle: "Back",
+        }}
+      />
+      <Stack.Screen
+        name="canvas/[id]"
+        options={{
+          title: "画布",
+          headerBackTitle: "Back",
+          headerLargeTitle: false,
+        }}
+      />
+      <Stack.Screen
         name="settings/index"
         options={{
           ...formSheetSurfaceOptions,
