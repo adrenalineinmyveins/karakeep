@@ -4,6 +4,8 @@ import { apiKeysAppRouter } from "./apiKeys";
 import { assetsAppRouter } from "./assets";
 import { backupsAppRouter } from "./backups";
 import { bookmarksAppRouter } from "./bookmarks";
+import { canvasesAppRouter } from "./canvases";
+import { chatsAppRouter } from "./chats";
 import { configAppRouter } from "./config";
 import { feedsAppRouter } from "./feeds";
 import { highlightsAppRouter } from "./highlights";
@@ -20,6 +22,8 @@ import { webhooksAppRouter } from "./webhooks";
 
 export const appRouter = router({
   bookmarks: bookmarksAppRouter,
+  chats: chatsAppRouter,
+  canvases: canvasesAppRouter,
   apiKeys: apiKeysAppRouter,
   users: usersAppRouter,
   lists: listsAppRouter,

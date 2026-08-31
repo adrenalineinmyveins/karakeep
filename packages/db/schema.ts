@@ -691,6 +691,27 @@ export const chatMessages = sqliteTable(
   ],
 );
 
+export const canvases = sqliteTable(
+  "canvases",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    title: text("title").notNull().default("未命名画布"),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    data: text("data", { mode: "json" }).$type<unknown>(),
+    createdAt: createdAtMsField(),
+    modifiedAt: modifiedAtMsField(),
+  },
+  (c) => [
+    index("canvases_userId_idx").on(c.userId),
+    index("canvases_userId_modifiedAt_idx").on(c.userId, c.modifiedAt),
+  ],
+);
+
 export const rssFeedsTable = sqliteTable(
   "rssFeeds",
   {
@@ -1064,6 +1085,7 @@ export const userRelations = relations(users, ({ many, one }) => ({
   webhooks: many(webhooksTable),
   rules: many(ruleEngineRulesTable),
   chatSessions: many(chatSessions),
+  canvases: many(canvases),
   invites: many(invites),
   subscription: one(subscriptions),
   importSessions: many(importSessions),

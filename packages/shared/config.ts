@@ -85,6 +85,7 @@ const allEnv = z.object({
   OLLAMA_KEEP_ALIVE: z.string().optional(),
   CHAT_ENABLED: stringBool("false"),
   CHAT_MODEL: z.string().optional(),
+  TAVILY_API_KEY: z.string().optional(),
   SEMANTIC_SEARCH_ENABLED: stringBool("true"),
   INFERENCE_JOB_TIMEOUT_SEC: z.coerce.number().default(30),
   INFERENCE_FETCH_TIMEOUT_SEC: z.coerce.number().default(300),
@@ -362,6 +363,9 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
     },
     chat: {
       enabled: val.CHAT_ENABLED,
+    },
+    tavily: {
+      apiKey: val.TAVILY_API_KEY,
     },
     experimentalFeatures: {
       semanticSearch: val.SEMANTIC_SEARCH_ENABLED,
