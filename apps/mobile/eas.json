@@ -12,9 +12,16 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "SENTRY_DISABLE_AUTOUPLOAD": "true"
+      }
     },
-    "production": {}
+    "production": {
+      "env": {
+        "SENTRY_DISABLE_AUTOUPLOAD": "true"
+      }
+    }
   },
   "submit": {
     "production": {}
