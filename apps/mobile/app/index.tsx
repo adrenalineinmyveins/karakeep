@@ -1,16 +1,6 @@
 import { Redirect } from "expo-router";
-import FullPageSpinner from "@/components/ui/FullPageSpinner";
-import { useIsLoggedIn } from "@/lib/session";
 
+// Dev stage: skip the sign-in gate and always land on the dashboard.
 export default function App() {
-  const isLoggedIn = useIsLoggedIn();
-
-  if (isLoggedIn === undefined) {
-    // Wait until it's loaded
-    return <FullPageSpinner />;
-  } else if (isLoggedIn) {
-    return <Redirect href="dashboard" />;
-  } else {
-    return <Redirect href="signin" />;
-  }
+  return <Redirect href="dashboard" />;
 }

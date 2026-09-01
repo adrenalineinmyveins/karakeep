@@ -1,12 +1,10 @@
 import type { AppStateStatus } from "react-native";
 import { useEffect } from "react";
 import { AppState, Platform } from "react-native";
-import { useRouter } from "expo-router";
 import { Stack } from "expo-router/stack";
 import BookmarkListHeader from "@/components/bookmarks/BookmarkListHeader";
 import { getFormSheetSurfaceOptions } from "@/lib/form-sheet-options";
 import { isIOS26 } from "@/lib/ios";
-import { useIsLoggedIn } from "@/lib/session";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { focusManager } from "@tanstack/react-query";
 
@@ -17,16 +15,8 @@ function onAppStateChange(status: AppStateStatus) {
 }
 
 export default function Dashboard() {
-  const router = useRouter();
   const { colors } = useColorScheme();
   const formSheetSurfaceOptions = getFormSheetSurfaceOptions(colors.background);
-
-  const isLoggedIn = useIsLoggedIn();
-  useEffect(() => {
-    if (isLoggedIn !== undefined && !isLoggedIn) {
-      return router.replace("signin");
-    }
-  }, [isLoggedIn]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", onAppStateChange);
