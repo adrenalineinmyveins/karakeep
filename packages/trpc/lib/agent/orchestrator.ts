@@ -27,6 +27,11 @@ interface SessionHandle {
 const MAX_IDLE_MS = 30 * 60 * 1000;
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 
+/** 单条消息端到端处理上限（含所有 LLM 轮次与工具执行） */
+const TOTAL_MESSAGE_TIMEOUT_MS = 120_000;
+const TIMEOUT_USER_MESSAGE =
+  "回复超时：模型上游长时间无响应，请稍后重试";
+
 const SYSTEM_PROMPT = `你是 Karakeep 的 AI 助手，帮助用户管理他们的书签知识库。
 
 你的能力：
@@ -121,11 +126,35 @@ export class AgentOrchestrator {
     );
 
     let errored = false;
+    const deadline = Date.now() + TOTAL_MESSAGE_TIMEOUT_MS;
+    let waitTimer: ReturnType<typeof setTimeout> | null = null;
+    let timedOut = false;
     try {
       for (;;) {
         if (queue.length === 0) {
+          if (timedOut) {
+            errored = true;
+            handle.agent.abort();
+            yield { type: "error", message: TIMEOUT_USER_MESSAGE };
+            return;
+          }
+          const remaining = deadline - Date.now();
+          if (remaining <= 0) {
+            timedOut = true;
+            continue;
+          }
           await new Promise<void>((r) => {
-            resolver = r;
+            resolver = () => {
+              if (waitTimer) {
+                clearTimeout(waitTimer);
+                waitTimer = null;
+              }
+              r();
+            };
+            waitTimer = setTimeout(() => {
+              timedOut = true;
+              r();
+            }, remaining);
           });
         }
         while (queue.length > 0) {
@@ -141,6 +170,9 @@ export class AgentOrchestrator {
         }
       }
     } finally {
+      if (waitTimer) {
+        clearTimeout(waitTimer);
+      }
       unsubscribe();
       handle.lastUsed = Date.now();
       // 出错时废弃缓存，下次请求从 DB 重新加载干净的历史
@@ -218,10 +250,7 @@ export class AgentOrchestrator {
     );
 
     // ★ 从 DB 恢复历史消息
-    const history = await this.restoreHistory(
-      params.sessionId,
-      params.userId,
-    );
+    const history = await this.restoreHistory(params.sessionId, params.userId);
 
     const handle: SessionHandle = {
       agent: createAgent({
@@ -256,10 +285,7 @@ export class AgentOrchestrator {
       .select({ id: chatSessions.id })
       .from(chatSessions)
       .where(
-        and(
-          eq(chatSessions.id, sessionId),
-          eq(chatSessions.userId, userId),
-        ),
+        and(eq(chatSessions.id, sessionId), eq(chatSessions.userId, userId)),
       )
       .limit(1);
     if (!session) {
@@ -302,8 +328,7 @@ export class AgentOrchestrator {
     }
 
     // 开头的孤儿 assistant 丢弃
-    const result =
-      merged[0]?.role === "assistant" ? merged.slice(1) : merged;
+    const result = merged[0]?.role === "assistant" ? merged.slice(1) : merged;
 
     if (result.length !== chronological.length) {
       console.log(

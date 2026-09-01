@@ -142,9 +142,7 @@ function ensureModels(): MutableModels {
           name: "Custom OpenAI Compatible",
           baseUrl: serverConfig.inference.openAIBaseUrl,
           auth: {
-            apiKey: envApiKeyAuth("Custom OpenAI API key", [
-              "OPENAI_API_KEY",
-            ]),
+            apiKey: envApiKeyAuth("Custom OpenAI API key", ["OPENAI_API_KEY"]),
           },
           models: [
             {
@@ -184,6 +182,9 @@ function ensureModels(): MutableModels {
 }
 
 // ── Agent 工厂 ───────────────────────────────────────
+
+/** 单轮 LLM 调用（一次 streamSimple）的硬超时 */
+const LLM_STREAM_TIMEOUT_MS = 60_000;
 
 export function createAgent(params: CreateAgentParams): AgentInterface {
   const models = ensureModels();
@@ -239,7 +240,12 @@ export function createAgent(params: CreateAgentParams): AgentInterface {
       tools,
       messages,
     },
-    streamFn: models.streamSimple.bind(models),
+    streamFn: (model, context, options) =>
+      models.streamSimple(model, context, {
+        ...options,
+        // 单轮 LLM 调用硬超时：上游挂死时中止请求，避免无限等待
+        signal: AbortSignal.timeout(LLM_STREAM_TIMEOUT_MS),
+      }),
   });
 
   return {
