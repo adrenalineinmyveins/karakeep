@@ -124,7 +124,7 @@ export default {
         origin: false,
       },
       eas: {
-        projectId: "d6d14643-ad43-4cd3-902a-92c5944d5e45",
+        projectId: "55483bf0-9fe1-4bc9-b188-ae1734e2a0df",
       },
     },
   },
