@@ -340,15 +340,31 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
     // ── 创建书签 ──────────────────────────────────────────
     zodToToolSchema(
       "create_bookmark",
-      "保存一个 URL 作为新书签。会自动触发抓取和 AI 处理。",
+      "保存内容为新书签：传 url 保存网页链接（自动触发抓取和 AI 处理）；传 text 保存一段文字/文章作为笔记。url 与 text 二选一。",
       z.object({
-        url: z.string().url().describe("要保存的 URL"),
+        url: z
+          .string()
+          .url()
+          .optional()
+          .describe("要保存的 URL（与 text 二选一）"),
+        text: z
+          .string()
+          .optional()
+          .describe("要保存的文字内容或文章全文（与 url 二选一）"),
       }),
       async (args) => {
-        const result = await caller.bookmarks.createBookmark({
-          type: BookmarkTypes.LINK,
-          url: args.url as string,
-        });
+        const url = args.url as string | undefined;
+        const text = args.text as string | undefined;
+        if (!url && !text) {
+          return JSON.stringify({
+            error: "必须提供 url 或 text 参数（二选一）",
+          });
+        }
+        const result = await caller.bookmarks.createBookmark(
+          url
+            ? { type: BookmarkTypes.LINK, url }
+            : { type: BookmarkTypes.TEXT, text: text as string },
+        );
         return JSON.stringify({
           id: result.id,
           title: result.title,
@@ -618,6 +634,54 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
             parts.push(`## ${r.title}\nURL: ${r.url}\n${r.content ?? ""}`);
           }
           return parts.join("\n\n---\n\n") || "未找到相关结果";
+        },
+      ),
+    );
+
+    tools.push(
+      zodToToolSchema(
+        "fetch_web_page",
+        "抓取指定 URL 网页的正文（清洁文本）。用户消息中包含链接、或需要阅读某个网页才能回答时使用。默认返回前 12000 字符。",
+        z.object({
+          url: z.string().url().describe("要抓取的网页 URL"),
+          maxLength: z
+            .number()
+            .default(12000)
+            .describe("返回正文的最大字符数（1000-20000）"),
+        }),
+        async (args) => {
+          const apiKey = serverConfig.tavily.apiKey!;
+          const resp = await fetch("https://api.tavily.com/extract", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({ urls: [args.url as string] }),
+          });
+
+          if (!resp.ok) {
+            const text = await resp.text().catch(() => "");
+            return `Tavily Extract 调用失败 (${resp.status}): ${text.slice(0, 200)}`;
+          }
+
+          const data = (await resp.json()) as {
+            results?: Array<{ url: string; raw_content?: string | null }>;
+            failed_results?: Array<{ url: string; error: string }>;
+          };
+
+          const raw = data.results?.[0]?.raw_content;
+          if (!raw) {
+            const reason = data.failed_results?.[0]?.error;
+            return reason
+              ? `网页 ${args.url} 抓取失败: ${reason}`
+              : `未能从 ${args.url} 提取到正文`;
+          }
+
+          const max = Math.min(Math.max(args.maxLength as number, 1000), 20000);
+          return raw.length > max
+            ? `${raw.slice(0, max)}\n\n[正文过长，已截断]`
+            : raw;
         },
       ),
     );

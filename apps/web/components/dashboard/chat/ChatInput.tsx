@@ -1,10 +1,12 @@
 "use client";
 
-import { Send, Square } from "lucide-react";
+import { Link2, Send, Square } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+
+const URL_REGEX = /https?:\/\/[^\s<>()"']+/i;
 
 export default function ChatInput({
   onSend,
@@ -19,6 +21,8 @@ export default function ChatInput({
 }) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const detectedUrl = URL_REGEX.exec(value)?.[0];
 
   const handleSend = () => {
     const trimmed = value.trim();
@@ -40,41 +44,52 @@ export default function ChatInput({
   };
 
   return (
-    <div className="flex items-end gap-2 border-t p-4">
-      <Textarea
-        ref={textareaRef}
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-          // 自动调整高度
-          e.target.style.height = "auto";
-          e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
-        }}
-        onKeyDown={handleKeyDown}
-        placeholder="输入消息，Enter 发送，Shift+Enter 换行"
-        disabled={disabled}
-        className="min-h-[40px] max-h-[200px] resize-none"
-        rows={1}
-      />
-      {isStreaming ? (
-        <Button
-          variant="destructive"
-          size="icon"
-          onClick={onAbort}
-          className="shrink-0"
+    <div className="border-t p-4">
+      {detectedUrl && (
+        <div
+          className="mb-2 flex items-center gap-1 truncate text-xs text-muted-foreground"
+          title={detectedUrl}
         >
-          <Square size={18} />
-        </Button>
-      ) : (
-        <Button
-          size="icon"
-          onClick={handleSend}
-          disabled={disabled || !value.trim()}
-          className="shrink-0"
-        >
-          <Send size={18} />
-        </Button>
+          <Link2 size={12} className="shrink-0" />
+          <span className="truncate">检测到链接：{detectedUrl}</span>
+        </div>
       )}
+      <div className="flex items-end gap-2">
+        <Textarea
+          ref={textareaRef}
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            // 自动调整高度
+            e.target.style.height = "auto";
+            e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
+          }}
+          onKeyDown={handleKeyDown}
+          placeholder="输入消息，Enter 发送，Shift+Enter 换行"
+          disabled={disabled}
+          className="min-h-[40px] max-h-[200px] resize-none"
+          rows={1}
+        />
+        {isStreaming ? (
+          <Button
+            variant="destructive"
+            size="icon"
+            onClick={onAbort}
+            className="shrink-0"
+          >
+            <Square size={18} />
+          </Button>
+        ) : (
+          <Button
+            size="icon"
+            onClick={handleSend}
+            disabled={disabled || !value.trim()}
+            className="shrink-0"
+          >
+            <Send size={18} />
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
