@@ -91,6 +91,11 @@ const allEnv = z.object({
   INFERENCE_FETCH_TIMEOUT_SEC: z.coerce.number().default(300),
   INFERENCE_TEXT_MODEL: z.string().default("gpt-5.6-luna"),
   INFERENCE_IMAGE_MODEL: z.string().default("gpt-4o-mini"),
+  // Speech-to-text model, served through the OpenAI-compatible
+  // /v1/audio/transcriptions endpoint (e.g. SiliconFlow
+  // "FunAudioLLM/SenseVoiceSmall" or OpenAI "gpt-4o-mini-transcribe").
+  // Leave unset to disable audio transcription features.
+  INFERENCE_SPEECH_MODEL: z.string().optional(),
   EMBEDDING_ENABLE_AUTO_INDEXING: optionalStringBool(),
   EMBEDDING_OPENAI_API_KEY: z.string().optional(),
   EMBEDDING_OPENAI_BASE_URL: z.string().url().optional(),
@@ -348,6 +353,7 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
       chatModel: val.CHAT_MODEL ?? val.INFERENCE_TEXT_MODEL,
       textModel: val.INFERENCE_TEXT_MODEL,
       imageModel: val.INFERENCE_IMAGE_MODEL,
+      speechModel: val.INFERENCE_SPEECH_MODEL,
       inferredTagLang: val.INFERENCE_LANG,
       contextLength: val.INFERENCE_CONTEXT_LENGTH,
       maxOutputTokens: val.INFERENCE_MAX_OUTPUT_TOKENS,

@@ -356,6 +356,9 @@ async function inferTags(
         );
         break;
       case "pdf":
+      // Audio transcription is stored in asset.content as well, so audio
+      // bookmarks go through the same text-based tagging path as PDFs.
+      case "audio":
         response = await inferTagsFromPDF(
           jobId,
           bookmark,

@@ -105,6 +105,27 @@ function ImageContentSection({ bookmark }: { bookmark: ZBookmark }) {
   );
 }
 
+function AudioContentSection({ bookmark }: { bookmark: ZBookmark }) {
+  if (bookmark.content.type != BookmarkTypes.ASSET) {
+    throw new Error("Invalid content type");
+  }
+  const transcription = bookmark.content.content;
+  return (
+    <div className="flex h-full min-w-full flex-col items-center gap-4 p-4">
+      <audio
+        controls
+        className="w-full"
+        src={getAssetUrl(bookmark.content.assetId)}
+      />
+      {transcription && (
+        <div className="w-full whitespace-pre-wrap rounded-lg border bg-muted/40 p-4 text-sm">
+          {transcription}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AssetContentSection({ bookmark }: { bookmark: ZBookmark }) {
   if (bookmark.content.type != BookmarkTypes.ASSET) {
     throw new Error("Invalid content type");
@@ -112,6 +133,8 @@ export function AssetContentSection({ bookmark }: { bookmark: ZBookmark }) {
   switch (bookmark.content.assetType) {
     case "image":
       return <ImageContentSection bookmark={bookmark} />;
+    case "audio":
+      return <AudioContentSection bookmark={bookmark} />;
     case "pdf":
       return <PDFContentSection bookmark={bookmark} />;
     default:

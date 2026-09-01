@@ -36,6 +36,49 @@ function sanitizeTitle(raw: string): string {
 }
 
 export const chatsAppRouter = router({
+  // 语音转文字：接收 base64 音频，返回转录文本（用于聊天输入回填）
+  transcribeAudio: authedProcedure
+    .input(
+      z.object({
+        audioBase64: z.string(),
+        contentType: z.enum([
+          "audio/webm",
+          "audio/mp4",
+          "audio/mpeg",
+          "audio/wav",
+          "audio/ogg",
+          "audio/opus",
+          "audio/m4a",
+          "audio/x-m4a",
+        ]),
+      }),
+    )
+    .output(z.object({ text: z.string() }))
+    .mutation(async ({ input }) => {
+      const inferenceClient = InferenceClientFactory.build();
+      if (!inferenceClient) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Speech-to-text is not available. Set INFERENCE_SPEECH_MODEL to enable it.",
+        });
+      }
+      try {
+        const resp = await inferenceClient.inferFromAudio({
+          contentType: input.contentType,
+          buffer: Buffer.from(input.audioBase64, "base64"),
+        });
+        return { text: resp.response };
+      } catch (e) {
+        logger.error(`Failed to transcribe audio: ${e}`);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            e instanceof Error ? e.message : "Audio transcription failed",
+        });
+      }
+    }),
+
   // 创建会话
   createSession: authedProcedure
     .input(z.object({ title: z.string().optional() }))

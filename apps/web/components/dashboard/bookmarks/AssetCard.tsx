@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { FileText } from "lucide-react";
+import { FileAudio2, FileText } from "lucide-react";
 
 import type { ZBookmarkTypeAsset } from "@karakeep/shared/types/bookmarks";
 import { getAssetUrl } from "@karakeep/shared/utils/assetUtils";
@@ -58,6 +58,26 @@ function AssetImage({
             className={className}
           />
         </Link>
+      );
+    }
+    case "audio": {
+      return (
+        <div
+          className={cn(
+            className,
+            "flex size-full flex-col items-center justify-center gap-2",
+          )}
+        >
+          <Link href={`/dashboard/preview/${bookmark.id}`}>
+            <FileAudio2 size={60} />
+          </Link>
+          <audio
+            controls
+            preload="none"
+            src={getAssetUrl(bookmarkedAsset.assetId)}
+            className="w-full px-2"
+          />
+        </div>
       );
     }
     default: {

@@ -1,5 +1,5 @@
 import { Ollama } from "ollama";
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import * as undici from "undici";
 import { z } from "zod";
@@ -116,6 +116,11 @@ export interface EmbeddingClient {
   generateEmbeddingFromText(inputs: string[]): Promise<EmbeddingResponse>;
 }
 
+export interface InferenceAudio {
+  contentType: string;
+  buffer: Buffer;
+}
+
 export interface InferenceClient extends EmbeddingClient {
   inferFromText(
     prompt: string,
@@ -126,6 +131,10 @@ export interface InferenceClient extends EmbeddingClient {
     contentType: string,
     image: string,
     opts: Partial<InferenceOptions>,
+  ): Promise<InferenceResponse>;
+  inferFromAudio(
+    audio: InferenceAudio,
+    opts?: Partial<InferenceOptions>,
   ): Promise<InferenceResponse>;
 }
 
@@ -157,6 +166,23 @@ const mapOpenAIResponseFormat = (
   );
 };
 
+// Transcription providers commonly validate the upload by file extension, so
+// derive one from the asset's content type (defaults to mp3, which is widely
+// accepted).
+const audioFileExtension = (contentType: string): string => {
+  const map: Record<string, string> = {
+    "audio/mpeg": ".mp3",
+    "audio/mp4": ".m4a",
+    "audio/m4a": ".m4a",
+    "audio/x-m4a": ".m4a",
+    "audio/webm": ".webm",
+    "audio/wav": ".wav",
+    "audio/ogg": ".ogg",
+    "audio/opus": ".opus",
+  };
+  return map[contentType] ?? ".mp3";
+};
+
 export interface OpenAIInferenceConfig {
   apiKey: string;
   baseURL?: string;
@@ -165,6 +191,7 @@ export interface OpenAIInferenceConfig {
   serviceTier?: typeof serverConfig.inference.openAIServiceTier;
   textModel: string;
   imageModel: string;
+  speechModel?: string;
   contextLength: number;
   maxOutputTokens: number;
   useMaxCompletionTokens: boolean;
@@ -280,6 +307,7 @@ export class OpenAIInferenceClient implements InferenceClient {
       serviceTier: serverConfig.inference.openAIServiceTier,
       textModel: serverConfig.inference.textModel,
       imageModel: serverConfig.inference.imageModel,
+      speechModel: serverConfig.inference.speechModel,
       contextLength: serverConfig.inference.contextLength,
       maxOutputTokens: serverConfig.inference.maxOutputTokens,
       useMaxCompletionTokens: serverConfig.inference.useMaxCompletionTokens,
@@ -373,6 +401,27 @@ export class OpenAIInferenceClient implements InferenceClient {
       throw new Error(`Got no message content from OpenAI`);
     }
     return { response, totalTokens: chatCompletion.usage?.total_tokens };
+  }
+
+  async inferFromAudio(
+    audio: InferenceAudio,
+    _opts?: Partial<InferenceOptions>,
+  ): Promise<InferenceResponse> {
+    if (!this.config.speechModel) {
+      throw new Error(
+        "Speech-to-text is not configured. Set INFERENCE_SPEECH_MODEL to enable it.",
+      );
+    }
+    const file = await toFile(
+      audio.buffer,
+      `audio${audioFileExtension(audio.contentType)}`,
+      { type: audio.contentType },
+    );
+    const transcription = await this.openAI.audio.transcriptions.create({
+      file,
+      model: this.config.speechModel,
+    });
+    return { response: transcription.text, totalTokens: undefined };
   }
 
   async generateEmbeddingFromText(
@@ -533,6 +582,10 @@ class OllamaInferenceClient implements InferenceClient {
       optsWithDefaults,
       image,
     );
+  }
+
+  async inferFromAudio(): Promise<InferenceResponse> {
+    throw new Error("Audio transcription is not supported with Ollama.");
   }
 
   async generateEmbeddingFromText(

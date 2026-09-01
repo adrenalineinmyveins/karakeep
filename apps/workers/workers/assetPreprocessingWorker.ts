@@ -371,6 +371,53 @@ async function extractAndSavePDFText(
   return true;
 }
 
+async function extractAndSaveAudioText(
+  jobId: string,
+  asset: Buffer,
+  contentType: string,
+  bookmark: NonNullable<Awaited<ReturnType<typeof getBookmark>>>,
+  isFixMode: boolean,
+): Promise<boolean> {
+  {
+    const alreadyHasText = !!bookmark.asset.content;
+    if (alreadyHasText && isFixMode) {
+      logger.info(
+        `[assetPreprocessing][${jobId}] Skipping audio transcription as it's already been transcribed.`,
+      );
+      return false;
+    }
+  }
+  const inferenceClient = InferenceClientFactory.build();
+  if (!inferenceClient) {
+    throw new Error(
+      `[assetPreprocessing][${jobId}] No inference client is configured. Audio transcription requires an OpenAI-compatible inference setup with INFERENCE_SPEECH_MODEL set.`,
+    );
+  }
+  logger.info(
+    `[assetPreprocessing][${jobId}] Attempting to transcribe audio (${contentType}).`,
+  );
+  const transcription = await inferenceClient.inferFromAudio({
+    contentType,
+    buffer: asset,
+  });
+  if (!transcription.response.trim()) {
+    throw new Error(
+      `[assetPreprocessing][${jobId}] Audio transcription is empty.`,
+    );
+  }
+  logger.info(
+    `[assetPreprocessing][${jobId}] Transcribed ${transcription.response.length} characters from audio.`,
+  );
+  await db
+    .update(bookmarkAssets)
+    .set({
+      content: transcription.response,
+      metadata: null,
+    })
+    .where(eq(bookmarkAssets.id, bookmark.id));
+  return true;
+}
+
 async function getBookmark(bookmarkId: string) {
   return db.query.bookmarks.findFirst({
     where: eq(bookmarks.id, bookmarkId),
@@ -405,7 +452,7 @@ async function run(req: DequeuedJob<AssetPreprocessingRequest>) {
 
   if (!bookmark.asset) {
     throw new Error(
-      `[assetPreprocessing][${jobId}] Bookmark is not an asset (not an image or pdf)`,
+      `[assetPreprocessing][${jobId}] Bookmark is not an asset (not an image, audio or pdf)`,
     );
   }
 
@@ -455,6 +502,17 @@ async function run(req: DequeuedJob<AssetPreprocessingRequest>) {
         isFixMode,
       );
       anythingChanged ||= extractedText || extractedScreenshot;
+      break;
+    }
+    case "audio": {
+      const extractedText = await extractAndSaveAudioText(
+        jobId,
+        asset,
+        metadata.contentType,
+        bookmark,
+        isFixMode,
+      );
+      anythingChanged ||= extractedText;
       break;
     }
     default:

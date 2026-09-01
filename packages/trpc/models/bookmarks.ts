@@ -923,6 +923,8 @@ export class Bookmark extends BareBookmark {
               }
               return getPublicSignedAssetUrl(screenshotAssetId);
             }
+            case "audio":
+              return null;
             default: {
               const _exhaustiveCheck: never = content.assetType;
               return null;

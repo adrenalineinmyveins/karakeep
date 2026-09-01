@@ -20,9 +20,24 @@ vi.mock("openai", () => {
         }),
       },
     },
+    audio: {
+      transcriptions: {
+        create: vi.fn(async (body: Record<string, unknown>) => {
+          capturedBodies.push(body);
+          return { text: "transcribed text" };
+        }),
+      },
+    },
   }));
 
-  return { default: OpenAIMock };
+  return {
+    default: OpenAIMock,
+    toFile: vi.fn(async (buffer: Buffer, name: string, opts?: object) => ({
+      buffer,
+      name,
+      ...opts,
+    })),
+  };
 });
 
 vi.mock("openai/helpers/zod", () => ({
@@ -34,11 +49,13 @@ vi.mock("openai/helpers/zod", () => ({
 
 function makeConfig(
   outputSchema: OpenAIInferenceConfig["outputSchema"],
+  speechModel?: string,
 ): OpenAIInferenceConfig {
   return {
     apiKey: "test-key",
     textModel: "test-text-model",
     imageModel: "test-image-model",
+    speechModel,
     contextLength: 2048,
     maxOutputTokens: 1024,
     useMaxCompletionTokens: false,
@@ -90,5 +107,59 @@ describe("OpenAIInferenceClient response_format", () => {
       type: "json_schema",
       json_schema: { name: "schema" },
     });
+  });
+});
+
+describe("OpenAIInferenceClient inferFromAudio", () => {
+  beforeEach(() => {
+    capturedBodies.length = 0;
+  });
+
+  it("sends the configured speech model and the audio file to the transcription endpoint", async () => {
+    const client = new OpenAIInferenceClient(
+      makeConfig("json", "test-speech-model"),
+    );
+
+    const result = await client.inferFromAudio({
+      contentType: "audio/mpeg",
+      buffer: Buffer.from("AUDIO_BYTES"),
+    });
+
+    expect(result.response).toBe("transcribed text");
+    expect(capturedBodies).toHaveLength(1);
+    expect(capturedBodies[0].model).toBe("test-speech-model");
+    expect(capturedBodies[0].file).toMatchObject({
+      name: "audio.mp3",
+      type: "audio/mpeg",
+    });
+  });
+
+  it("derives the file extension from the audio content type", async () => {
+    const client = new OpenAIInferenceClient(
+      makeConfig("json", "test-speech-model"),
+    );
+
+    await client.inferFromAudio({
+      contentType: "audio/x-m4a",
+      buffer: Buffer.from("AUDIO_BYTES"),
+    });
+
+    expect(capturedBodies).toHaveLength(1);
+    expect(capturedBodies[0].file).toMatchObject({
+      name: "audio.m4a",
+      type: "audio/x-m4a",
+    });
+  });
+
+  it("throws when the speech model is not configured", async () => {
+    const client = new OpenAIInferenceClient(makeConfig("json"));
+
+    await expect(
+      client.inferFromAudio({
+        contentType: "audio/mpeg",
+        buffer: Buffer.from("AUDIO_BYTES"),
+      }),
+    ).rejects.toThrow(/INFERENCE_SPEECH_MODEL/);
+    expect(capturedBodies).toHaveLength(0);
   });
 });

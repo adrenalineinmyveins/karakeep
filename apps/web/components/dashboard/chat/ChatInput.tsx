@@ -1,10 +1,14 @@
 "use client";
 
-import { Link2, Send, Square } from "lucide-react";
+import { Link2, Loader2, Mic, Send, Square } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/sonner";
 import { Textarea } from "@/components/ui/textarea";
+
+import { useMutation } from "@tanstack/react-query";
+import { useTRPC } from "@karakeep/shared-react/trpc";
 
 const URL_REGEX = /https?:\/\/[^\s<>()"']+/i;
 
@@ -19,10 +23,65 @@ export default function ChatInput({
   isStreaming: boolean;
   disabled?: boolean;
 }) {
+  const api = useTRPC();
   const [value, setValue] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
 
   const detectedUrl = URL_REGEX.exec(value)?.[0];
+
+  const { mutate: transcribe, isPending: isTranscribing } = useMutation(
+    api.chats.transcribeAudio.mutationOptions({
+      onSuccess: (resp) => {
+        setValue((prev) => (prev ? `${prev} ${resp.text}` : resp.text));
+      },
+      onError: (e) => {
+        toast({ description: e.message, variant: "destructive" });
+      },
+    }),
+  );
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : "audio/mp4";
+      const recorder = new MediaRecorder(stream, { mimeType });
+      chunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+      recorder.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(chunksRef.current, { type: mimeType });
+        if (blob.size === 0) {
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = (reader.result as string).split(",")[1]!;
+          transcribe({ audioBase64: base64, contentType: mimeType });
+        };
+        reader.readAsDataURL(blob);
+      };
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setIsRecording(true);
+    } catch {
+      toast({ description: "无法访问麦克风", variant: "destructive" });
+    }
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    mediaRecorderRef.current = null;
+    setIsRecording(false);
+  };
 
   const handleSend = () => {
     const trimmed = value.trim();
@@ -70,6 +129,24 @@ export default function ChatInput({
           className="min-h-[40px] max-h-[200px] resize-none"
           rows={1}
         />
+        {!isStreaming && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={disabled || isTranscribing}
+            className="shrink-0"
+            title={isRecording ? "停止录音" : "语音输入"}
+          >
+            {isRecording ? (
+              <Square size={18} className="text-red-500" />
+            ) : isTranscribing ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <Mic size={18} />
+            )}
+          </Button>
+        )}
         {isStreaming ? (
           <Button
             variant="destructive"

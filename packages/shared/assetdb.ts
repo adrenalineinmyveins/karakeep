@@ -32,6 +32,15 @@ export const enum ASSET_TYPES {
   VIDEO_MP4 = "video/mp4",
   VIDEO_WEBM = "video/webm",
   VIDEO_MKV = "video/x-matroska",
+
+  AUDIO_MPEG = "audio/mpeg",
+  AUDIO_MP4 = "audio/mp4",
+  AUDIO_WEBM = "audio/webm",
+  AUDIO_WAV = "audio/wav",
+  AUDIO_OGG = "audio/ogg",
+  AUDIO_OPUS = "audio/opus",
+  AUDIO_M4A = "audio/m4a",
+  AUDIO_X_M4A = "audio/x-m4a",
 }
 
 export const VIDEO_ASSET_TYPES: Set<string> = new Set<string>([
@@ -47,10 +56,22 @@ export const IMAGE_ASSET_TYPES: Set<string> = new Set<string>([
   ASSET_TYPES.IMAGE_WEBP,
 ]);
 
+export const AUDIO_ASSET_TYPES: Set<string> = new Set<string>([
+  ASSET_TYPES.AUDIO_MPEG,
+  ASSET_TYPES.AUDIO_MP4,
+  ASSET_TYPES.AUDIO_WEBM,
+  ASSET_TYPES.AUDIO_WAV,
+  ASSET_TYPES.AUDIO_OGG,
+  ASSET_TYPES.AUDIO_OPUS,
+  ASSET_TYPES.AUDIO_M4A,
+  ASSET_TYPES.AUDIO_X_M4A,
+]);
+
 // The assets that we allow the users to upload
 export const SUPPORTED_UPLOAD_ASSET_TYPES: Set<string> = new Set<string>([
   ...IMAGE_ASSET_TYPES,
   ...VIDEO_ASSET_TYPES,
+  ...AUDIO_ASSET_TYPES,
   ASSET_TYPES.TEXT_HTML,
   ASSET_TYPES.APPLICATION_PDF,
 ]);
@@ -58,6 +79,7 @@ export const SUPPORTED_UPLOAD_ASSET_TYPES: Set<string> = new Set<string>([
 // The assets that we allow as a bookmark of type asset
 export const SUPPORTED_BOOKMARK_ASSET_TYPES: Set<string> = new Set<string>([
   ...IMAGE_ASSET_TYPES,
+  ...AUDIO_ASSET_TYPES,
   ASSET_TYPES.APPLICATION_PDF,
 ]);
 

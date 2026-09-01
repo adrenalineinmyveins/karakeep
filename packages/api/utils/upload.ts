@@ -66,8 +66,18 @@ export async function uploadAsset(
   if (fallbackType && supportedMimeTypes.has(fallbackType) && !detectedType) {
     return { error: "Unsupported asset type", status: 400 };
   }
-  const contentType =
+  let contentType =
     detectedType?.mime ?? fallbackType ?? "application/octet-stream";
+  // Audio-only webm/mp4 recordings (MediaRecorder) are sniffed as their video
+  // container equivalents since file-type has no audio/webm / audio/mp4
+  // entries. When the sniffed container matches and the browser declared an
+  // audio MIME, prefer the browser-declared audio type.
+  if (
+    fallbackType?.startsWith("audio/") &&
+    (contentType === "video/webm" || contentType === "video/mp4")
+  ) {
+    contentType = fallbackType;
+  }
 
   // Replace all non-ascii characters with underscores
   const fileName = data.name.replace(/[^\x20-\x7E]/g, "_");
