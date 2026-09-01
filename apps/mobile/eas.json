@@ -14,12 +14,16 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "SENTRY_DISABLE_AUTOUPLOAD": "true"
+        "SENTRY_DISABLE_AUTOUPLOAD": "true",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true",
+        "SENTRY_DISABLE_NATIVE_DEBUG_UPLOAD": "true"
       }
     },
     "production": {
       "env": {
-        "SENTRY_DISABLE_AUTOUPLOAD": "true"
+        "SENTRY_DISABLE_AUTOUPLOAD": "true",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true",
+        "SENTRY_DISABLE_NATIVE_DEBUG_UPLOAD": "true"
       }
     }
   },
