@@ -21,7 +21,11 @@ function sanitizeTitle(raw: string): string {
   let t = raw.trim();
   try {
     const parsed = JSON.parse(t);
-    if (parsed && typeof parsed === "object" && typeof parsed.title === "string") {
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      typeof parsed.title === "string"
+    ) {
       t = parsed.title;
     }
   } catch {
@@ -71,7 +75,10 @@ export const chatsAppRouter = router({
         .limit(1);
 
       if (!session) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Session not found",
+        });
       }
 
       const messages = await db
@@ -122,7 +129,10 @@ export const chatsAppRouter = router({
         )
         .limit(1);
       if (!session) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Session not found",
+        });
       }
 
       await db
@@ -168,7 +178,8 @@ export const chatsAppRouter = router({
         try {
           const transcript = rows
             .map(
-              (r) => `${r.role === "user" ? "用户" : "助手"}: ${r.content.slice(0, 500)}`,
+              (r) =>
+                `${r.role === "user" ? "用户" : "助手"}: ${r.content.slice(0, 500)}`,
             )
             .join("\n")
             .slice(0, 12000);
@@ -332,7 +343,10 @@ ${transcript}`,
         )
         .limit(1);
       if (!session) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Session not found",
+        });
       }
 
       // 2. 孤儿 user 消息覆盖（同 sendMessage）

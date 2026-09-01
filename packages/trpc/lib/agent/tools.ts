@@ -74,16 +74,17 @@ async function ensureBrowserLikeEnv() {
 
   // 3. 计算样式：box-model 属性空值时返回 "0px"
   const origGetComputedStyle = win.getComputedStyle.bind(win);
-  (win as unknown as { getComputedStyle: (el: Element) => CSSStyleDeclaration }).getComputedStyle =
-    (el: Element) => {
-      const style = origGetComputedStyle(el);
-      const origGet = style.getPropertyValue.bind(style);
-      style.getPropertyValue = (name: string) => {
-        const v = origGet(name);
-        return v === "" && /padding|margin|border/.test(name) ? "0px" : v;
-      };
-      return style;
+  (
+    win as unknown as { getComputedStyle: (el: Element) => CSSStyleDeclaration }
+  ).getComputedStyle = (el: Element) => {
+    const style = origGetComputedStyle(el);
+    const origGet = style.getPropertyValue.bind(style);
+    style.getPropertyValue = (name: string) => {
+      const v = origGet(name);
+      return v === "" && /padding|margin|border/.test(name) ? "0px" : v;
     };
+    return style;
+  };
 
   // 4. getBoundingClientRect：支持从 viewBox 解析尺寸
   const getBoundingClientRect = function (this: Element) {
@@ -119,7 +120,8 @@ async function ensureBrowserLikeEnv() {
     win as unknown as {
       Element: { prototype: Element };
     }
-  ).Element.prototype.getBoundingClientRect = getBoundingClientRect as unknown as () => DOMRect;
+  ).Element.prototype.getBoundingClientRect =
+    getBoundingClientRect as unknown as () => DOMRect;
 
   // 5. Canvas 2D 上下文（mermaid 用 measureText 估算文本宽度）
   (
@@ -274,14 +276,8 @@ export function buildBookmarkCanvasElements(
         texts: [],
         strokeWidth: 2,
         points: [
-          [
-            src.points[0][0] + BOOKMARK_CARD_WIDTH / 2,
-            src.points[0][1],
-          ],
-          [
-            tgt.points[0][0] + BOOKMARK_CARD_WIDTH / 2,
-            tgt.points[1][1],
-          ],
+          [src.points[0][0] + BOOKMARK_CARD_WIDTH / 2, src.points[0][1]],
+          [tgt.points[0][0] + BOOKMARK_CARD_WIDTH / 2, tgt.points[1][1]],
         ],
         opacity: 1,
       };
@@ -319,9 +315,7 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
             summary: b.summary,
             url: b.content.type === "link" ? b.content.url : undefined,
             description:
-              b.content.type === "link"
-                ? b.content.description
-                : undefined,
+              b.content.type === "link" ? b.content.description : undefined,
           })),
         );
       },
@@ -490,13 +484,14 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
       async (args) => {
         const description = args.description as string;
         const mermaid = ((args.mermaid as string | undefined) ?? "").trim();
-        const bookmarkNodes = (args.bookmarkNodes as string[] | undefined) ?? [];
-        const links =
-          (args.links as CanvasLinkInput[] | undefined) ?? [];
+        const bookmarkNodes =
+          (args.bookmarkNodes as string[] | undefined) ?? [];
+        const links = (args.links as CanvasLinkInput[] | undefined) ?? [];
 
         if (!mermaid && bookmarkNodes.length === 0) {
           return JSON.stringify({
-            error: "缺少 mermaid 或 bookmarkNodes 参数。请提供 mermaid 语法（如 graph TD; A-->B），或提供书签 ID 列表（bookmarkNodes），或两者都提供。",
+            error:
+              "缺少 mermaid 或 bookmarkNodes 参数。请提供 mermaid 语法（如 graph TD; A-->B），或提供书签 ID 列表（bookmarkNodes），或两者都提供。",
           });
         }
 
@@ -507,9 +502,8 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
         if (mermaid) {
           try {
             await ensureBrowserLikeEnv();
-            const { parseMermaidToDrawnix } = await import(
-              "@plait-board/mermaid-to-drawnix"
-            );
+            const { parseMermaidToDrawnix } =
+              await import("@plait-board/mermaid-to-drawnix");
             elements = ((await parseMermaidToDrawnix(mermaid)).elements ??
               []) as object[];
           } catch (e) {
@@ -542,7 +536,9 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
                 title: b.title ?? null,
                 url: b.content.type === "link" ? b.content.url : "",
                 favicon:
-                  b.content.type === "link" ? (b.content.favicon ?? null) : null,
+                  b.content.type === "link"
+                    ? (b.content.favicon ?? null)
+                    : null,
               })),
               links,
               // 有 mermaid 产物时错开摆放，避免重叠
@@ -580,10 +576,7 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
         "在互联网上搜索最新信息。用于回答时事、新闻、技术文档、产品规格等用户书签库中没有的内容。返回每条结果的标题、URL 和清洁正文。",
         z.object({
           query: z.string().describe("搜索查询词"),
-          maxResults: z
-            .number()
-            .default(5)
-            .describe("返回结果数量（1-10）"),
+          maxResults: z.number().default(5).describe("返回结果数量（1-10）"),
         }),
         async (args) => {
           const apiKey = serverConfig.tavily.apiKey!;
@@ -595,10 +588,7 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
             },
             body: JSON.stringify({
               query: args.query as string,
-              max_results: Math.min(
-                Math.max(args.maxResults as number, 1),
-                10,
-              ),
+              max_results: Math.min(Math.max(args.maxResults as number, 1), 10),
               // include_answer 让 Tavily 返回 LLM 生成的简短答案
               include_answer: true,
               // include_raw_content 太重，正文 content 已够用
@@ -625,9 +615,7 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
             parts.push(`[Tavily 摘要] ${data.answer}`);
           }
           for (const r of data.results ?? []) {
-            parts.push(
-              `## ${r.title}\nURL: ${r.url}\n${r.content ?? ""}`,
-            );
+            parts.push(`## ${r.title}\nURL: ${r.url}\n${r.content ?? ""}`);
           }
           return parts.join("\n\n---\n\n") || "未找到相关结果";
         },

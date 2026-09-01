@@ -23,10 +23,7 @@ const fakeCaller = {
 
 // 拦截 createCallerFactory，让 getCaller 返回 fakeCaller
 vi.mock("../../index", () => ({
-  createCallerFactory:
-    () =>
-    (_ctx: unknown) =>
-      fakeCaller,
+  createCallerFactory: () => (_ctx: unknown) => fakeCaller,
 }));
 
 vi.mock("@plait-board/mermaid-to-drawnix", () => ({
@@ -36,10 +33,7 @@ vi.mock("@plait-board/mermaid-to-drawnix", () => ({
 // eslint-disable-next-line import/first
 import { parseMermaidToDrawnix } from "@plait-board/mermaid-to-drawnix";
 // eslint-disable-next-line import/first
-import {
-  buildAgentTools,
-  buildBookmarkCanvasElements,
-} from "./tools";
+import { buildAgentTools, buildBookmarkCanvasElements } from "./tools";
 
 const ctx = { user: { id: "user-1" } } as never;
 
