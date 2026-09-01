@@ -6,13 +6,8 @@ import ChatMessage from "@/components/chat/ChatMessage";
 import { Text } from "@/components/ui/Text";
 import { useChatSync } from "@/lib/useChatSync";
 
-export default function ChatPanel({
-  sessionId,
-}: {
-  sessionId: string;
-}) {
-  const { messages, isSending, sendMessage, abort } =
-    useChatSync(sessionId);
+export default function ChatPanel({ sessionId }: { sessionId: string }) {
+  const { messages, isSending, sendMessage, abort } = useChatSync(sessionId);
   const scrollRef = useRef<ScrollView>(null);
 
   // 新消息自动滚底
@@ -48,11 +43,7 @@ export default function ChatPanel({
           </ScrollView>
         )}
 
-        <ChatInput
-          onSend={sendMessage}
-          onAbort={abort}
-          isSending={isSending}
-        />
+        <ChatInput onSend={sendMessage} onAbort={abort} isSending={isSending} />
       </View>
     </KeyboardAvoidingView>
   );

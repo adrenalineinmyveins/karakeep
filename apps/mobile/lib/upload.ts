@@ -57,12 +57,19 @@ export function useUploadAsset(
           },
         ],
       );
-      return zUploadResponseSchema.parse(await resp.json());
+      return {
+        ...zUploadResponseSchema.parse(await resp.json()),
+        declaredType: file.type,
+      };
     },
-    onSuccess: (resp) => {
-      const assetId = resp.assetId;
-      const assetType =
-        resp.contentType === "application/pdf" ? "pdf" : "image";
+    onSuccess: ({ assetId, contentType, declaredType }) => {
+      // The picker-declared type wins: the server-side sniffer has no
+      // audio/mp4 entry and reports audio-only m4a/mp4 as their video
+      // container equivalents.
+      const audio =
+        declaredType.startsWith("audio/") || contentType.startsWith("audio/");
+      const pdf = declaredType === "application/pdf";
+      const assetType = audio ? "audio" : pdf ? "pdf" : "image";
       createBookmark({
         type: BookmarkTypes.ASSET,
         assetId,

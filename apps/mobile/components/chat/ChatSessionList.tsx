@@ -72,20 +72,14 @@ export default function ChatSessionList({
           {sessions.map((session) => (
             <Pressable
               key={session.id}
-              onPress={() =>
-                router.push(`/dashboard/chats/${session.id}`)
-              }
+              onPress={() => router.push(`/dashboard/chats/${session.id}`)}
               className={cn(
                 "flex-row items-center gap-2 px-4 py-3",
                 session.id === currentSessionId && "bg-primary/10",
               )}
             >
               <MessageCircle size={16} color="#888" />
-              <Text
-                variant="body"
-                className="flex-1"
-                numberOfLines={1}
-              >
+              <Text variant="body" className="flex-1" numberOfLines={1}>
                 {session.title}
               </Text>
               <Pressable
@@ -100,9 +94,7 @@ export default function ChatSessionList({
         </ScrollView>
       ) : (
         <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-center text-muted-foreground">
-            还没有对话
-          </Text>
+          <Text className="text-center text-muted-foreground">还没有对话</Text>
           <Button
             variant="tonal"
             size="md"

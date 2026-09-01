@@ -90,9 +90,7 @@ export function useChatSync(sessionId: string | undefined) {
             i === prev.length - 1 && m.role === "assistant"
               ? {
                   ...m,
-                  content: result.error
-                    ? `❌ ${result.error}`
-                    : result.content,
+                  content: result.error ? `❌ ${result.error}` : result.content,
                   toolCalls: result.toolCalls,
                   pending: false,
                   isError: !!result.error,
@@ -153,11 +151,11 @@ export function useChatSync(sessionId: string | undefined) {
     }
     const data = historyQuery.data as
       | {
-          messages: Array<{
+          messages: {
             id: string;
             role: "user" | "assistant" | "toolResult";
             content: string;
-          }>;
+          }[];
         }
       | undefined;
     if (!data) return;

@@ -111,6 +111,13 @@ export default {
       "expo-sharing",
       "expo-web-browser",
       [
+        "expo-audio",
+        {
+          microphonePermission:
+            "The app accesses your microphone to record voice notes for transcription.",
+        },
+      ],
+      [
         "@sentry/react-native/expo",
         {
           url: "https://sentry.io/",

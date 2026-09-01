@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Platform, PlatformColor, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
 import BookmarkListHeader from "@/components/bookmarks/BookmarkListHeader";
@@ -28,7 +29,7 @@ function useNewBookmarkActions(openNewBookmarkModal: () => void) {
   const { uploadAsset } = useUploadAsset(settings, {
     onSuccess: () => {
       if (uploadToastIdRef.current !== null) {
-        sonnerToast.success("Image saved!", { id: uploadToastIdRef.current });
+        sonnerToast.success("Saved!", { id: uploadToastIdRef.current });
         uploadToastIdRef.current = null;
       }
     },
@@ -87,6 +88,44 @@ function useNewBookmarkActions(openNewBookmarkModal: () => void) {
           uploadToastIdRef.current = null;
         } else {
           sonnerToast.error("Failed to open photo library");
+        }
+      }
+    } else if (nativeEvent.event === "audio") {
+      try {
+        uploadToastIdRef.current = sonnerToast.loading(
+          "Opening audio picker...",
+        );
+        const result = await DocumentPicker.getDocumentAsync({
+          type: "audio/*",
+          copyToCacheDirectory: true,
+        });
+        if (result.canceled) {
+          sonnerToast.dismiss(uploadToastIdRef.current);
+          uploadToastIdRef.current = null;
+          return;
+        }
+        const asset = result.assets[0];
+        if (!asset) {
+          sonnerToast.dismiss(uploadToastIdRef.current);
+          uploadToastIdRef.current = null;
+          return;
+        }
+        sonnerToast.loading("Uploading audio...", {
+          id: uploadToastIdRef.current,
+        });
+        uploadAsset({
+          type: asset.mimeType ?? "",
+          name: asset.name ?? "",
+          uri: asset.uri,
+        });
+      } catch {
+        if (uploadToastIdRef.current !== null) {
+          sonnerToast.error("Failed to open audio picker", {
+            id: uploadToastIdRef.current,
+          });
+          uploadToastIdRef.current = null;
+        } else {
+          sonnerToast.error("Failed to open audio picker");
         }
       }
     } else if (nativeEvent.event === "clipboard") {
@@ -152,6 +191,12 @@ function useNewBookmarkActions(openNewBookmarkModal: () => void) {
       id: "library",
       title: "Photo Library",
       image: Platform.select({ ios: "photo" }),
+      imageColor: Platform.select({ ios: menuIconColor }),
+    },
+    {
+      id: "audio",
+      title: "Audio File",
+      image: Platform.select({ ios: "music.note" }),
       imageColor: Platform.select({ ios: menuIconColor }),
     },
   ];

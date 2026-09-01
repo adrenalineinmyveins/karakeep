@@ -1,6 +1,12 @@
 import { useRouter } from "expo-router";
 import { Bot, Paintbrush, User, Wrench } from "lucide-react-native";
-import { ActivityIndicator, Platform, PlatformColor, Pressable, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  PlatformColor,
+  Pressable,
+  View,
+} from "react-native";
 import Markdown from "react-native-markdown-display";
 
 import { Text } from "@/components/ui/Text";
@@ -14,8 +20,8 @@ import type { ChatMessageInfo } from "@/lib/useChatSync";
 //   JSON 内容和模型回复里的 markdown 链接）
 function extractCanvasRefs(
   message: ChatMessageInfo,
-): Array<{ id: string; title?: string }> {
-  const refs: Array<{ id: string; title?: string }> = [];
+): { id: string; title?: string }[] {
+  const refs: { id: string; title?: string }[] = [];
   const seen = new Set<string>();
   const add = (id: string, title?: string) => {
     if (!seen.has(id)) {
@@ -61,9 +67,19 @@ export default function ChatMessage({ message }: { message: ChatMessageInfo }) {
         )}
       >
         {isUser ? (
-          <User size={16} color={Platform.OS === "ios" ? PlatformColor("systemBackground") : "white"} />
+          <User
+            size={16}
+            color={
+              Platform.OS === "ios"
+                ? PlatformColor("systemBackground")
+                : "white"
+            }
+          />
         ) : (
-          <Bot size={16} color={Platform.OS === "ios" ? PlatformColor("label") : "#666"} />
+          <Bot
+            size={16}
+            color={Platform.OS === "ios" ? PlatformColor("label") : "#666"}
+          />
         )}
       </View>
 
