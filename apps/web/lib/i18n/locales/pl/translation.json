@@ -175,7 +175,7 @@
       "import_export": "Import / Eksport",
       "import_export_bookmarks": "Import / Eksport zakładek",
       "import_bookmarks_from_omnivore_export": "Importuj zakładki z eksportu Omnivore",
-      "import_bookmarks_from_karakeep_export": "Importuj zakładki z eksportu Karakeep",
+      "import_bookmarks_from_karakeep_export": "Importuj zakładki z eksportu Saiye",
       "export_links_and_notes": "Eksportuj linki i notatki",
       "imported_bookmarks": "Zaimportowane zakładki",
       "import_bookmarks_from_linkwarden_export": "Importuj zakładki z eksportu Linkwarden",
@@ -923,8 +923,7 @@
     "dark_mode": "Tryb ciemny",
     "light_mode": "Tryb jasny",
     "apps_extensions": "Aplikacje i rozszerzenia",
-    "documentation": "Dokumentacja",
-    "follow_us_on_x": "Obserwuj nas na X"
+    "documentation": "Dokumentacja"
   },
   "lists": {
     "all_lists": "Wszystkie listy",
@@ -1091,7 +1090,7 @@
     "is_from_source": "Źródło to",
     "is_not_from_source": "To nie jest źródło",
     "mode_label": "Tryb wyszukiwania",
-    "mode_label_description": "Wybierz, w jaki sposób Karakeep znajduje pasujące zakładki.",
+    "mode_label_description": "Wybierz, w jaki sposób Saiye znajduje pasujące zakładki.",
     "mode_keyword": "Słowo kluczowe",
     "mode_keyword_description": "Dopasuj dokładne słowa w tytułach, treści, adresach URL i notatkach. Prawie natychmiastowe.",
     "mode_hybrid": "Hybrydowy",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Podsumowanie {{year}}",
-    "subtitle": "Rok w Karakeep",
+    "subtitle": "Rok w Saiye",
     "banner": {
       "title": "Twoje podsumowanie 2025 jest gotowe!",
       "description": "Zobacz swój rok w zakładkach",
@@ -1190,7 +1189,7 @@
         "assets": "Zasoby"
       }
     },
-    "footer": "Stworzone z Karakeep",
+    "footer": "Stworzone z Saiye",
     "share": "Udostępnij",
     "download": "Pobierz",
     "close": "Zamknij",

@@ -10,8 +10,8 @@ import useBulkTagActionsStore from "@/lib/bulkTagActions";
 import { useTranslation } from "@/lib/i18n/client";
 import { CheckCheck, Pencil, Trash2, X } from "lucide-react";
 
-import { useDeleteTag } from "@karakeep/shared-react/hooks/tags";
-import { limitConcurrency } from "@karakeep/shared/concurrency";
+import { useDeleteTag } from "@saiye/shared-react/hooks/tags";
+import { limitConcurrency } from "@saiye/shared/concurrency";
 
 const MAX_CONCURRENT_BULK_ACTIONS = 50;
 

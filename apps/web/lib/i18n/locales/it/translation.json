@@ -218,7 +218,7 @@
       "import_export": "Importa / Esporta",
       "import_bookmarks_from_pocket_export": "Importa segnalibri da esportazione Pocket",
       "import_bookmarks_from_matter_export": "Importa segnalibri da esportazione Matter",
-      "import_bookmarks_from_karakeep_export": "Importa segnalibri da esportazione Karakeep",
+      "import_bookmarks_from_karakeep_export": "Importa segnalibri da esportazione Saiye",
       "export_links_and_notes": "Esporta link e note",
       "imported_bookmarks": "Segnalibri importati",
       "import_bookmarks_from_html_file": "Importa segnalibri da file HTML",
@@ -861,8 +861,7 @@
     "dark_mode": "Modalità scura",
     "light_mode": "Modalità chiara",
     "apps_extensions": "App e estensioni",
-    "documentation": "Documentazione",
-    "follow_us_on_x": "Seguici su X"
+    "documentation": "Documentazione"
   },
   "lists": {
     "all_lists": "Tutte le liste",
@@ -1088,7 +1087,7 @@
     "is_from_source": "L'origine è",
     "is_not_from_source": "L'origine non è",
     "mode_label": "Modalità di ricerca",
-    "mode_label_description": "Scegli come Karakeep trova i segnalibri corrispondenti.",
+    "mode_label_description": "Scegli come Saiye trova i segnalibri corrispondenti.",
     "mode_keyword": "Parola chiave",
     "mode_keyword_description": "Corrispondenza di parole esatte in titoli, contenuti, URL e note. Quasi istantaneo.",
     "mode_hybrid": "Ibrida",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Il tuo riepilogo {{year}}",
-    "subtitle": "Un anno su Karakeep",
+    "subtitle": "Un anno su Saiye",
     "banner": {
       "title": "Il tuo riepilogo 2025 è pronto!",
       "description": "Guarda il tuo anno in segnalibri",
@@ -1190,7 +1189,7 @@
         "assets": "Risorse"
       }
     },
-    "footer": "Realizzato con Karakeep",
+    "footer": "Realizzato con Saiye",
     "share": "Condividi",
     "download": "Scarica",
     "close": "Chiudi",

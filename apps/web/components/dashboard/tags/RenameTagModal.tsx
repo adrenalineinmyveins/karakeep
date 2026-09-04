@@ -26,7 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useUpdateTag } from "@karakeep/shared-react/hooks/tags";
+import { useUpdateTag } from "@saiye/shared-react/hooks/tags";
 
 const formSchema = z.object({
   name: z.string().trim().min(1, "Tag name is required"),

@@ -23,8 +23,8 @@ import { useTranslation } from "react-i18next";
 import {
   useDeleteBookmark,
   useRecrawlBookmark,
-} from "@karakeep/shared-react/hooks/bookmarks";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+} from "@saiye/shared-react/hooks/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 export default function BrokenLinksPage() {
   const api = useTRPC();

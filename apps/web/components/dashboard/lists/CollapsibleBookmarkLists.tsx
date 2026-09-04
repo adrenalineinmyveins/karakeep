@@ -3,10 +3,10 @@ import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { FullPageSpinner } from "@/components/ui/full-page-spinner";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
-import { useBookmarkLists } from "@karakeep/shared-react/hooks/lists";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
-import { ZBookmarkListTreeNode } from "@karakeep/shared/utils/listUtils";
+import { useBookmarkLists } from "@saiye/shared-react/hooks/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
+import { ZBookmarkListTreeNode } from "@saiye/shared/utils/listUtils";
 
 type RenderFunc = (params: {
   node: ZBookmarkListTreeNode;

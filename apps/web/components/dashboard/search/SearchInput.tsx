@@ -27,8 +27,8 @@ import { useDoBookmarkSearch } from "@/lib/hooks/bookmark-search";
 import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
-import { useSearchHistory } from "@karakeep/shared-react/hooks/search-history";
-import { parseSearchQuery } from "@karakeep/shared/searchQueryParser";
+import { useSearchHistory } from "@saiye/shared-react/hooks/search-history";
+import { parseSearchQuery } from "@saiye/shared/searchQueryParser";
 
 import { EditListModal } from "../lists/EditListModal";
 import QueryExplainerTooltip from "./QueryExplainerTooltip";

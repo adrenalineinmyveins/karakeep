@@ -19,8 +19,8 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Command as CommandPrimitive } from "cmdk";
 import { Check, Loader2, Plus, Sparkles, X } from "lucide-react";
 
-import type { ZBookmarkTags } from "@karakeep/shared/types/tags";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import type { ZBookmarkTags } from "@saiye/shared/types/tags";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 export function TagsEditor({
   tags: _tags,

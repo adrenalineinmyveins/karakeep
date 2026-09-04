@@ -2,8 +2,8 @@ import { toast } from "@/components/ui/sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { useClientConfig } from "@/lib/clientConfig";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { useUpdateBookmark } from "@karakeep/shared-react/hooks/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import { useUpdateBookmark } from "@saiye/shared-react/hooks/bookmarks";
 
 export function NoteEditor({
   bookmark,

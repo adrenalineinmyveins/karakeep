@@ -2,7 +2,7 @@ import MarkdownEditor from "@/components/ui/markdown/markdown-editor";
 import { MarkdownReadonly } from "@/components/ui/markdown/markdown-readonly";
 import { toast } from "@/components/ui/sonner";
 
-import { useUpdateBookmark } from "@karakeep/shared-react/hooks/bookmarks";
+import { useUpdateBookmark } from "@saiye/shared-react/hooks/bookmarks";
 
 export function BookmarkMarkdownComponent({
   children: bookmark,

@@ -36,20 +36,20 @@ import type {
   ZBookmark,
   ZBookmarkedAsset,
   ZBookmarkedLink,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 import {
   useAttachBookmarkAsset,
   useReplaceBookmarkAsset,
-} from "@karakeep/shared-react/hooks/assets";
-import { useBookmarkGridContext } from "@karakeep/shared-react/hooks/bookmark-grid-context";
-import { useBookmarkListContext } from "@karakeep/shared-react/hooks/bookmark-list-context";
+} from "@saiye/shared-react/hooks/assets";
+import { useBookmarkGridContext } from "@saiye/shared-react/hooks/bookmark-grid-context";
+import { useBookmarkListContext } from "@saiye/shared-react/hooks/bookmark-list-context";
 import {
   useRecrawlBookmark,
   useUpdateBookmark,
-} from "@karakeep/shared-react/hooks/bookmarks";
-import { useRemoveBookmarkFromList } from "@karakeep/shared-react/hooks/lists";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
-import { getAssetUrl } from "@karakeep/shared/utils/assetUtils";
+} from "@saiye/shared-react/hooks/bookmarks";
+import { useRemoveBookmarkFromList } from "@saiye/shared-react/hooks/lists";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
+import { getAssetUrl } from "@saiye/shared/utils/assetUtils";
 
 import { BookmarkedTextEditor } from "./BookmarkedTextEditor";
 import DeleteBookmarkConfirmationDialog from "./DeleteBookmarkConfirmationDialog";

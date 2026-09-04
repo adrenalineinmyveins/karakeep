@@ -9,8 +9,8 @@ import {
 import { useTranslation } from "@/lib/i18n/client";
 import { match } from "@/lib/utils";
 
-import { TextAndMatcher } from "@karakeep/shared/searchQueryParser";
-import { Matcher } from "@karakeep/shared/types/search";
+import { TextAndMatcher } from "@saiye/shared/searchQueryParser";
+import { Matcher } from "@saiye/shared/types/search";
 
 export default function QueryExplainerTooltip({
   parsedSearchQuery,

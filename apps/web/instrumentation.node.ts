@@ -2,7 +2,7 @@ import {
   initEventLogger,
   initTracing,
   loadAllPlugins,
-} from "@karakeep/shared-server";
+} from "@saiye/shared-server";
 
 await loadAllPlugins();
 initTracing("web");

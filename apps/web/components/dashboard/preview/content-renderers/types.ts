@@ -1,4 +1,4 @@
-import { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import { ZBookmark } from "@saiye/shared/types/bookmarks";
 
 export interface ContentRenderer {
   id: string;

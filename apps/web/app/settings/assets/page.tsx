@@ -24,13 +24,13 @@ import { formatBytes } from "@/lib/utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { ExternalLink, Trash2 } from "lucide-react";
 
-import { useDetachBookmarkAsset } from "@karakeep/shared-react/hooks/assets";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { getAssetUrl } from "@karakeep/shared/utils/assetUtils";
+import { useDetachBookmarkAsset } from "@saiye/shared-react/hooks/assets";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { getAssetUrl } from "@saiye/shared/utils/assetUtils";
 import {
   humanFriendlyNameForAssertType,
   isAllowedToDetachAsset,
-} from "@karakeep/trpc/lib/attachments";
+} from "@saiye/trpc/lib/attachments";
 
 export default function AssetsSettingsPage() {
   const api = useTRPC();

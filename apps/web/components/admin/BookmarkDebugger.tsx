@@ -35,8 +35,8 @@ import {
 import { parseAsString, useQueryState } from "nuqs";
 import { toast } from "sonner";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 export default function BookmarkDebugger() {
   const api = useTRPC();

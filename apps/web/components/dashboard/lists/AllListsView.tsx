@@ -8,11 +8,11 @@ import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
 import {
   augmentBookmarkListsWithInitialData,
   useBookmarkLists,
-} from "@karakeep/shared-react/hooks/lists";
+} from "@saiye/shared-react/hooks/lists";
 
 import { CollapsibleBookmarkLists } from "./CollapsibleBookmarkLists";
 import { ListOptions } from "./ListOptions";

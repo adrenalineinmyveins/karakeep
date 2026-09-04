@@ -337,7 +337,7 @@
     "import": {
       "import_export_bookmarks": "ブックマークのインポート/エクスポート",
       "import_bookmarks_from_html_file": "HTML ファイルからブックマークをインポートする",
-      "import_bookmarks_from_karakeep_export": "Karakeep エクスポートからブックマークをインポート",
+      "import_bookmarks_from_karakeep_export": "Saiye エクスポートからブックマークをインポート",
       "imported_bookmarks": "インポートされたブックマーク",
       "import_bookmarks_from_pocket_export": "Pocketのエクスポートからブックマークをインポート",
       "import_bookmarks_from_matter_export": "Matterのエクスポートからブックマークをインポート",
@@ -899,8 +899,7 @@
     "dark_mode": "ダークモード",
     "light_mode": "ライトモード",
     "apps_extensions": "アプリと拡張機能",
-    "documentation": "ドキュメンテーション",
-    "follow_us_on_x": "Xでフォローする"
+    "documentation": "ドキュメンテーション"
   },
   "tags": {
     "drag_and_drop_merging": "ドラッグ＆ドロップマージ",
@@ -981,7 +980,7 @@
     "is_from_source": "ソースは",
     "is_not_from_source": "ソースではない",
     "mode_label": "検索モード",
-    "mode_label_description": "Karakeepが一致するブックマークを見つける方法を選択します。",
+    "mode_label_description": "Saiyeが一致するブックマークを見つける方法を選択します。",
     "mode_keyword": "キーワード",
     "mode_keyword_description": "タイトル、内容、URL、メモ内の正確な語句と一致させます。ほぼ瞬時に実行されます。",
     "mode_hybrid": "ハイブリッド",
@@ -1190,7 +1189,7 @@
         "assets": "アセット"
       }
     },
-    "footer": "Karakeep製",
+    "footer": "Saiye製",
     "share": "共有",
     "download": "ダウンロード",
     "close": "閉じる",

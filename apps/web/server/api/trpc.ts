@@ -3,7 +3,7 @@ import { createContext } from "@/server/api/client";
 import { QueryClient } from "@tanstack/react-query";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 
-import { appRouter } from "@karakeep/trpc/routers/_app";
+import { appRouter } from "@saiye/trpc/routers/_app";
 
 export const getQueryClient = cache(
   () =>

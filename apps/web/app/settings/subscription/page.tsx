@@ -5,13 +5,13 @@ import SubscriptionSettings from "@/components/settings/SubscriptionSettings";
 import { QuotaProgress } from "@/components/subscription/QuotaProgress";
 import { useTranslation } from "@/lib/i18n/server";
 
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 
 export async function generateMetadata(): Promise<Metadata> {
   // oxlint-disable-next-line rules-of-hooks
   const { t } = await useTranslation();
   return {
-    title: `${t("settings.subscription.subscription")} | Karakeep`,
+    title: `${t("settings.subscription.subscription")} | Saiye`,
   };
 }
 

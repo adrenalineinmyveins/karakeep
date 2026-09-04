@@ -27,16 +27,16 @@ import {
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { useBookmarkListContext } from "@karakeep/shared-react/hooks/bookmark-list-context";
-import { useUpdateBookmark } from "@karakeep/shared-react/hooks/bookmarks";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import { useBookmarkListContext } from "@saiye/shared-react/hooks/bookmark-list-context";
+import { useUpdateBookmark } from "@saiye/shared-react/hooks/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import {
   getBookmarkTitle,
   isBookmarkStillTagging,
-} from "@karakeep/shared/utils/bookmarkUtils";
-import { switchCase } from "@karakeep/shared/utils/switch";
+} from "@saiye/shared/utils/bookmarkUtils";
+import { switchCase } from "@saiye/shared/utils/switch";
 
 import BookmarkActionBar from "./BookmarkActionBar";
 import BookmarkFormattedCreatedAt from "./BookmarkFormattedCreatedAt";

@@ -1,8 +1,8 @@
 // reference article https://refine.dev/blog/zustand-react-state/#build-a-to-do-app-using-zustand
 import { create } from "zustand";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
 
 interface BookmarkState {
   selectedBookmarkIds: string[];

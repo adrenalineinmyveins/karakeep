@@ -59,7 +59,7 @@ const nextConfig = {
     ];
   },
 
-  // transpilePackages: ["@karakeep/shared", "@karakeep/db", "@karakeep/trpc"],
+  // transpilePackages: ["@saiye/shared", "@saiye/db", "@saiye/trpc"],
 
   /** We already do linting and typechecking as separate tasks in CI */
   typescript: { ignoreBuildErrors: true },

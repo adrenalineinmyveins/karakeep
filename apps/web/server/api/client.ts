@@ -2,10 +2,10 @@ import { headers } from "next/headers";
 import { getServerAuthSession } from "@/server/auth";
 import requestIp from "request-ip";
 
-import { db } from "@karakeep/db";
-import { Context, createCallerFactory } from "@karakeep/trpc";
-import { authenticateApiKey } from "@karakeep/trpc/auth";
-import { appRouter } from "@karakeep/trpc/routers/_app";
+import { db } from "@saiye/db";
+import { Context, createCallerFactory } from "@saiye/trpc";
+import { authenticateApiKey } from "@saiye/trpc/auth";
+import { appRouter } from "@saiye/trpc/routers/_app";
 
 // 用 API key 构造请求上下文（Bearer 鉴权，供移动端 WebView 等无 cookie 场景复用）
 export async function createContextFromApiKey(

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import type { RuleEngineAction } from "@karakeep/shared/types/rules";
+import type { RuleEngineAction } from "@saiye/shared/types/rules";
 
 import { BookmarkListSelector } from "../lists/BookmarkListSelector";
 import { TagAutocomplete } from "../tags/TagAutocomplete";

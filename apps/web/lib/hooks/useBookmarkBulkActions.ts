@@ -2,16 +2,16 @@
 
 import { useCallback } from "react";
 
-import { limitConcurrency } from "@karakeep/shared/concurrency";
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { limitConcurrency } from "@saiye/shared/concurrency";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import {
   useDeleteBookmark,
   useRecrawlBookmark,
   useUpdateBookmark,
-} from "@karakeep/shared-react/hooks/bookmarks";
-import { useRemoveBookmarkFromList } from "@karakeep/shared-react/hooks/lists";
+} from "@saiye/shared-react/hooks/bookmarks";
+import { useRemoveBookmarkFromList } from "@saiye/shared-react/hooks/lists";
 
 const MAX_CONCURRENT_BULK_ACTIONS = 50;
 

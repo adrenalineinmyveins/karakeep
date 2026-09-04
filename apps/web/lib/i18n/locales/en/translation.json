@@ -191,6 +191,17 @@
         "preview_inline": "(preview)"
       }
     },
+    "about": {
+      "about": "About",
+      "description": "Version, license and attribution information",
+      "version": "Version",
+      "based_on_title": "Based on Karakeep",
+      "based_on_description": "Saiye is built on top of the open-source project Karakeep (formerly Hoarder). Many thanks to the Karakeep team and its community for their outstanding work.",
+      "karakeep_website": "Karakeep website",
+      "license": "License",
+      "license_description": "This application is licensed under the GNU AGPL-3.0 license. The original Karakeep project is also licensed under AGPL-3.0.",
+      "view_license": "View license"
+    },
     "stats": {
       "usage_statistics": "Usage Statistics",
       "insights_description": "Insights into your bookmarking habits and collection",
@@ -309,7 +320,7 @@
       "import_bookmarks_from_matter_export": "Import Bookmarks from Matter export",
       "import_bookmarks_from_omnivore_export": "Import Bookmarks from Omnivore export",
       "import_bookmarks_from_linkwarden_export": "Import Bookmarks from Linkwarden export",
-      "import_bookmarks_from_karakeep_export": "Import Bookmarks from Karakeep export",
+      "import_bookmarks_from_karakeep_export": "Import Bookmarks from Saiye export",
       "import_bookmarks_from_tab_session_manager_export": "Import Bookmarks from Tab Session Manager",
       "import_bookmarks_from_mymind_export": "Import Bookmarks from mymind export",
       "import_bookmarks_from_instapaper_export": "Import Bookmarks from Instapaper export",
@@ -787,8 +798,7 @@
     "dark_mode": "Dark Mode",
     "light_mode": "Light Mode",
     "apps_extensions": "Apps & Extensions",
-    "documentation": "Documentation",
-    "follow_us_on_x": "Follow us on X"
+    "documentation": "Documentation"
   },
   "lists": {
     "all_lists": "All Lists",
@@ -966,7 +976,7 @@
     "feeds": "Feeds",
     "no_suggestions": "No suggestions",
     "mode_label": "Search mode",
-    "mode_label_description": "Choose how Karakeep finds matching bookmarks.",
+    "mode_label_description": "Choose how Saiye finds matching bookmarks.",
     "mode_keyword": "Keyword",
     "mode_keyword_description": "Match exact words in titles, content, URLs, and notes. Almost instant.",
     "mode_hybrid": "Hybrid",
@@ -1121,7 +1131,7 @@
   },
   "wrapped": {
     "title": "Your {{year}} Wrapped",
-    "subtitle": "A Year in Karakeep",
+    "subtitle": "A Year in Saiye",
     "banner": {
       "title": "Your 2025 Wrapped is ready!",
       "description": "See your year in bookmarks",
@@ -1162,7 +1172,7 @@
         "assets": "Assets"
       }
     },
-    "footer": "Made with Karakeep",
+    "footer": "Made with Saiye",
     "share": "Share",
     "download": "Download",
     "close": "Close",

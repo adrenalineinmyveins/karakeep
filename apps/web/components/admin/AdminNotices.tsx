@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import { AdminCard } from "./AdminCard";
 

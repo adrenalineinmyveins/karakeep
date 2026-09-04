@@ -59,7 +59,7 @@
     "import": {
       "export_links_and_notes": "Eksporter links og noter",
       "import_bookmarks_from_omnivore_export": "Importer bogmærker fra Omnivore-eksport",
-      "import_bookmarks_from_karakeep_export": "Importer bogmærker fra Karakeep-eksport",
+      "import_bookmarks_from_karakeep_export": "Importer bogmærker fra Saiye-eksport",
       "import_export": "Import / eksport",
       "import_export_bookmarks": "Import / eksport bogmærker",
       "import_bookmarks_from_html_file": "Importer bogmærker fra HTML-fil",
@@ -780,8 +780,7 @@
     "light_mode": "Lys tilstand",
     "dark_mode": "Mørk tilstand",
     "apps_extensions": "Apps & udvidelser",
-    "documentation": "Dokumentation",
-    "follow_us_on_x": "Følg os på X"
+    "documentation": "Dokumentation"
   },
   "editor": {
     "quickly_focus": "Du kan hurtigt fokusere på dette felt ved at bruge genvejen ⌘ + E",
@@ -1091,7 +1090,7 @@
     "is_from_source": "Kilde er",
     "is_not_from_source": "Kilden er ikke",
     "mode_label": "Søgetilstand",
-    "mode_label_description": "Vælg hvordan Karakeep finder matchende bogmærker.",
+    "mode_label_description": "Vælg hvordan Saiye finder matchende bogmærker.",
     "mode_keyword": "Nøgleord",
     "mode_keyword_description": "Match eksakte ord i titler, indhold, URL'er og noter. Næsten øjeblikkeligt.",
     "mode_hybrid": "Hybrid",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Din {{year}}-opsummering",
-    "subtitle": "Et år i Karakeep",
+    "subtitle": "Et år i Saiye",
     "banner": {
       "title": "Din opsummering for 2025 er klar!",
       "description": "Se dit år i bogmærker",
@@ -1190,7 +1189,7 @@
         "assets": "Aktiver"
       }
     },
-    "footer": "Lavet med Karakeep",
+    "footer": "Lavet med Saiye",
     "share": "Del",
     "download": "Hent",
     "close": "Luk",

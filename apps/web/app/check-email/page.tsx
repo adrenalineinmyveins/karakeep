@@ -14,8 +14,8 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, Mail } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { validateRedirectUrl } from "@karakeep/shared/utils/redirectUrl";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { validateRedirectUrl } from "@saiye/shared/utils/redirectUrl";
 
 export default function CheckEmailPage() {
   const api = useTRPC();

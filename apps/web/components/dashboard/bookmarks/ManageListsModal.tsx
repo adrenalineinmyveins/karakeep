@@ -19,8 +19,8 @@ import {
   useAddBookmarkToList,
   useBookmarkLists,
   useRemoveBookmarkFromList,
-} from "@karakeep/shared-react/hooks/lists";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+} from "@saiye/shared-react/hooks/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import { BookmarkListSelector } from "../lists/BookmarkListSelector";
 import ArchiveBookmarkButton from "./action-buttons/ArchiveBookmarkButton";

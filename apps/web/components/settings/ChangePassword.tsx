@@ -19,8 +19,8 @@ import { useMutation } from "@tanstack/react-query";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { zChangePasswordSchema } from "@karakeep/shared/types/users";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { zChangePasswordSchema } from "@saiye/shared/types/users";
 
 import { Button } from "../ui/button";
 import { SettingsSection } from "./SettingsPage";

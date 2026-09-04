@@ -7,7 +7,7 @@ import LoadingSpinner from "@/components/ui/spinner";
 import ValidAccountCheck from "@/components/utils/ValidAccountCheck";
 import { ErrorBoundary } from "react-error-boundary";
 
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 
 export default function SidebarLayout({
   children,

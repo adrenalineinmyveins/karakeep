@@ -1,7 +1,7 @@
 import { toast } from "@/components/ui/sonner";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { useUpdateBookmarkTags } from "@karakeep/shared-react/hooks/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import { useUpdateBookmarkTags } from "@saiye/shared-react/hooks/bookmarks";
 
 import { TagsEditor } from "./TagsEditor";
 

@@ -5,11 +5,12 @@ import { useClientConfig } from "@/lib/clientConfig";
 import { useTranslation } from "@/lib/i18n/client";
 import { useQuery } from "@tanstack/react-query";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 const REPO_LATEST_RELEASE_API =
-  "https://api.github.com/repos/karakeep-app/karakeep/releases/latest";
-const REPO_RELEASE_PAGE = "https://github.com/karakeep-app/karakeep/releases";
+  "https://api.github.com/repos/adrenalineinmyveins/karakeep/releases/latest";
+const REPO_RELEASE_PAGE =
+  "https://github.com/adrenalineinmyveins/karakeep/releases";
 
 function useLatestRelease() {
   const { data } = useQuery({

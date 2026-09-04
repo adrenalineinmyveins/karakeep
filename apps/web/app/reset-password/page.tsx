@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import KarakeepLogo from "@/components/KarakeepIcon";
+import SaiyeLogo from "@/components/SaiyeIcon";
 import ResetPasswordForm from "@/components/signin/ResetPasswordForm";
 import { getServerAuthSession } from "@/server/auth";
 
@@ -21,7 +21,7 @@ export default async function ResetPasswordPage({
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div className="flex items-center justify-center">
-          <KarakeepLogo height={80} />
+          <SaiyeLogo height={80} />
         </div>
         <ResetPasswordForm token={token} />
       </div>

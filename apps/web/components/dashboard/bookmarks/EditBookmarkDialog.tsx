@@ -37,14 +37,14 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
-import { useUpdateBookmark } from "@karakeep/shared-react/hooks/bookmarks";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useUpdateBookmark } from "@saiye/shared-react/hooks/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
 import {
   BookmarkTypes,
   ZBookmark,
   zUpdateBookmarksRequestSchema,
-} from "@karakeep/shared/types/bookmarks";
-import { getBookmarkTitle } from "@karakeep/shared/utils/bookmarkUtils";
+} from "@saiye/shared/types/bookmarks";
+import { getBookmarkTitle } from "@saiye/shared/utils/bookmarkUtils";
 
 import { BookmarkTagsEditor } from "./BookmarkTagsEditor";
 

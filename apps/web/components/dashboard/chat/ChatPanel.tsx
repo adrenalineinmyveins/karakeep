@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import { useChat } from "@/lib/hooks/useChat";
 import ChatInput from "./ChatInput";

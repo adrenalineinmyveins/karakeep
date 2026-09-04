@@ -33,8 +33,8 @@ import {
 } from "lucide-react";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { zBookmarkSourceSchema } from "@karakeep/shared/types/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { zBookmarkSourceSchema } from "@saiye/shared/types/bookmarks";
 
 type BookmarkSource = z.infer<typeof zBookmarkSourceSchema>;
 

@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/i18n/client";
 import { BookOpen, ExternalLink, Globe2 } from "lucide-react";
 
-import type { ZBookmarkedLink } from "@karakeep/shared/types/bookmarks";
-import { getBookmarkLinkImageUrl } from "@karakeep/shared/utils/bookmarkUtils";
+import type { ZBookmarkedLink } from "@saiye/shared/types/bookmarks";
+import { getBookmarkLinkImageUrl } from "@saiye/shared/utils/bookmarkUtils";
 
 function hostname(url: string) {
   try {

@@ -27,8 +27,8 @@ import { useQuery } from "@tanstack/react-query";
 import { distance } from "fastest-levenshtein";
 import { Check, Combine, X } from "lucide-react";
 
-import { useMergeTag } from "@karakeep/shared-react/hooks/tags";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useMergeTag } from "@saiye/shared-react/hooks/tags";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 interface Suggestion {
   mergeIntoId: string;

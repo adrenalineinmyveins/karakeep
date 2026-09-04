@@ -7,8 +7,8 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useQuery } from "@tanstack/react-query";
 import { Bot, Hash, MoreHorizontal, User } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { ZGetTagResponse } from "@karakeep/shared/types/tags";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { ZGetTagResponse } from "@saiye/shared/types/tags";
 
 export default function TagHeader({
   initialData,

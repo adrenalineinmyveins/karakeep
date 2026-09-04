@@ -12,7 +12,7 @@ export async function generateMetadata(props: {
   try {
     const tag = await api.tags.get({ tagId: params.tagId });
     return {
-      title: `${tag.name} | Karakeep`,
+      title: `${tag.name} | Saiye`,
     };
   } catch (e) {
     if (e instanceof TRPCError && e.code === "NOT_FOUND") {

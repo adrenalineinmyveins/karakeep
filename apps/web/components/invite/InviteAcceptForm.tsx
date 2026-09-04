@@ -29,7 +29,7 @@ import { AlertCircle, Clock, Loader2, Mail, UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 const inviteAcceptSchema = z
   .object({
@@ -170,7 +170,7 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
           Accept Your Invitation
         </CardTitle>
         <CardDescription>
-          Complete your account setup to join Karakeep
+          Complete your account setup to join Saiye
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
 
 import useBulkActionsStore from "./bulkActions";
 

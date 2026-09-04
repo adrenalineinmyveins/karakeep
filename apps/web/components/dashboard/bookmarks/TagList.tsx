@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
 
 export default function TagList({
   bookmark,

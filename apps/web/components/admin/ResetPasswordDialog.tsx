@@ -26,9 +26,9 @@ import { TRPCClientError } from "@trpc/client";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc"; // Adjust the import path as needed
+import { useTRPC } from "@saiye/shared-react/trpc"; // Adjust the import path as needed
 
-import { resetPasswordSchema } from "@karakeep/shared/types/admin";
+import { resetPasswordSchema } from "@saiye/shared/types/admin";
 
 interface ResetPasswordDialogProps {
   userId: string;

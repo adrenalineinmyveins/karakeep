@@ -27,11 +27,10 @@ import {
   Settings,
   Shield,
   Sun,
-  Twitter,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
-import { useWhoAmI } from "@karakeep/shared-react/hooks/users";
+import { useWhoAmI } from "@saiye/shared-react/hooks/users";
 
 import { AdminNoticeBadge } from "../../admin/AdminNotices";
 
@@ -138,7 +137,11 @@ export default function SidebarProfileOptions() {
         )}
         <Separator className="my-2" />
         <DropdownMenuItem asChild>
-          <a href="https://karakeep.app/apps" target="_blank" rel="noreferrer">
+          <a
+            href="https://github.com/adrenalineinmyveins/karakeep"
+            target="_blank"
+            rel="noreferrer"
+          >
             <Puzzle className="mr-2 size-4" />
             {t("options.apps_extensions")}
           </a>
@@ -147,12 +150,6 @@ export default function SidebarProfileOptions() {
           <a href="https://docs.karakeep.app" target="_blank" rel="noreferrer">
             <BookOpen className="mr-2 size-4" />
             {t("options.documentation")}
-          </a>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <a href="https://x.com/karakeep_app" target="_blank" rel="noreferrer">
-            <Twitter className="mr-2 size-4" />
-            {t("options.follow_us_on_x")}
           </a>
         </DropdownMenuItem>
         <Separator className="my-2" />

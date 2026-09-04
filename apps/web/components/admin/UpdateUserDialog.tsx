@@ -33,8 +33,8 @@ import { TRPCClientError } from "@trpc/client";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { updateUserSchema } from "@karakeep/shared/types/admin";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { updateUserSchema } from "@saiye/shared/types/admin";
 
 type UpdateUserSchema = z.infer<typeof updateUserSchema>;
 

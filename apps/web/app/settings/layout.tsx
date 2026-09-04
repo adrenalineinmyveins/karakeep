@@ -16,6 +16,7 @@ import {
   Download,
   GitBranch,
   Image,
+  Info,
   KeyRound,
   Link,
   Rss,
@@ -24,8 +25,8 @@ import {
   Webhook,
 } from "lucide-react";
 
-import serverConfig from "@karakeep/shared/config";
-import { tryCatch } from "@karakeep/shared/tryCatch";
+import serverConfig from "@saiye/shared/config";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
 const settingsSidebarItems = (
   t: TFunction,
@@ -102,6 +103,11 @@ const settingsSidebarItems = (
       name: t("settings.rules.rules"),
       icon: <GitBranch size={18} />,
       path: "/settings/rules",
+    },
+    {
+      name: t("settings.about.about"),
+      icon: <Info size={18} />,
+      path: "/settings/about",
     },
     {
       name: t("settings.manage_assets.manage_assets"),

@@ -38,7 +38,7 @@ import {
   formatLineHeight,
   READER_DEFAULTS,
   READER_SETTING_CONSTRAINTS,
-} from "@karakeep/shared/types/readers";
+} from "@saiye/shared/types/readers";
 
 interface ReaderSettingsPopoverProps {
   open?: boolean;

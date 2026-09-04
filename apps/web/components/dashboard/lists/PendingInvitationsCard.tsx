@@ -13,7 +13,7 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, Mail, X } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 interface Invitation {
   id: string;

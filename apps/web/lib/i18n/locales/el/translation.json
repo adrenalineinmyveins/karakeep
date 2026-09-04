@@ -243,7 +243,7 @@
       "import_bookmarks_from_matter_export": "Εισαγωγή Σελιδοδεικτών από εξαγωγή Matter",
       "import_bookmarks_from_omnivore_export": "Εισαγωγή Σελιδοδεικτών από εξαγωγή Omnivore",
       "import_bookmarks_from_linkwarden_export": "Εισαγωγή Σελιδοδεικτών από εξαγωγή Linkwarden",
-      "import_bookmarks_from_karakeep_export": "Εισαγωγή Σελιδοδεικτών από εξαγωγή Karakeep",
+      "import_bookmarks_from_karakeep_export": "Εισαγωγή Σελιδοδεικτών από εξαγωγή Saiye",
       "import_bookmarks_from_tab_session_manager_export": "Εισαγωγή Σελιδοδεικτών από Tab Session Manager",
       "export_links_and_notes": "Εξαγωγή Συνδέσμων και Σημειώσεων",
       "imported_bookmarks": "Εισαγόμενοι Σελιδοδείκτες",
@@ -805,8 +805,7 @@
     "dark_mode": "Σκοτεινή Λειτουργία",
     "light_mode": "Ανοιχτή Λειτουργία",
     "apps_extensions": "Εφαρμογές & Επεκτάσεις",
-    "documentation": "Τεκμηρίωση",
-    "follow_us_on_x": "Ακολουθήστε μας στο X"
+    "documentation": "Τεκμηρίωση"
   },
   "lists": {
     "all_lists": "Όλες οι Λίστες",
@@ -984,7 +983,7 @@
     "is_from_source": "Η πηγή είναι",
     "is_not_from_source": "Η πηγή δεν είναι",
     "mode_label": "Λειτουργία αναζήτησης",
-    "mode_label_description": "Επιλέξτε πώς το Karakeep βρίσκει σχετικούς σελιδοδείκτες.",
+    "mode_label_description": "Επιλέξτε πώς το Saiye βρίσκει σχετικούς σελιδοδείκτες.",
     "mode_keyword": "Λέξη-κλειδί",
     "mode_keyword_description": "Αντιστοίχιση ακριβών λέξεων σε τίτλους, περιεχόμενο, URL και σημειώσεις. Σχεδόν ακαριαία.",
     "mode_hybrid": "Υβριδική",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Το {{year}} σας σε περιτύλιγμα",
-    "subtitle": "Μια χρονιά στο Karakeep",
+    "subtitle": "Μια χρονιά στο Saiye",
     "banner": {
       "title": "Το δικό σας 2025 Wrapped είναι έτοιμο!",
       "description": "Δείτε τη χρονιά σας σε σελιδοδείκτες",
@@ -1190,7 +1189,7 @@
         "assets": "Περιουσιακά στοιχεία"
       }
     },
-    "footer": "Δημιουργήθηκε με το Karakeep",
+    "footer": "Δημιουργήθηκε με το Saiye",
     "share": "Κοινή χρήση",
     "download": "Λήψη",
     "close": "Κλείσιμο",

@@ -19,7 +19,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { Mail, MailX, UserPlus } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import ActionConfirmingDialog from "../ui/action-confirming-dialog";
 import { AdminCard } from "./AdminCard";

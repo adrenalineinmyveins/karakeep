@@ -107,7 +107,7 @@
       }
     },
     "import": {
-      "import_bookmarks_from_karakeep_export": "Uvozi zaznamke iz Karakeep izvoza",
+      "import_bookmarks_from_karakeep_export": "Uvozi zaznamke iz Saiye izvoza",
       "import_bookmarks_from_linkwarden_export": "Uvozi zaznamke iz Linkwarden izvoza",
       "imported_bookmarks": "Uvoženi zaznamki",
       "import_bookmarks_from_pocket_export": "Uvozi zaznamke iz Pocket izvoza",
@@ -739,7 +739,7 @@
     "is_from_source": "Vir je",
     "is_not_from_source": "Vir ni",
     "mode_label": "Način iskanja",
-    "mode_label_description": "Izberite, kako Karakeep išče ujemajoče se zaznamke.",
+    "mode_label_description": "Izberite, kako Saiye išče ujemajoče se zaznamke.",
     "mode_keyword": "Ključna beseda",
     "mode_keyword_description": "Iskanje natančnih besed v naslovih, vsebini, URL-jih in opombah. Skoraj trenutno.",
     "mode_hybrid": "Hibridno",
@@ -989,8 +989,7 @@
     "dark_mode": "Temni način",
     "light_mode": "Svetli način",
     "apps_extensions": "Aplikacije in razširitve",
-    "documentation": "Dokumentacija",
-    "follow_us_on_x": "Sledi nam na X"
+    "documentation": "Dokumentacija"
   },
   "editor": {
     "text_toolbar": {
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Tvoj zavitek {{year}}",
-    "subtitle": "Leto v Karakeepu",
+    "subtitle": "Leto v Saiyeu",
     "banner": {
       "title": "Tvoj zavitek 2025 je pripravljen!",
       "description": "Oglej si svoje leto v zaznamkih",
@@ -1190,7 +1189,7 @@
         "assets": "Sredstva"
       }
     },
-    "footer": "Izdelano s programom Karakeep",
+    "footer": "Izdelano s programom Saiye",
     "share": "Deli",
     "download": "Prenesi",
     "close": "Zapri",

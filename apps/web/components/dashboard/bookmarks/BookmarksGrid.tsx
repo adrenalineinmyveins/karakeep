@@ -21,8 +21,8 @@ import { useInView } from "react-intersection-observer";
 import Masonry from "react-masonry-css";
 import resolveConfig from "tailwindcss/resolveConfig";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { useBookmarkListContext } from "@karakeep/shared-react/hooks/bookmark-list-context";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import { useBookmarkListContext } from "@saiye/shared-react/hooks/bookmark-list-context";
 
 import BookmarkCard from "./BookmarkCard";
 import EditorCard from "./EditorCard";

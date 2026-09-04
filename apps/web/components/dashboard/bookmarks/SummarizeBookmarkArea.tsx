@@ -11,8 +11,8 @@ import { ChevronUp, RefreshCw, Sparkles, Trash2 } from "lucide-react";
 import {
   useSummarizeBookmark,
   useUpdateBookmark,
-} from "@karakeep/shared-react/hooks/bookmarks";
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared-react/hooks/bookmarks";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
 
 function AISummary({
   bookmarkId,

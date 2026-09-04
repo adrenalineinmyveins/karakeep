@@ -296,7 +296,7 @@
       "import_bookmarks_from_linkwarden_export": "درون‌ریزی نشانک‌ها از خروجی Linkwarden",
       "import_bookmarks_from_tab_session_manager_export": "درون‌ریزی نشانک‌ها از Tab Session Manager",
       "export_links_and_notes": "برون‌بری لینک‌ها و یادداشت‌ها",
-      "import_bookmarks_from_karakeep_export": "درون‌ریزی نشانک‌ها از خروجی Karakeep",
+      "import_bookmarks_from_karakeep_export": "درون‌ریزی نشانک‌ها از خروجی Saiye",
       "imported_bookmarks": "نشانک‌های درون‌ریزی‌شده",
       "import_bookmarks_from_mymind_export": "درون‌ریزی نشانک‌ها از خروجی mymind",
       "import_bookmarks_from_instapaper_export": "درون‌ریزی نشانک‌ها از خروجی Instapaper",
@@ -781,8 +781,7 @@
     "dark_mode": "حالت تیره",
     "light_mode": "حالت روشن",
     "apps_extensions": "برنامه‌ها و افزونه‌ها",
-    "documentation": "مستندات",
-    "follow_us_on_x": "ما را در X دنبال کنید"
+    "documentation": "مستندات"
   },
   "lists": {
     "all_lists": "تمام فهرست‌ها",
@@ -960,7 +959,7 @@
     "is_from_source": "از منبع است",
     "is_not_from_source": "از منبع نیست",
     "mode_label": "حالت جستجو",
-    "mode_label_description": "نحوه یافتن نشانک‌های منطبق توسط Karakeep را انتخاب کنید.",
+    "mode_label_description": "نحوه یافتن نشانک‌های منطبق توسط Saiye را انتخاب کنید.",
     "mode_keyword": "کلمه کلیدی",
     "mode_keyword_description": "انطباق دقیق کلمات در عناوین، محتوا، نشانی‌ها و یادداشت‌ها. تقریباً فوری.",
     "mode_hybrid": "ترکیبی (Hybrid)",
@@ -1166,7 +1165,7 @@
         "assets": "دارایی‌ها"
       }
     },
-    "footer": "ساخته شده با Karakeep",
+    "footer": "ساخته شده با Saiye",
     "share": "اشتراک‌گذاری",
     "download": "بارگیری",
     "close": "بستن",

@@ -5,11 +5,16 @@ import { signIn } from "@/lib/auth/client";
 
 export default function SignInProviderButton({
   provider,
+  label,
+  className,
 }: {
   provider: {
     id: string;
     name: string;
   };
+  // 自定义按钮文案（默认 "Sign in with {name}"）
+  label?: string;
+  className?: string;
 }) {
   return (
     <Button
@@ -18,9 +23,9 @@ export default function SignInProviderButton({
           callbackUrl: "/",
         })
       }
-      className="w-full"
+      className={`w-full ${className ?? ""}`}
     >
-      Sign in with {provider.name}
+      {label ?? `Sign in with ${provider.name}`}
     </Button>
   );
 }

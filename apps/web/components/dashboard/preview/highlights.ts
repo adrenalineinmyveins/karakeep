@@ -1,1 +1,1 @@
-export { HIGHLIGHT_COLOR_MAP } from "@karakeep/shared-react/components/highlights";
+export { HIGHLIGHT_COLOR_MAP } from "@saiye/shared-react/components/highlights";

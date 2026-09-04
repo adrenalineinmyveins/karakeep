@@ -1,1 +1,1 @@
-export { useClientConfig } from "@karakeep/shared-react/providers/client-config-provider";
+export { useClientConfig } from "@saiye/shared-react/providers/client-config-provider";

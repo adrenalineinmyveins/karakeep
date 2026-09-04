@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n/client";
 
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
 
 import PublicListLink from "./PublicListLink";
 import RssLink from "./RssLink";

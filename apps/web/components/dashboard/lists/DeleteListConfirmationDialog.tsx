@@ -7,8 +7,8 @@ import { toast } from "@/components/ui/sonner";
 import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "@/lib/i18n/client";
 
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
-import { useDeleteBookmarkList } from "@karakeep/shared-react/hooks/lists";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
+import { useDeleteBookmarkList } from "@saiye/shared-react/hooks/lists";
 
 export default function DeleteListConfirmationDialog({
   list,

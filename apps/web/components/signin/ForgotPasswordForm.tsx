@@ -27,7 +27,7 @@ import { AlertCircle, CheckCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email address"),

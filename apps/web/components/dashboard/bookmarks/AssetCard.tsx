@@ -5,9 +5,9 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { FileAudio2, FileText } from "lucide-react";
 
-import type { ZBookmarkTypeAsset } from "@karakeep/shared/types/bookmarks";
-import { getAssetUrl } from "@karakeep/shared/utils/assetUtils";
-import { getSourceUrl } from "@karakeep/shared/utils/bookmarkUtils";
+import type { ZBookmarkTypeAsset } from "@saiye/shared/types/bookmarks";
+import { getAssetUrl } from "@saiye/shared/utils/assetUtils";
+import { getSourceUrl } from "@saiye/shared/utils/bookmarkUtils";
 
 import { BookmarkLayoutAdaptingCard } from "./BookmarkLayoutAdaptingCard";
 import FooterLinkURL from "./FooterLinkURL";

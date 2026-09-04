@@ -20,7 +20,7 @@ import {
 } from "@tanstack/react-query";
 import { Check, KeyRound, Pencil, Trash, UserPlus, X } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import ActionConfirmingDialog from "../ui/action-confirming-dialog";
 import AddUserDialog from "./AddUserDialog";

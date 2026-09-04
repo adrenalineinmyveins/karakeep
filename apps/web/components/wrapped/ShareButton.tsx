@@ -12,7 +12,7 @@ interface ShareButtonProps {
 
 export function ShareButton({
   contentRef,
-  fileName = "karakeep-wrapped-2025.png",
+  fileName = "saiye-wrapped-2025.png",
 }: ShareButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -45,8 +45,8 @@ export function ShareButton({
         if (navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
-            title: "My 2025 Karakeep Wrapped",
-            text: "Check out my 2025 Karakeep Wrapped!",
+            title: "My 2025 Saiye Wrapped",
+            text: "Check out my 2025 Saiye Wrapped!",
           });
           return;
         }

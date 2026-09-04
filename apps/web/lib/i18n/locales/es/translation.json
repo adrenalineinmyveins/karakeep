@@ -159,7 +159,7 @@
       "import_bookmarks_from_matter_export": "Importar marcadores desde exportación de Matter",
       "export_links_and_notes": "Exportar links y notas",
       "imported_bookmarks": "Marcadores importados",
-      "import_bookmarks_from_karakeep_export": "Importar marcadores desde exportación de Karakeep",
+      "import_bookmarks_from_karakeep_export": "Importar marcadores desde exportación de Saiye",
       "import_bookmarks_from_html_file": "Importar marcadores desde archivo HTML",
       "import_bookmarks_from_omnivore_export": "Importar marcadores desde exportación de Omnivore",
       "import_bookmarks_from_linkwarden_export": "Importar marcadores desde Linkwarden",
@@ -802,8 +802,7 @@
     "dark_mode": "Modo oscuro",
     "light_mode": "Modo claro",
     "apps_extensions": "Apps y extensiones",
-    "documentation": "Documentación",
-    "follow_us_on_x": "Síguenos en X"
+    "documentation": "Documentación"
   },
   "lists": {
     "all_lists": "Todas las listas",
@@ -1091,7 +1090,7 @@
     "is_from_source": "El origen es",
     "is_not_from_source": "El origen no es",
     "mode_label": "Modo de búsqueda",
-    "mode_label_description": "Elija cómo Karakeep encuentra marcadores coincidentes.",
+    "mode_label_description": "Elija cómo Saiye encuentra marcadores coincidentes.",
     "mode_keyword": "Palabra clave",
     "mode_keyword_description": "Busca coincidencias exactas en títulos, contenido, URL y notas. Casi instantáneo.",
     "mode_hybrid": "Híbrido",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Tu resumen de {{year}}",
-    "subtitle": "Un año en Karakeep",
+    "subtitle": "Un año en Saiye",
     "banner": {
       "title": "¡Tu resumen de 2025 está listo!",
       "description": "Mira tu año en marcadores",
@@ -1190,7 +1189,7 @@
         "assets": "Activos"
       }
     },
-    "footer": "Hecho con Karakeep",
+    "footer": "Hecho con Saiye",
     "share": "Compartir",
     "download": "Descargar",
     "close": "Cerrar",

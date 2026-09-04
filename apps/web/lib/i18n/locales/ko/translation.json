@@ -185,7 +185,7 @@
     "is_from_source": "출처:",
     "is_not_from_source": "출처가 아님",
     "mode_label": "검색 모드",
-    "mode_label_description": "Karakeep이 일치하는 북마크를 찾는 방법을 선택하세요.",
+    "mode_label_description": "Saiye이 일치하는 북마크를 찾는 방법을 선택하세요.",
     "mode_keyword": "키워드",
     "mode_keyword_description": "제목, 내용, URL 및 메모에서 정확히 일치하는 단어를 찾습니다. 거의 즉시 검색됩니다.",
     "mode_hybrid": "하이브리드",
@@ -546,7 +546,7 @@
       "import_bookmarks_from_pocket_export": "Pocket 내보내기에서 북마크 가져오기",
       "import_bookmarks_from_matter_export": "Matter 내보내기에서 북마크 가져오기",
       "import_bookmarks_from_omnivore_export": "Omnivore 내보내기에서 북마크 가져오기",
-      "import_bookmarks_from_karakeep_export": "Karakeep 내보내기에서 북마크 가져오기",
+      "import_bookmarks_from_karakeep_export": "Saiye 내보내기에서 북마크 가져오기",
       "export_links_and_notes": "링크와 주석 내보내기",
       "imported_bookmarks": "가져온 북마크",
       "import_bookmarks_from_tab_session_manager_export": "탭 세션 관리자에서 북마크 가져오기",
@@ -1071,8 +1071,7 @@
     "light_mode": "라이트 모드",
     "dark_mode": "다크 모드",
     "apps_extensions": "앱 & 확장 기능",
-    "documentation": "문서",
-    "follow_us_on_x": "X에서 팔로우하세요"
+    "documentation": "문서"
   },
   "highlights": {
     "no_highlights": "강조된 부분이 없습니다."
@@ -1158,7 +1157,7 @@
         "assets": "자산"
       }
     },
-    "footer": "Karakeep으로 만들었습니다",
+    "footer": "Saiye으로 만들었습니다",
     "share": "공유",
     "download": "다운로드",
     "close": "닫기",

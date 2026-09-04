@@ -19,7 +19,7 @@ import {
   Users,
 } from "lucide-react";
 
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
 
 import { EditListModal } from "../lists/EditListModal";
 import DeleteListConfirmationDialog from "./DeleteListConfirmationDialog";

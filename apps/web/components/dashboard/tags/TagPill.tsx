@@ -7,7 +7,7 @@ import { useDragAndDrop } from "@/lib/drag-and-drop";
 import { X } from "lucide-react";
 import Draggable from "react-draggable";
 
-import { useMergeTag } from "@karakeep/shared-react/hooks/tags";
+import { useMergeTag } from "@saiye/shared-react/hooks/tags";
 
 export const TagPill = React.memo(function TagPill({
   id,

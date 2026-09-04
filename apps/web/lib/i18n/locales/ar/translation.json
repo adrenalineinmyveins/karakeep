@@ -243,7 +243,7 @@
       "import_bookmarks_from_matter_export": "استيراد إشارات مرجعية من تصدير Matter",
       "import_bookmarks_from_omnivore_export": "استيراد إشارات مرجعية من تصدير Omnivore",
       "import_bookmarks_from_linkwarden_export": "استيراد إشارات مرجعية من تصدير Linkwarden",
-      "import_bookmarks_from_karakeep_export": "استيراد إشارات مرجعية من تصدير Karakeep",
+      "import_bookmarks_from_karakeep_export": "استيراد إشارات مرجعية من تصدير Saiye",
       "export_links_and_notes": "تصدير الروابط والملاحظات",
       "imported_bookmarks": "الإشارات المرجعية المستوردة",
       "import_bookmarks_from_tab_session_manager_export": "استيراد الإشارات المرجعية من مدير جلسة علامات التبويب",
@@ -805,8 +805,7 @@
     "dark_mode": "الوضع الداكن",
     "light_mode": "الوضع الفاتح",
     "apps_extensions": "التطبيقات والإضافات",
-    "documentation": "الوثائق",
-    "follow_us_on_x": "تابعنا على X"
+    "documentation": "الوثائق"
   },
   "lists": {
     "all_lists": "جميع القوائم",
@@ -984,7 +983,7 @@
     "is_from_source": "المصدر هو",
     "is_not_from_source": "المصدر ليس",
     "mode_label": "وسيلة البحث",
-    "mode_label_description": "اختر كيف يجد Karakeep الإشارات المرجعية المطابقَة.",
+    "mode_label_description": "اختر كيف يجد Saiye الإشارات المرجعية المطابقَة.",
     "mode_keyword": "كلمة مفتاحية",
     "mode_keyword_description": "مطابقة الكلمات الدقيقة في العناوين، والمحتوى، والروابط، والملحوظات. فوري تقريباً.",
     "mode_hybrid": "هجين",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "ملخص {{year}} الخاص بك",
-    "subtitle": "عام في Karakeep",
+    "subtitle": "عام في Saiye",
     "banner": {
       "title": "ملخص 2025 الخاص بك جاهز!",
       "description": "اطلع على عامك في الإشارات المرجعية",
@@ -1190,7 +1189,7 @@
         "assets": "الأصول"
       }
     },
-    "footer": "صُنع بواسطة Karakeep",
+    "footer": "صُنع بواسطة Saiye",
     "share": "شارك",
     "download": "تنزيل",
     "close": "إغلاق",

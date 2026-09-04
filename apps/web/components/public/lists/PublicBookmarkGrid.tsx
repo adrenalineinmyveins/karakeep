@@ -17,12 +17,12 @@ import { useInView } from "react-intersection-observer";
 import Masonry from "react-masonry-css";
 import resolveConfig from "tailwindcss/resolveConfig";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 import {
   BookmarkTypes,
   ZPublicBookmark,
-} from "@karakeep/shared/types/bookmarks";
-import { ZCursor } from "@karakeep/shared/types/pagination";
+} from "@saiye/shared/types/bookmarks";
+import { ZCursor } from "@saiye/shared/types/pagination";
 
 function TagPill({ tag }: { tag: string }) {
   return (

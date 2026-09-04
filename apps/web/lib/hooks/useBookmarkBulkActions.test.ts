@@ -2,8 +2,8 @@
 
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
 
 const mutators = vi.hoisted(() => ({
   updateMutateAsync: vi.fn(),
@@ -12,7 +12,7 @@ const mutators = vi.hoisted(() => ({
   removeFromListMutateAsync: vi.fn(),
 }));
 
-vi.mock("@karakeep/shared-react/hooks/bookmarks", () => ({
+vi.mock("@saiye/shared-react/hooks/bookmarks", () => ({
   useUpdateBookmark: () => ({
     mutateAsync: mutators.updateMutateAsync,
     isPending: false,
@@ -27,7 +27,7 @@ vi.mock("@karakeep/shared-react/hooks/bookmarks", () => ({
   }),
 }));
 
-vi.mock("@karakeep/shared-react/hooks/lists", () => ({
+vi.mock("@saiye/shared-react/hooks/lists", () => ({
   useRemoveBookmarkFromList: () => ({
     mutateAsync: mutators.removeFromListMutateAsync,
     isPending: false,

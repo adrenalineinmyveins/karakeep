@@ -6,7 +6,7 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Check, Loader2 } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import { Alert, AlertDescription } from "../ui/alert";
 import { Badge } from "../ui/badge";

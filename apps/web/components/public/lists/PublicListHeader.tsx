@@ -1,5 +1,5 @@
 import Link from "next/link";
-import KarakeepLogo from "@/components/KarakeepIcon";
+import SaiyeLogo from "@/components/SaiyeIcon";
 import { buttonVariants } from "@/components/ui/button";
 import { BookmarkIcon, RssIcon } from "lucide-react";
 
@@ -19,7 +19,7 @@ export default function PublicListHeader({
   return (
     <div className="rounded-lg border bg-gradient-to-br from-purple-50/50 via-purple-100/30 to-purple-200/40 p-6 transition-all duration-300 dark:from-purple-950/20 dark:via-purple-900/15 dark:to-purple-800/20">
       <div className="space-y-4">
-        <KarakeepLogo height={38} />
+        <SaiyeLogo height={38} />
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           {/* Header */}
           <div className="flex min-w-0 flex-1 items-start gap-3">

@@ -3,7 +3,7 @@ import { ActionButton } from "@/components/ui/action-button";
 import ActionConfirmingDialog from "@/components/ui/action-confirming-dialog";
 import { toast } from "@/components/ui/sonner";
 
-import { useDeleteTag } from "@karakeep/shared-react/hooks/tags";
+import { useDeleteTag } from "@saiye/shared-react/hooks/tags";
 
 export default function DeleteTagConfirmationDialog({
   tag,

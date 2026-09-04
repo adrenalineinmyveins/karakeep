@@ -11,13 +11,13 @@ import {
 import {
   ReaderSettingsProvider as BaseReaderSettingsProvider,
   useReaderSettingsContext,
-} from "@karakeep/shared-react/hooks/reader-settings";
+} from "@saiye/shared-react/hooks/reader-settings";
 import {
   ReaderSettings,
   ReaderSettingsPartial,
-} from "@karakeep/shared/types/readers";
+} from "@saiye/shared/types/readers";
 
-const LOCAL_STORAGE_KEY = "karakeep-reader-settings";
+const LOCAL_STORAGE_KEY = "saiye-reader-settings";
 
 function getLocalOverridesFromStorage(): ReaderSettingsPartial {
   if (typeof window === "undefined") return {};

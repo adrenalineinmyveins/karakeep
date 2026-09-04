@@ -9,7 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 import { toast } from "sonner";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 export default function DeleteApiKey({
   name,

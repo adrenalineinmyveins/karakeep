@@ -1,4 +1,4 @@
-import { supportedLangs } from "@karakeep/shared/langs";
+import { supportedLangs } from "@saiye/shared/langs";
 
 export const fallbackLng = "en";
 export const languages = supportedLangs;

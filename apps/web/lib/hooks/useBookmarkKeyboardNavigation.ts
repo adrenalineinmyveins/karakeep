@@ -9,7 +9,7 @@ import { useKeyboardNavigationStore } from "@/lib/store/useKeyboardNavigationSto
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
 
 import { useTranslation } from "../i18n/client";
 

@@ -12,12 +12,12 @@ import { Archive, Bookmark, Clock } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useUpdateUserSettings } from "@karakeep/shared-react/hooks/users";
-import { langNameMappings } from "@karakeep/shared/langs";
+import { useUpdateUserSettings } from "@saiye/shared-react/hooks/users";
+import { langNameMappings } from "@saiye/shared/langs";
 import {
   ZUserSettings,
   zUserSettingsSchema,
-} from "@karakeep/shared/types/users";
+} from "@saiye/shared/types/users";
 
 import { Form, FormField } from "../ui/form";
 import { Label } from "../ui/label";

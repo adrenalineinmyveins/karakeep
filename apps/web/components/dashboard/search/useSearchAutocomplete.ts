@@ -12,11 +12,11 @@ import {
   Tag as TagIcon,
 } from "lucide-react";
 
-import { useBookmarkLists } from "@karakeep/shared-react/hooks/lists";
-import { useTagAutocomplete } from "@karakeep/shared-react/hooks/tags";
-import { useDebounce } from "@karakeep/shared-react/hooks/use-debounce";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { zBookmarkSourceSchema } from "@karakeep/shared/types/bookmarks";
+import { useBookmarkLists } from "@saiye/shared-react/hooks/lists";
+import { useTagAutocomplete } from "@saiye/shared-react/hooks/tags";
+import { useDebounce } from "@saiye/shared-react/hooks/use-debounce";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { zBookmarkSourceSchema } from "@saiye/shared/types/bookmarks";
 
 const MAX_DISPLAY_SUGGESTIONS = 5;
 

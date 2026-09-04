@@ -222,7 +222,7 @@
       "import_bookmarks_from_pocket_export": "从Pocket导出导入书签",
       "import_bookmarks_from_matter_export": "从Matter导出导入书签",
       "import_bookmarks_from_omnivore_export": "从Omnivore导出导入书签",
-      "import_bookmarks_from_karakeep_export": "从Karakeep导出导入书签",
+      "import_bookmarks_from_karakeep_export": "从Saiye导出导入书签",
       "export_links_and_notes": "导出链接和笔记",
       "imported_bookmarks": "已导入书签",
       "import_bookmarks_from_linkwarden_export": "导入 Linkwarden 导出的书签",
@@ -803,8 +803,7 @@
     "dark_mode": "暗模式",
     "light_mode": "亮模式",
     "apps_extensions": "应用与扩展",
-    "documentation": "文档",
-    "follow_us_on_x": "在 X 上关注我们"
+    "documentation": "文档"
   },
   "lists": {
     "all_lists": "所有列表",
@@ -1089,7 +1088,7 @@
     "is_from_source": "来源是",
     "is_not_from_source": "来源不是",
     "mode_label": "搜索模式",
-    "mode_label_description": "选择 Karakeep 查找匹配书签的方式。",
+    "mode_label_description": "选择 Saiye 查找匹配书签的方式。",
     "mode_keyword": "关键词",
     "mode_keyword_description": "匹配标题、内容、URL 和备注中的精确词汇。几乎瞬间完成。",
     "mode_hybrid": "混合",
@@ -1150,7 +1149,7 @@
   },
   "wrapped": {
     "title": "你的 {{year}} 年终报告",
-    "subtitle": "Karakeep 年度回顾",
+    "subtitle": "Saiye 年度回顾",
     "banner": {
       "title": "你的 2025 年度报告已准备就绪！",
       "description": "查看你一年来的书签",
@@ -1191,7 +1190,7 @@
         "assets": "资产"
       }
     },
-    "footer": "用 Karakeep 制作",
+    "footer": "用 Saiye 制作",
     "share": "分享",
     "download": "下载",
     "close": "关闭",

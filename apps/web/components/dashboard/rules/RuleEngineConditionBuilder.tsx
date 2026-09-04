@@ -32,8 +32,8 @@ import { useTranslation } from "react-i18next";
 import type {
   RuleEngineCondition,
   RuleEngineEvent,
-} from "@karakeep/shared/types/rules";
-import { zBookmarkSourceSchema } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/rules";
+import { zBookmarkSourceSchema } from "@saiye/shared/types/bookmarks";
 
 import { FeedSelector } from "../feeds/FeedSelector";
 import { TagAutocomplete } from "../tags/TagAutocomplete";

@@ -30,12 +30,12 @@ import { useTranslation } from "@/lib/i18n/client";
 import { ArrowDownAZ, ChevronDown, Combine, Search, Tag } from "lucide-react";
 import { parseAsStringEnum, useQueryState } from "nuqs";
 
-import type { ZGetTagResponse, ZTagBasic } from "@karakeep/shared/types/tags";
+import type { ZGetTagResponse, ZTagBasic } from "@saiye/shared/types/tags";
 import {
   useDeleteUnusedTags,
   usePaginatedSearchTags,
-} from "@karakeep/shared-react/hooks/tags";
-import { useDebounce } from "@karakeep/shared-react/hooks/use-debounce";
+} from "@saiye/shared-react/hooks/tags";
+import { useDebounce } from "@saiye/shared-react/hooks/use-debounce";
 
 import BulkTagAction from "./BulkTagAction";
 import { CreateTagModal } from "./CreateTagModal";

@@ -13,8 +13,8 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useQuery } from "@tanstack/react-query";
 import { PlusCircle } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { RuleEngineRule } from "@karakeep/shared/types/rules";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { RuleEngineRule } from "@saiye/shared/types/rules";
 
 export default function RulesSettingsPage() {
   const api = useTRPC();

@@ -5,7 +5,7 @@ import { api } from "@/server/api/client";
 import { getServerAuthSession } from "@/server/auth";
 import { TRPCError } from "@trpc/server";
 
-import { tryCatch } from "@karakeep/shared/tryCatch";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
 export default async function ReaderLayout({
   children,

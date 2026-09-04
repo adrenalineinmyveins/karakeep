@@ -4,13 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUserSettings } from "@/lib/userSettings";
 
-import type { ZBookmarkTypeLink } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmarkTypeLink } from "@saiye/shared/types/bookmarks";
 import {
   getBookmarkLinkImageUrl,
   getBookmarkTitle,
   getSourceUrl,
   isBookmarkStillCrawling,
-} from "@karakeep/shared/utils/bookmarkUtils";
+} from "@saiye/shared/utils/bookmarkUtils";
 
 import { BookmarkLayoutAdaptingCard } from "./BookmarkLayoutAdaptingCard";
 import FooterLinkURL from "./FooterLinkURL";

@@ -1,8 +1,8 @@
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
 import {
   Tooltip,
   TooltipContent,

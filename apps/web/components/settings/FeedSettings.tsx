@@ -34,12 +34,12 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 import {
   ZFeed,
   zNewFeedSchema,
   zUpdateFeedSchema,
-} from "@karakeep/shared/types/feeds";
+} from "@saiye/shared/types/feeds";
 
 import ActionConfirmingDialog from "../ui/action-confirming-dialog";
 import { Button, buttonVariants } from "../ui/button";

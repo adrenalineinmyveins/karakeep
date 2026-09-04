@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { getBookmarkRefreshInterval } from "@karakeep/shared/utils/bookmarkUtils";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
+import { getBookmarkRefreshInterval } from "@saiye/shared/utils/bookmarkUtils";
 
 import AssetCard from "./AssetCard";
 import LinkCard from "./LinkCard";

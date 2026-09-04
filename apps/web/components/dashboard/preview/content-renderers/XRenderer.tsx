@@ -1,7 +1,7 @@
 import { MessageSquare } from "lucide-react";
 import { Tweet } from "react-tweet";
 
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
 
 import { ContentRenderer } from "./types";
 

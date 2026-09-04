@@ -1,7 +1,7 @@
 import { useTranslation } from "@/lib/i18n/server";
 import { TFunction } from "i18next";
 
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 
 import SidebarItem from "./SidebarItem";
 import SidebarVersion from "./SidebarVersion";

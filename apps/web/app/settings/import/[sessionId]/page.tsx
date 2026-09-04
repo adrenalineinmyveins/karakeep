@@ -6,7 +6,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // oxlint-disable-next-line rules-of-hooks
   const { t } = await useTranslation();
   return {
-    title: `${t("settings.import_sessions.detail.page_title")} | Karakeep`,
+    title: `${t("settings.import_sessions.detail.page_title")} | Saiye`,
   };
 }
 

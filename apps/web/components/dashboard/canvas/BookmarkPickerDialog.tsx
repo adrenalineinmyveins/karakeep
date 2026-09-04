@@ -16,10 +16,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { getBookmarkTitle } from "@karakeep/shared/utils/bookmarkUtils";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { getBookmarkTitle } from "@saiye/shared/utils/bookmarkUtils";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
 
 interface Props {
   open: boolean;

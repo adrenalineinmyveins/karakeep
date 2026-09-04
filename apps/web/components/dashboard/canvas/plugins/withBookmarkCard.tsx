@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 书签卡片画布插件（karakeep 特色工具）
+ * 书签卡片画布插件（saiye 特色工具）
  *
  * 元素以 @plait/draw 的 geometry（shape=rectangle）存储，附带
  * { bookmarkId, title, url, favicon } 标记字段——这样连线（arrow-line）的

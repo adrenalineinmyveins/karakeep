@@ -234,7 +234,7 @@
       "import_bookmarks_from_matter_export": "Імпортувати закладки з експорту Matter",
       "import_bookmarks_from_omnivore_export": "Імпорт закладок з експорту Omnivore",
       "import_bookmarks_from_linkwarden_export": "Імпортувати закладки з експорту Linkwarden",
-      "import_bookmarks_from_karakeep_export": "Імпортувати закладки з експорту Karakeep",
+      "import_bookmarks_from_karakeep_export": "Імпортувати закладки з експорту Saiye",
       "export_links_and_notes": "Експорт посилань і нотаток",
       "imported_bookmarks": "Імпортовані закладки",
       "import_bookmarks_from_tab_session_manager_export": "Імпортувати закладки з Tab Session Manager",
@@ -661,7 +661,7 @@
     "is_from_source": "Джерелом є",
     "is_not_from_source": "Джерелом не є",
     "mode_label": "Режим пошуку",
-    "mode_label_description": "Виберіть, як Karakeep шукає відповідні закладки.",
+    "mode_label_description": "Виберіть, як Saiye шукає відповідні закладки.",
     "mode_keyword": "Ключове слово",
     "mode_keyword_description": "Пошук точних слів у заголовках, вмісті, URL-адресах та нотатках. Майже миттєво.",
     "mode_hybrid": "Гібридний",
@@ -1074,8 +1074,7 @@
     "dark_mode": "Темний режим",
     "light_mode": "Світлий режим",
     "apps_extensions": "Застосунки та розширення",
-    "documentation": "Документація",
-    "follow_us_on_x": "Слідкуйте за нами в X"
+    "documentation": "Документація"
   },
   "toasts": {
     "bookmarks": {
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Ваш підсумок за {{year}} рік",
-    "subtitle": "Рік у Karakeep",
+    "subtitle": "Рік у Saiye",
     "banner": {
       "title": "Ваш підсумок за 2025 рік готовий!",
       "description": "Подивіться свій рік у закладках",
@@ -1190,7 +1189,7 @@
         "assets": "Активи"
       }
     },
-    "footer": "Зроблено з допомогою Karakeep",
+    "footer": "Зроблено з допомогою Saiye",
     "share": "Поділитися",
     "download": "Завантажити",
     "close": "Закрити",

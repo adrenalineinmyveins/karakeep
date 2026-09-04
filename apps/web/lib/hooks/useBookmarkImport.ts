@@ -5,13 +5,13 @@ import { toast } from "@/components/ui/sonner";
 import { useTranslation } from "@/lib/i18n/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { useCreateBookmarkList } from "@karakeep/shared-react/hooks/lists";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useCreateBookmarkList } from "@saiye/shared-react/hooks/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
 import {
   importBookmarksFromFile,
   ImportSource,
   parseImportFile,
-} from "@karakeep/shared/import-export";
+} from "@saiye/shared/import-export";
 
 import { useCreateImportSession } from "./useImportSessions";
 

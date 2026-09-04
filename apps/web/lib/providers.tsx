@@ -16,13 +16,13 @@ import {
 } from "@trpc/client";
 import superjson from "superjson";
 
-import type { ClientConfig } from "@karakeep/shared/config";
-import type { AppRouter } from "@karakeep/trpc/routers/_app";
-import { ClientConfigProvider } from "@karakeep/shared-react/providers/client-config-provider";
+import type { ClientConfig } from "@saiye/shared/config";
+import type { AppRouter } from "@saiye/trpc/routers/_app";
+import { ClientConfigProvider } from "@saiye/shared-react/providers/client-config-provider";
 import {
   TRPC_MAX_URL_LENGTH_INTERNAL,
   TRPCProvider,
-} from "@karakeep/shared-react/trpc";
+} from "@saiye/shared-react/trpc";
 
 import CustomI18nextProvider from "./i18n/provider";
 

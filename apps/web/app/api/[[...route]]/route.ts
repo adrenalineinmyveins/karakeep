@@ -3,8 +3,8 @@ import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
 import { handle } from "hono/vercel";
 
-import allApp from "@karakeep/api";
-import { Context } from "@karakeep/trpc";
+import allApp from "@saiye/api";
+import { Context } from "@saiye/trpc";
 
 export const runtime = "nodejs";
 

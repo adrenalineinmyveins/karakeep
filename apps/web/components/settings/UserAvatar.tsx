@@ -13,7 +13,7 @@ import { Upload, User, X } from "lucide-react";
 import {
   useUpdateUserAvatar,
   useWhoAmI,
-} from "@karakeep/shared-react/hooks/users";
+} from "@saiye/shared-react/hooks/users";
 
 import { Button } from "../ui/button";
 import { SettingsSection } from "./SettingsPage";

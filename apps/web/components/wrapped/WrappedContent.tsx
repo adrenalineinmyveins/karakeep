@@ -22,8 +22,8 @@ import {
 } from "lucide-react";
 import { z } from "zod";
 
-import { zBookmarkSourceSchema } from "@karakeep/shared/types/bookmarks";
-import { zWrappedStatsResponseSchema } from "@karakeep/shared/types/users";
+import { zBookmarkSourceSchema } from "@saiye/shared/types/bookmarks";
+import { zWrappedStatsResponseSchema } from "@saiye/shared/types/users";
 
 type WrappedStats = z.infer<typeof zWrappedStatsResponseSchema>;
 type BookmarkSource = z.infer<typeof zBookmarkSourceSchema>;
@@ -115,7 +115,7 @@ export const WrappedContent = forwardRef<HTMLDivElement, WrappedContentProps>(
                 Your {stats.year} Wrapped
               </h1>
               <p className="mt-1 text-xs text-slate-300 md:text-sm">
-                A Year in Karakeep
+                A Year in Saiye
               </p>
               {userName && (
                 <p className="mt-2 text-sm text-slate-400">{userName}</p>
@@ -379,7 +379,7 @@ export const WrappedContent = forwardRef<HTMLDivElement, WrappedContentProps>(
 
           {/* Footer */}
           <div className="pb-4 pt-1 text-center text-[10px] text-slate-500">
-            Made with Karakeep
+            Made with Saiye
           </div>
         </div>
       </div>

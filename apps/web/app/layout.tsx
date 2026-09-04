@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-import "@karakeep/tailwind-config/globals.css";
+import "@saiye/tailwind-config/globals.css";
 
 import type { Viewport } from "next";
 import React from "react";
@@ -13,7 +13,7 @@ import { getServerAuthSession } from "@/server/auth";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "sonner";
 
-import { clientConfig } from "@karakeep/shared/config";
+import { clientConfig } from "@saiye/shared/config";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,13 +21,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Karakeep",
-  applicationName: "Karakeep",
+  title: "Saiye",
+  applicationName: "Saiye",
   description:
-    "The Bookmark Everything app. Hoard links, notes, and images and they will get automatically tagged AI.",
+    "The Bookmark Everything app. Save links, notes, and images and they will get automatically tagged AI.",
   appleWebApp: {
     capable: true,
-    title: "Karakeep",
+    title: "Saiye",
   },
   formatDetection: {
     telephone: false,

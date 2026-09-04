@@ -16,13 +16,13 @@ import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { MoreHorizontal, Plus } from "lucide-react";
 
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
 import {
   augmentBookmarkListsWithInitialData,
   useAddBookmarkToList,
   useBookmarkLists,
-} from "@karakeep/shared-react/hooks/lists";
-import { ZBookmarkListTreeNode } from "@karakeep/shared/utils/listUtils";
+} from "@saiye/shared-react/hooks/lists";
+import { ZBookmarkListTreeNode } from "@saiye/shared/utils/listUtils";
 
 import { CollapsibleBookmarkLists } from "../lists/CollapsibleBookmarkLists";
 import { EditListModal } from "../lists/EditListModal";

@@ -178,7 +178,7 @@
       "import_bookmarks_from_matter_export": "Importar marcadores desde Matter",
       "import_bookmarks_from_omnivore_export": "Importar marcadores desde Omnivore",
       "import_bookmarks_from_linkwarden_export": "Importar marcadores desde Linkwarden",
-      "import_bookmarks_from_karakeep_export": "Importar marcadores desde Karakeep",
+      "import_bookmarks_from_karakeep_export": "Importar marcadores desde Saiye",
       "export_links_and_notes": "Exportar links e notas",
       "imported_bookmarks": "Marcadores importados",
       "import_bookmarks_from_tab_session_manager_export": "Importar marcadores do xestor de sesións de pestanas",
@@ -867,8 +867,7 @@
     "dark_mode": "Modo escuro",
     "light_mode": "Modo claro",
     "apps_extensions": "Aplicacións e extensións",
-    "documentation": "Documentación",
-    "follow_us_on_x": "Séguenos en X"
+    "documentation": "Documentación"
   },
   "lists": {
     "all_lists": "Todas as listas",
@@ -1091,7 +1090,7 @@
     "is_from_source": "Orixe é",
     "is_not_from_source": "A orixe non é",
     "mode_label": "Modo de busca",
-    "mode_label_description": "Escolla como Karakeep atopa marcadores coincidentes.",
+    "mode_label_description": "Escolla como Saiye atopa marcadores coincidentes.",
     "mode_keyword": "Palabra clave",
     "mode_keyword_description": "Busca palabras exactas en títulos, contido, enderezos URL e notas. Case instantánea.",
     "mode_hybrid": "Híbrida",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "O teu {{year}} resumido",
-    "subtitle": "Un ano en Karakeep",
+    "subtitle": "Un ano en Saiye",
     "banner": {
       "title": "Xa está listo o teu resumo de 2025!",
       "description": "Consulta o teu ano en marcadores",
@@ -1190,7 +1189,7 @@
         "assets": "Activos"
       }
     },
-    "footer": "Feito con Karakeep",
+    "footer": "Feito con Saiye",
     "share": "Compartir",
     "download": "Descargar",
     "close": "Pechar",

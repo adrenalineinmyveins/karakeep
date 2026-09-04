@@ -2,9 +2,9 @@ import Image from "next/image";
 import { BookmarkMarkdownComponent } from "@/components/dashboard/bookmarks/BookmarkMarkdownComponent";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import type { ZBookmarkTypeText } from "@karakeep/shared/types/bookmarks";
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { getAssetUrl } from "@karakeep/shared/utils/assetUtils";
+import type { ZBookmarkTypeText } from "@saiye/shared/types/bookmarks";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
+import { getAssetUrl } from "@saiye/shared/utils/assetUtils";
 
 export function TextContentSection({ bookmark }: { bookmark: ZBookmark }) {
   if (bookmark.content.type != BookmarkTypes.TEXT) {

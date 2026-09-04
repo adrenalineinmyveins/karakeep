@@ -26,7 +26,7 @@ import { TRPCClientError } from "@trpc/client";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 const createInviteSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -79,7 +79,7 @@ export default function CreateInviteDialog({
         <DialogHeader>
           <DialogTitle>Send User Invitation</DialogTitle>
           <DialogDescription>
-            Send an invitation to a new user to join Karakeep. They&apos;ll
+            Send an invitation to a new user to join Saiye. They&apos;ll
             receive an email with instructions to create their account and will
             be assigned the &quot;user&quot; role.
           </DialogDescription>

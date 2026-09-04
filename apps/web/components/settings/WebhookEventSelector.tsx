@@ -17,7 +17,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import {
   ZWebhookEvent,
   zWebhookEventSchema,
-} from "@karakeep/shared/types/webhooks";
+} from "@saiye/shared/types/webhooks";
 
 export function WebhookEventSelector({
   value,

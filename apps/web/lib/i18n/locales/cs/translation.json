@@ -401,7 +401,7 @@
       "import_bookmarks_from_matter_export": "Importovat záložky z exportu Matter",
       "import_bookmarks_from_omnivore_export": "Importovat záložky z Omnivore exportu",
       "import_bookmarks_from_linkwarden_export": "Importovat záložky z exportu Linkwarden",
-      "import_bookmarks_from_karakeep_export": "Importovat záložky z exportu Karakeep",
+      "import_bookmarks_from_karakeep_export": "Importovat záložky z exportu Saiye",
       "import_bookmarks_from_tab_session_manager_export": "Importovat záložky ze správce relací panelů",
       "export_links_and_notes": "Exportovat odkazy a poznámky",
       "imported_bookmarks": "Importované záložky",
@@ -788,7 +788,7 @@
     "is_from_source": "Zdroj je",
     "is_not_from_source": "Zdroj není",
     "mode_label": "Režim vyhledávání",
-    "mode_label_description": "Zvolte, jak Karakeep vyhledává odpovídající záložky.",
+    "mode_label_description": "Zvolte, jak Saiye vyhledává odpovídající záložky.",
     "mode_keyword": "Klíčové slovo",
     "mode_keyword_description": "Hledat přesná slova v názvech, obsahu, URL adresách a poznámkách. Téměř okamžité.",
     "mode_hybrid": "Hybridní",
@@ -1086,8 +1086,7 @@
     "dark_mode": "Tmavý režim",
     "light_mode": "Světlý režim",
     "apps_extensions": "Aplikace a rozšíření",
-    "documentation": "Dokumentace",
-    "follow_us_on_x": "Sleduj nás na X"
+    "documentation": "Dokumentace"
   },
   "preview": {
     "view_original": "Zobrazit originál",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Tvůj {{year}} Wrapped",
-    "subtitle": "Rok v Karakeepu",
+    "subtitle": "Rok v Saiyeu",
     "banner": {
       "title": "Tvůj 2025 Wrapped je připraven!",
       "description": "Podívej se na svůj rok v záložkách",
@@ -1190,7 +1189,7 @@
         "assets": "Aktiva"
       }
     },
-    "footer": "Vyrobeno s Karakeep",
+    "footer": "Vyrobeno s Saiye",
     "share": "Sdílet",
     "download": "Stáhnout",
     "close": "Zavřít",

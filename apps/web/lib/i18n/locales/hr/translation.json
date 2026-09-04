@@ -271,7 +271,7 @@
       "import_bookmarks_from_linkwarden_export": "Import oznaka iz Linkwarden exporta",
       "import_bookmarks_from_pocket_export": "Import oznaka iz Pocket exporta",
       "import_bookmarks_from_matter_export": "Import oznaka iz Matter exporta",
-      "import_bookmarks_from_karakeep_export": "Import oznaka iz Karakeep exporta",
+      "import_bookmarks_from_karakeep_export": "Import oznaka iz Saiye exporta",
       "export_links_and_notes": "Export veza i bilješki",
       "imported_bookmarks": "Importirane oznake",
       "import_bookmarks_from_omnivore_export": "Import oznaka iz Omnivore exporta",
@@ -805,8 +805,7 @@
     "dark_mode": "Dark Mode",
     "light_mode": "Light Mode",
     "apps_extensions": "Aplikacije i proširenja",
-    "documentation": "Dokumentacija",
-    "follow_us_on_x": "Prati nas na X-u"
+    "documentation": "Dokumentacija"
   },
   "lists": {
     "all_lists": "Svi popisi",
@@ -1091,7 +1090,7 @@
     "is_from_source": "Izvor je",
     "is_not_from_source": "Izvor nije",
     "mode_label": "Način pretraživanja",
-    "mode_label_description": "Odaberite kako Karakeep pronalazi podudarne knjižne oznake.",
+    "mode_label_description": "Odaberite kako Saiye pronalazi podudarne knjižne oznake.",
     "mode_keyword": "Ključna riječ",
     "mode_keyword_description": "Podudaranje točnih riječi u naslovima, sadržaju, URL-ovima i bilješkama. Gotovo trenutno.",
     "mode_hybrid": "Hibridno",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Tvoj {{year}} sažetak",
-    "subtitle": "Godina u Karakeepu",
+    "subtitle": "Godina u Saiyeu",
     "banner": {
       "title": "Tvoj 2025 sažetak je spreman!",
       "description": "Pogledaj svoju godinu u oznakama",
@@ -1190,7 +1189,7 @@
         "assets": "Sredstva"
       }
     },
-    "footer": "Napravljeno s Karakeepom",
+    "footer": "Napravljeno s Saiyeom",
     "share": "Podijeli",
     "download": "Preuzmi",
     "close": "Zatvori",

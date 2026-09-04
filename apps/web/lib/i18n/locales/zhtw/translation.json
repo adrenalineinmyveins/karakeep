@@ -221,7 +221,7 @@
       "import_bookmarks_from_pocket_export": "從 Pocket 匯出檔案匯入書籤",
       "import_bookmarks_from_matter_export": "從 Matter 匯出檔案匯入書籤",
       "import_bookmarks_from_omnivore_export": "從 Omnivore 匯出檔案匯入書籤",
-      "import_bookmarks_from_karakeep_export": "從 Karakeep 匯出檔案匯入書籤",
+      "import_bookmarks_from_karakeep_export": "從 Saiye 匯出檔案匯入書籤",
       "export_links_and_notes": "匯出連結和筆記",
       "imported_bookmarks": "已匯入的書籤",
       "import_bookmarks_from_linkwarden_export": "從 Linkwarden 匯出檔案匯入書籤",
@@ -802,8 +802,7 @@
     "dark_mode": "深色模式",
     "light_mode": "淺色模式",
     "apps_extensions": "應用程式和擴充功能",
-    "documentation": "文件",
-    "follow_us_on_x": "在 X 上追蹤我們"
+    "documentation": "文件"
   },
   "lists": {
     "all_lists": "所有清單",
@@ -1088,7 +1087,7 @@
     "is_from_source": "來源是",
     "is_not_from_source": "來源不是",
     "mode_label": "搜尋模式",
-    "mode_label_description": "選擇 Karakeep 尋找匹配書籤的方式。",
+    "mode_label_description": "選擇 Saiye 尋找匹配書籤的方式。",
     "mode_keyword": "關鍵字",
     "mode_keyword_description": "匹配標題、內容、URL 和筆記中的精確字詞。幾乎是瞬間完成。",
     "mode_hybrid": "混合",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "您的 {{year}} 年度回顧",
-    "subtitle": "Karakeep 年度大事記",
+    "subtitle": "Saiye 年度大事記",
     "banner": {
       "title": "您的 2025 年度回顧已準備就緒！",
       "description": "看看你這年的書籤",
@@ -1190,7 +1189,7 @@
         "assets": "資產"
       }
     },
-    "footer": "使用 Karakeep 製作",
+    "footer": "使用 Saiye 製作",
     "share": "分享",
     "download": "下載",
     "close": "關閉",

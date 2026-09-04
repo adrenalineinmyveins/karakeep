@@ -27,8 +27,8 @@ import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useMergeLists } from "@karakeep/shared-react/hooks/lists";
-import { ZBookmarkList, zMergeListSchema } from "@karakeep/shared/types/lists";
+import { useMergeLists } from "@saiye/shared-react/hooks/lists";
+import { ZBookmarkList, zMergeListSchema } from "@saiye/shared/types/lists";
 
 import { BookmarkListSelector } from "./BookmarkListSelector";
 

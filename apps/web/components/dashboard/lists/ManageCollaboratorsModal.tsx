@@ -28,8 +28,8 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Trash2, UserPlus, Users } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
 
 export function ManageCollaboratorsModal({
   open: userOpen,

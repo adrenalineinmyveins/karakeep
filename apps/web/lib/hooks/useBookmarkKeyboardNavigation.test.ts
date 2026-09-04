@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import useBulkActionsStore from "@/lib/bulkActions";
 import { useKeyboardNavigationStore } from "@/lib/store/useKeyboardNavigationStore";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
 
 import { useBookmarkKeyboardNavigation } from "./useBookmarkKeyboardNavigation";
 
@@ -57,7 +57,7 @@ vi.mock("sonner", () => ({
   },
 }));
 
-vi.mock("@karakeep/shared-react/hooks/bookmarks", () => ({
+vi.mock("@saiye/shared-react/hooks/bookmarks", () => ({
   useUpdateBookmark: () => ({
     mutate: mocks.updateMutate,
     mutateAsync: mocks.updateMutateAsync,
@@ -74,7 +74,7 @@ vi.mock("@karakeep/shared-react/hooks/bookmarks", () => ({
   }),
 }));
 
-vi.mock("@karakeep/shared-react/hooks/lists", () => ({
+vi.mock("@saiye/shared-react/hooks/lists", () => ({
   useRemoveBookmarkFromList: () => ({
     mutateAsync: mocks.removeFromListMutateAsync,
     isPending: false,

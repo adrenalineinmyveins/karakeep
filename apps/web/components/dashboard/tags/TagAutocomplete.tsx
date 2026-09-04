@@ -18,9 +18,9 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 
-import { useTagAutocomplete } from "@karakeep/shared-react/hooks/tags";
-import { useDebounce } from "@karakeep/shared-react/hooks/use-debounce";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTagAutocomplete } from "@saiye/shared-react/hooks/tags";
+import { useDebounce } from "@saiye/shared-react/hooks/use-debounce";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 interface TagAutocompleteProps {
   tagId: string;

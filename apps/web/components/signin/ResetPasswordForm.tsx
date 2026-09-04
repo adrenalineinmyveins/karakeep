@@ -27,8 +27,8 @@ import { AlertCircle, CheckCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { zResetPasswordSchema } from "@karakeep/shared/types/users";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { zResetPasswordSchema } from "@saiye/shared/types/users";
 
 const resetPasswordSchema = z
   .object({

@@ -17,11 +17,11 @@ import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { z } from "zod";
 
-const GITHUB_OWNER_REPO = "karakeep-app/karakeep";
+const GITHUB_OWNER_REPO = "adrenalineinmyveins/karakeep";
 const GITHUB_REPO_URL = `https://github.com/${GITHUB_OWNER_REPO}`;
 const GITHUB_RELEASE_URL = `${GITHUB_REPO_URL}/releases/tag/`;
 const RELEASE_API_URL = `https://api.github.com/repos/${GITHUB_OWNER_REPO}/releases/tags/`;
-const LOCAL_STORAGE_KEY = "karakeep:whats-new:last-seen-version";
+const LOCAL_STORAGE_KEY = "saiye:whats-new:last-seen-version";
 const RELEASE_NOTES_STALE_TIME = 1000 * 60 * 10; // 10 minutes
 
 const zGitHubReleaseSchema = z.object({
@@ -63,7 +63,7 @@ export default function SidebarVersion({
   const stableRelease = isStableRelease(effectiveChangelogVersion);
   const displayVersion = serverVersion ?? "unknown";
   const changelogDisplayVersion = effectiveChangelogVersion ?? displayVersion;
-  const versionLabel = `Karakeep v${displayVersion}`;
+  const versionLabel = `Saiye v${displayVersion}`;
   const releasePageUrl = useMemo(() => {
     if (
       !effectiveChangelogVersion ||

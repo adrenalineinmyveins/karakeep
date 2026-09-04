@@ -286,7 +286,7 @@
       }
     },
     "import": {
-      "import_bookmarks_from_karakeep_export": "Könyvjelző importálása Karakeep-ből",
+      "import_bookmarks_from_karakeep_export": "Könyvjelző importálása Saiye-ből",
       "import_bookmarks_from_omnivore_export": "Könyvjelző importálása Omnivore-ból",
       "import_export": "Importálás / Exportálás",
       "import_export_bookmarks": "Könyvjelző importálása / exportálása",
@@ -720,7 +720,7 @@
     "is_from_source": "A forrás a következő:",
     "is_not_from_source": "A forrás nem",
     "mode_label": "Keresési mód",
-    "mode_label_description": "Válassza ki, hogyan találja meg a Karakeep az egyező könyvjelzőket.",
+    "mode_label_description": "Válassza ki, hogyan találja meg a Saiye az egyező könyvjelzőket.",
     "mode_keyword": "Kulcsszó",
     "mode_keyword_description": "Pontos szavak keresése a címekben, tartalomban, URL-ekben és megjegyzésekben. Szinte azonnali.",
     "mode_hybrid": "Hibrid",
@@ -1012,8 +1012,7 @@
     "dark_mode": "Sötét mód",
     "light_mode": "Világos mód",
     "apps_extensions": "Appok és kiterjesztések",
-    "documentation": "Dokumentáció",
-    "follow_us_on_x": "Kövess minket az X-en"
+    "documentation": "Dokumentáció"
   },
   "tags": {
     "your_tags": "Salyát címkék",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "A te {{year}} összegzésed",
-    "subtitle": "Egy év Karakeepben",
+    "subtitle": "Egy év Saiyeben",
     "banner": {
       "title": "A 2025-ös összegzésed kész!",
       "description": "Nézd meg az éved a könyvjelzőkben",
@@ -1190,7 +1189,7 @@
         "assets": "Eszközök"
       }
     },
-    "footer": "Készült a Karakeep-pel",
+    "footer": "Készült a Saiye-pel",
     "share": "Megosztás",
     "download": "Letöltés",
     "close": "Bezárás",

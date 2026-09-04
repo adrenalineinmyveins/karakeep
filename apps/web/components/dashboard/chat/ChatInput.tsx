@@ -8,7 +8,7 @@ import { toast } from "@/components/ui/sonner";
 import { Textarea } from "@/components/ui/textarea";
 
 import { useMutation } from "@tanstack/react-query";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 const URL_REGEX = /https?:\/\/[^\s<>()"']+/i;
 

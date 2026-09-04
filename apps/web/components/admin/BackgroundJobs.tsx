@@ -31,7 +31,7 @@ import {
   Webhook,
 } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import { Button } from "../ui/button";
 import { AdminCard } from "./AdminCard";

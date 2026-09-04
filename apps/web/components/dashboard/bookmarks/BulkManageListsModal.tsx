@@ -20,8 +20,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useAddBookmarkToList } from "@karakeep/shared-react/hooks/lists";
-import { limitConcurrency } from "@karakeep/shared/concurrency";
+import { useAddBookmarkToList } from "@saiye/shared-react/hooks/lists";
+import { limitConcurrency } from "@saiye/shared/concurrency";
 
 import { BookmarkListSelector } from "../lists/BookmarkListSelector";
 

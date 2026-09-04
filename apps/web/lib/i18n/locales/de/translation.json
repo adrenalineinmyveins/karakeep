@@ -221,7 +221,7 @@
       "import_bookmarks_from_pocket_export": "Lesezeichen aus Pocket-Export importieren",
       "import_bookmarks_from_matter_export": "Lesezeichen aus Matter-Export importieren",
       "import_bookmarks_from_omnivore_export": "Lesezeichen aus Omnivore-Export importieren",
-      "import_bookmarks_from_karakeep_export": "Lesezeichen aus Karakeep-Export importieren",
+      "import_bookmarks_from_karakeep_export": "Lesezeichen aus Saiye-Export importieren",
       "export_links_and_notes": "Links und Notizen exportieren",
       "imported_bookmarks": "Importierte Lesezeichen",
       "import_bookmarks_from_linkwarden_export": "Lesezeichen aus Linkwarden-Export importieren",
@@ -802,8 +802,7 @@
     "dark_mode": "Dunkelmodus",
     "light_mode": "Hellmodus",
     "apps_extensions": "Apps & Erweiterungen",
-    "documentation": "Dokumentation",
-    "follow_us_on_x": "Folge uns auf X"
+    "documentation": "Dokumentation"
   },
   "lists": {
     "all_lists": "Alle Listen",
@@ -1098,7 +1097,7 @@
     "is_from_source": "Quelle ist",
     "is_not_from_source": "Quelle ist nicht",
     "mode_label": "Suchmodus",
-    "mode_label_description": "Wählen Sie aus, wie Karakeep passende Lesezeichen findet.",
+    "mode_label_description": "Wählen Sie aus, wie Saiye passende Lesezeichen findet.",
     "mode_keyword": "Stichwort",
     "mode_keyword_description": "Exakte Wörter in Titeln, Inhalten, URLs und Notizen abgleichen. Nahezu sofort.",
     "mode_hybrid": "Hybrid",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Dein {{year}} Jahresrückblick",
-    "subtitle": "Ein Jahr in Karakeep",
+    "subtitle": "Ein Jahr in Saiye",
     "banner": {
       "title": "Dein Jahresrückblick 2025 ist fertig!",
       "description": "Dein Jahr in Lesezeichen ansehen",
@@ -1190,7 +1189,7 @@
         "assets": "Assets"
       }
     },
-    "footer": "Gemacht mit Karakeep",
+    "footer": "Gemacht mit Saiye",
     "share": "Teilen",
     "download": "Herunterladen",
     "close": "Schließen",

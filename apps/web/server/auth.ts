@@ -13,26 +13,26 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { Provider } from "next-auth/providers/index";
 import requestIp from "request-ip";
 
-import { db } from "@karakeep/db";
+import { db } from "@saiye/db";
 import {
   accounts,
   sessions,
   users,
   verificationTokens,
-} from "@karakeep/db/schema";
-import serverConfig from "@karakeep/shared/config";
-import { getRateLimitClient } from "@karakeep/shared/ratelimiting";
+} from "@saiye/db/schema";
+import serverConfig from "@saiye/shared/config";
+import { getRateLimitClient } from "@saiye/shared/ratelimiting";
 import {
   containsUnsafeUserNameMarkup,
   normalizeUserNameInput,
-} from "@karakeep/shared/utils/userName";
-import { logEvent } from "@karakeep/shared-server";
+} from "@saiye/shared/utils/userName";
+import { logEvent } from "@saiye/shared-server";
 import {
   generatePasswordSalt,
   hashPassword,
   validatePassword,
-} from "@karakeep/trpc/auth";
-import { User } from "@karakeep/trpc/models/users";
+} from "@saiye/trpc/auth";
+import { User } from "@saiye/trpc/models/users";
 
 type UserRole = "admin" | "user";
 
@@ -170,6 +170,117 @@ const providers: Provider[] = [
   }),
 ];
 
+const wechat = serverConfig.auth.wechat;
+if (wechat.appId && wechat.appSecret) {
+  // 微信开放平台「网站应用」扫码登录（scope=snsapi_login）。
+  // 微信协议非标准 OAuth2：token 端点为 GET + query 且返回 JSON、
+  // userinfo 的 access_token 走 query、且不提供 email —— 故用函数形式
+  // 端点完全自定义，email 以 openid 合成（`{openid}@wechat-users.saiye.local`）。
+  // 桌面/内网场景通过 WECHAT_REDIRECT_URI 指向公网中转
+  // （apps/desktop/relay），由中转 302 回本机 NextAuth 回调。
+  const WECHAT_EMAIL_DOMAIN = "wechat-users.saiye.local";
+  providers.push({
+    id: "wechat",
+    name: "微信扫码",
+    type: "oauth",
+    clientId: wechat.appId,
+    clientSecret: wechat.appSecret,
+    authorization: {
+      url: "https://open.weixin.qq.com/connect/qrconnect",
+      params: {
+        appid: wechat.appId,
+        response_type: "code",
+        scope: "snsapi_login",
+        ...(wechat.redirectUri ? { redirect_uri: wechat.redirectUri } : {}),
+      },
+    },
+    // 微信不支持 PKCE 参数，仅用 state 防 CSRF
+    checks: ["state"],
+    token: {
+      async request({ params }) {
+        const url = new URL(
+          "https://api.weixin.qq.com/sns/oauth2/access_token",
+        );
+        url.searchParams.set("appid", wechat.appId!);
+        url.searchParams.set("secret", wechat.appSecret!);
+        url.searchParams.set("code", String(params.code));
+        url.searchParams.set("grant_type", "authorization_code");
+        const res = await fetch(url, {
+          headers: { accept: "application/json" },
+        });
+        const json = (await res.json()) as {
+          access_token?: string;
+          expires_in?: number;
+          openid?: string;
+          errcode?: number;
+          errmsg?: string;
+        };
+        if (!res.ok || !json.access_token || !json.openid) {
+          throw new Error(
+            `WeChat token exchange failed: ${json.errcode ?? res.status} ${json.errmsg ?? ""}`,
+          );
+        }
+        return {
+          tokens: {
+            access_token: json.access_token,
+            token_type: "Bearer",
+            expires_in: json.expires_in,
+            openid: json.openid,
+          },
+        };
+      },
+    },
+    userinfo: {
+      async request({ tokens }) {
+        const url = new URL("https://api.weixin.qq.com/sns/userinfo");
+        url.searchParams.set("access_token", String(tokens.access_token));
+        url.searchParams.set("openid", String(tokens.openid));
+        const res = await fetch(url, {
+          headers: { accept: "application/json" },
+        });
+        const json = (await res.json()) as {
+          openid?: string;
+          nickname?: string;
+          headimgurl?: string;
+          errcode?: number;
+          errmsg?: string;
+        };
+        if (!res.ok || !json.openid) {
+          throw new Error(
+            `WeChat userinfo failed: ${json.errcode ?? res.status} ${json.errmsg ?? ""}`,
+          );
+        }
+        // sub/name 是 NextAuth Profile 的已知属性，保证类型兼容
+        return {
+          sub: json.openid,
+          name: json.nickname,
+          openid: json.openid,
+          nickname: json.nickname,
+          headimgurl: json.headimgurl,
+        };
+      },
+    },
+    async profile(profile: {
+      openid: string;
+      nickname?: string;
+      headimgurl?: string;
+    }) {
+      const email = `${profile.openid}@${WECHAT_EMAIL_DOMAIN}`;
+      const [admin, firstUser] = await Promise.all([
+        isAdmin(email),
+        isFirstUser(),
+      ]);
+      return {
+        id: profile.openid,
+        name: normalizeSafeDisplayName(profile.nickname ?? null),
+        email,
+        image: profile.headimgurl,
+        role: admin || firstUser ? "admin" : "user",
+      };
+    },
+  });
+}
+
 const oauth = serverConfig.auth.oauth;
 if (oauth.wellKnownUrl) {
   providers.push({
@@ -305,11 +416,11 @@ export const authOptions: NextAuthOptions = {
 
 export const authHandler = NextAuth(authOptions);
 
-// ─── 桌面本地模式（KARAKEEP_LOCAL_MODE=true）──────────────────
+// ─── 桌面本地模式（SAIYE_LOCAL_MODE=true）──────────────────
 // 单机桌面部署信任 loopback：会话解析收口于此，本地模式直接返回
 // 合成 session（JWT 策略下无法向外部浏览器注入 cookie，故走旁路）。
 // 首个请求懒创建本地 admin 用户；服务端默认行为不受影响。
-const LOCAL_USER_EMAIL = "local@desktop.karakeep.local";
+const LOCAL_USER_EMAIL = "local@desktop.saiye.local";
 
 async function getLocalModeSession() {
   let user = await db.query.users.findFirst({

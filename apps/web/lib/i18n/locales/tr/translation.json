@@ -224,7 +224,7 @@
       "import_bookmarks_from_pocket_export": "Pocket Dışa Aktarımından Yer İşaretlerini İçe Aktar",
       "import_bookmarks_from_matter_export": "Matter Dışa Aktarımından Yer İşaretlerini İçe Aktar",
       "import_bookmarks_from_omnivore_export": "Omnivore Dışa Aktarımından Yer İşaretlerini İçe Aktar",
-      "import_bookmarks_from_karakeep_export": "Karakeep Dışa Aktarımından Yer İşaretlerini İçe Aktar",
+      "import_bookmarks_from_karakeep_export": "Saiye Dışa Aktarımından Yer İşaretlerini İçe Aktar",
       "export_links_and_notes": "Bağlantı ve Notları Dışa Aktar",
       "imported_bookmarks": "İçe Aktarılan Yer İşaretleri",
       "import_bookmarks_from_linkwarden_export": "Linkwarden dışa aktarımından Yer İşaretlerini İçe Aktar",
@@ -805,8 +805,7 @@
     "dark_mode": "Koyu Mod",
     "light_mode": "Açık Mod",
     "apps_extensions": "Uygulamalar & Uzantılar",
-    "documentation": "Belgeleme",
-    "follow_us_on_x": "Bizi X'te takip edin"
+    "documentation": "Belgeleme"
   },
   "lists": {
     "all_lists": "Tüm Listeler",
@@ -1091,7 +1090,7 @@
     "is_from_source": "Kaynak",
     "is_not_from_source": "Kaynak değil",
     "mode_label": "Arama modu",
-    "mode_label_description": "Karakeep'in eşleşen yer işaretlerini nasıl bulacağını seçin.",
+    "mode_label_description": "Saiye'in eşleşen yer işaretlerini nasıl bulacağını seçin.",
     "mode_keyword": "Anahtar kelime",
     "mode_keyword_description": "Başlıklarda, içerikte, URL'lerde ve notlarda tam kelimeleri eşleştirin. Neredeyse anlık.",
     "mode_hybrid": "Hibrit",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "{{year}} Özetin",
-    "subtitle": "Karakeep'te Bir Yıl",
+    "subtitle": "Saiye'te Bir Yıl",
     "banner": {
       "title": "2025 Özetin hazır!",
       "description": "Yılını yer işaretlerinde gör",
@@ -1190,7 +1189,7 @@
         "assets": "Varlıklar"
       }
     },
-    "footer": "Karakeep ile yapıldı",
+    "footer": "Saiye ile yapıldı",
     "share": "Paylaş",
     "download": "İndir",
     "close": "Kapat",

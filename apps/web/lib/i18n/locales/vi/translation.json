@@ -78,7 +78,7 @@
       "import_bookmarks_from_pocket_export": "Nhập dấu trang từ bản xuất Pocket",
       "import_bookmarks_from_matter_export": "Nhập dấu trang từ bản xuất Matter",
       "import_bookmarks_from_omnivore_export": "Nhập dấu trang từ xuất Omnivore",
-      "import_bookmarks_from_karakeep_export": "Nhập dấu trang từ bản xuất Karakeep",
+      "import_bookmarks_from_karakeep_export": "Nhập dấu trang từ bản xuất Saiye",
       "import_bookmarks_from_tab_session_manager_export": "Nhập dấu trang từ Tab Session Manager",
       "import_bookmarks_from_mymind_export": "Nhập dấu trang từ tệp xuất mymind",
       "import_bookmarks_from_instapaper_export": "Nhập dấu trang từ bản xuất Instapaper",
@@ -947,7 +947,7 @@
     "is_from_source": "Nguồn là",
     "is_not_from_source": "Nguồn không phải là",
     "mode_label": "Chế độ tìm kiếm",
-    "mode_label_description": "Chọn cách Karakeep tìm kiếm các dấu trang phù hợp.",
+    "mode_label_description": "Chọn cách Saiye tìm kiếm các dấu trang phù hợp.",
     "mode_keyword": "Từ khóa",
     "mode_keyword_description": "Khớp chính xác các từ trong tiêu đề, nội dung, URL và ghi chú. Gần như tức thì.",
     "mode_hybrid": "Hỗn hợp",
@@ -992,8 +992,7 @@
     "dark_mode": "Chế độ tối",
     "light_mode": "Chế độ sáng",
     "apps_extensions": "Ứng dụng & Tiện ích mở rộng",
-    "documentation": "Tài liệu",
-    "follow_us_on_x": "Theo dõi chúng tôi trên X"
+    "documentation": "Tài liệu"
   },
   "editor": {
     "text_toolbar": {
@@ -1180,13 +1179,13 @@
         "assets": "Tài sản"
       }
     },
-    "footer": "Được tạo bằng Karakeep",
+    "footer": "Được tạo bằng Saiye",
     "share": "Chia sẻ",
     "download": "Tải xuống",
     "close": "Đóng",
     "generating": "Đang tạo...",
     "title": "Tổng Kết {{year}} Của Bạn",
-    "subtitle": "Một Năm Ở Karakeep",
+    "subtitle": "Một Năm Ở Saiye",
     "banner": {
       "title": "Tổng Kết Năm 2025 Của Bạn đã sẵn sàng!",
       "description": "Xem năm của bạn qua các bookmark",

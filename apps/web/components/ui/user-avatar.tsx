@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
-import { getAssetUrl } from "@karakeep/shared/utils/assetUtils";
+import { getAssetUrl } from "@saiye/shared/utils/assetUtils";
 
 interface UserAvatarProps {
   image?: string | null;

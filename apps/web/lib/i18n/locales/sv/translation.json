@@ -218,7 +218,7 @@
       "import_export_bookmarks": "Exportera bokmärken",
       "import_bookmarks_from_omnivore_export": "Importera bokmärken från Omnivore-export",
       "imported_bookmarks": "Importerade bokmärken",
-      "import_bookmarks_from_karakeep_export": "Importera bokmärken från Karakeep-export",
+      "import_bookmarks_from_karakeep_export": "Importera bokmärken från Saiye-export",
       "import_bookmarks_from_html_file": "Importera bokmärken från HTML-fil",
       "import_bookmarks_from_pocket_export": "Importera bokmärken från Pocket-export",
       "import_bookmarks_from_matter_export": "Importera bokmärken från Matter-export",
@@ -802,8 +802,7 @@
     "light_mode": "Ljust läge",
     "dark_mode": "Mörkt läge",
     "apps_extensions": "Appar och tillägg",
-    "documentation": "Dokumentation",
-    "follow_us_on_x": "Följ oss på X"
+    "documentation": "Dokumentation"
   },
   "lists": {
     "new_nested_list": "Ny nästlad lista",
@@ -1095,7 +1094,7 @@
     "is_from_source": "Källa är",
     "is_not_from_source": "Källa är inte",
     "mode_label": "Sökläge",
-    "mode_label_description": "Välj hur Karakeep hittar matchande bokmärken.",
+    "mode_label_description": "Välj hur Saiye hittar matchande bokmärken.",
     "mode_keyword": "Nyckelord",
     "mode_keyword_description": "Matcha exakta ord i titlar, innehåll, webbadresser och anteckningar. Nästan omedelbart.",
     "mode_hybrid": "Hybrid",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Din sammanfattning för {{year}}",
-    "subtitle": "Ett år i Karakeep",
+    "subtitle": "Ett år i Saiye",
     "banner": {
       "title": "Din sammanfattning för 2025 är klar!",
       "description": "Se ditt år i bokmärken",
@@ -1190,7 +1189,7 @@
         "assets": "Tillgångar"
       }
     },
-    "footer": "Gjord med Karakeep",
+    "footer": "Gjord med Saiye",
     "share": "Dela",
     "download": "Ladda ner",
     "close": "Stäng",

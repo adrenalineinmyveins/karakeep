@@ -25,14 +25,14 @@ import {
   useAttachBookmarkAsset,
   useDetachBookmarkAsset,
   useReplaceBookmarkAsset,
-} from "@karakeep/shared-react/hooks/assets";
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { getAssetUrl } from "@karakeep/shared/utils/assetUtils";
+} from "@saiye/shared-react/hooks/assets";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
+import { getAssetUrl } from "@saiye/shared/utils/assetUtils";
 import {
   humanFriendlyNameForAssertType,
   isAllowedToAttachAsset,
   isAllowedToDetachAsset,
-} from "@karakeep/trpc/lib/attachments";
+} from "@saiye/trpc/lib/attachments";
 
 export default function AttachmentBox({
   bookmark,

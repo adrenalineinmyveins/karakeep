@@ -3,8 +3,8 @@ import { ActionButton, ActionButtonProps } from "@/components/ui/action-button";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 
-import { useUpdateBookmark } from "@karakeep/shared-react/hooks/bookmarks";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useUpdateBookmark } from "@saiye/shared-react/hooks/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 interface ArchiveBookmarkButtonProps extends Omit<
   ActionButtonProps,

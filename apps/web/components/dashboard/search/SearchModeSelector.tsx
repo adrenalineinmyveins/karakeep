@@ -14,7 +14,7 @@ import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { Blend, BrainCircuit, ChevronDown, TextSearch } from "lucide-react";
 
-import type { ZBookmarkSearchMode } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmarkSearchMode } from "@saiye/shared/types/bookmarks";
 
 const SEARCH_MODES = [
   {

@@ -8,11 +8,11 @@ import { useClientConfig } from "@/lib/clientConfig";
 import { Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import type { RuleEngineRule } from "@karakeep/shared/types/rules";
+import type { RuleEngineRule } from "@saiye/shared/types/rules";
 import {
   useDeleteRule,
   useUpdateRule,
-} from "@karakeep/shared-react/hooks/rules";
+} from "@saiye/shared-react/hooks/rules";
 
 export default function RuleList({
   rules,

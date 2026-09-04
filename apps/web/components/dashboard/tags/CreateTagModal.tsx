@@ -29,7 +29,7 @@ import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useCreateTag } from "@karakeep/shared-react/hooks/tags";
+import { useCreateTag } from "@saiye/shared-react/hooks/tags";
 
 const formSchema = z.object({
   name: z.string().trim().min(1, "Tag name is required"),

@@ -5,7 +5,7 @@ import {
   zUploadErrorSchema,
   ZUploadResponse,
   zUploadResponseSchema,
-} from "@karakeep/shared/types/uploads";
+} from "@saiye/shared/types/uploads";
 
 export default function useUpload({
   onSuccess,

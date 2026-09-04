@@ -11,12 +11,12 @@ import { Dot, LinkIcon, Search, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
 
-import { useDebounce } from "@karakeep/shared-react/hooks/use-debounce";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useDebounce } from "@saiye/shared-react/hooks/use-debounce";
+import { useTRPC } from "@saiye/shared-react/trpc";
 import {
   ZGetAllHighlightsResponse,
   ZHighlight,
-} from "@karakeep/shared/types/highlights";
+} from "@saiye/shared/types/highlights";
 
 import HighlightCard from "./HighlightCard";
 

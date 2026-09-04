@@ -4,7 +4,7 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useQuery } from "@tanstack/react-query";
 import { Database, HardDrive } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import {
   Card,

@@ -14,11 +14,11 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 import {
   isMobileAppRedirect,
   validateRedirectUrl,
-} from "@karakeep/shared/utils/redirectUrl";
+} from "@saiye/shared/utils/redirectUrl";
 
 export default function VerifyEmailPage() {
   const api = useTRPC();

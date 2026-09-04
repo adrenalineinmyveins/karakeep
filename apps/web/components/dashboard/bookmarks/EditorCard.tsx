@@ -20,8 +20,8 @@ import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
 import { z } from "zod";
 
-import { useCreateBookmarkWithPostHook } from "@karakeep/shared-react/hooks/bookmarks";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { useCreateBookmarkWithPostHook } from "@saiye/shared-react/hooks/bookmarks";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import { useUploadAsset } from "../UploadDropzone";
 

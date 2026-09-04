@@ -41,9 +41,9 @@ import { HelpCircle, PlusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { API_KEY_FULL_ACCESS_SCOPE } from "@karakeep/shared/types/apiKeys";
-import type { ZApiKeyScope } from "@karakeep/shared/types/apiKeys";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { API_KEY_FULL_ACCESS_SCOPE } from "@saiye/shared/types/apiKeys";
+import type { ZApiKeyScope } from "@saiye/shared/types/apiKeys";
 
 import ApiKeySuccess from "./ApiKeySuccess";
 import type { ScopeAccessChoice, ScopeOption } from "./apiKeyScopes";

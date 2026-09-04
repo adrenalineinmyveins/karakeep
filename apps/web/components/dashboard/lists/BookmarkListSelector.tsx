@@ -17,9 +17,9 @@ import LoadingSpinner from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 
-import { useBookmarkLists } from "@karakeep/shared-react/hooks/lists";
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
-import { listNameFromPath } from "@karakeep/shared/utils/listUtils";
+import { useBookmarkLists } from "@saiye/shared-react/hooks/lists";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
+import { listNameFromPath } from "@saiye/shared/utils/listUtils";
 
 interface DataProps {
   isPending: boolean;

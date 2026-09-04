@@ -5,7 +5,7 @@ import ListHeader from "@/components/dashboard/lists/ListHeader";
 import { api } from "@/server/api/client";
 import { TRPCError } from "@trpc/server";
 
-import { BookmarkListContextProvider } from "@karakeep/shared-react/hooks/bookmark-list-context";
+import { BookmarkListContextProvider } from "@saiye/shared-react/hooks/bookmark-list-context";
 
 export async function generateMetadata(props: {
   params: Promise<{ listId: string }>;
@@ -14,7 +14,7 @@ export async function generateMetadata(props: {
   try {
     const list = await api.lists.get({ listId: params.listId });
     return {
-      title: `${list.name} | Karakeep`,
+      title: `${list.name} | Saiye`,
     };
   } catch (e) {
     if (e instanceof TRPCError && e.code === "NOT_FOUND") {

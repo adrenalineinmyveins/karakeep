@@ -8,9 +8,9 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import type {
   ZGetBookmarksRequest,
   ZGetBookmarksResponse,
-} from "@karakeep/shared/types/bookmarks";
-import { BookmarkGridContextProvider } from "@karakeep/shared-react/hooks/bookmark-grid-context";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+} from "@saiye/shared/types/bookmarks";
+import { BookmarkGridContextProvider } from "@saiye/shared-react/hooks/bookmark-grid-context";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import BookmarksGrid from "./BookmarksGrid";
 

@@ -388,7 +388,7 @@
       "import_bookmarks_from_pocket_export": "Importer bokmerker fra Pocket-eksport",
       "import_bookmarks_from_matter_export": "Importer bokmerker fra Matter-eksport",
       "import_bookmarks_from_linkwarden_export": "Importer bokmerker fra Linkwarden-eksport",
-      "import_bookmarks_from_karakeep_export": "Importer bokmerker fra Karakeepp-eksport",
+      "import_bookmarks_from_karakeep_export": "Importer bokmerker fra Saiyep-eksport",
       "export_links_and_notes": "Eksporter lenker og notater",
       "imported_bookmarks": "Importerte bokmerker",
       "import_bookmarks_from_tab_session_manager_export": "Importer bokmerker fra Tab Session Manager",
@@ -796,8 +796,7 @@
     "dark_mode": "Mørk modus",
     "light_mode": "Lys modus",
     "apps_extensions": "Apper og utvidelser",
-    "documentation": "Dokumentasjon",
-    "follow_us_on_x": "Følg oss på X"
+    "documentation": "Dokumentasjon"
   },
   "lists": {
     "all_lists": "Alle lister",
@@ -975,7 +974,7 @@
     "is_from_source": "Kilden er",
     "is_not_from_source": "Kilden er ikke",
     "mode_label": "Søkemodus",
-    "mode_label_description": "Velg hvordan Karakeep finner samsvarende bokmerker.",
+    "mode_label_description": "Velg hvordan Saiye finner samsvarende bokmerker.",
     "mode_keyword": "Nøkkelord",
     "mode_keyword_description": "Finn nøyaktige ord i titler, innhold, URL-er og notater. Nesten umiddelbart.",
     "mode_hybrid": "Hybrid",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Din samlede oppsummering for {{year}}",
-    "subtitle": "Et år i Karakeep",
+    "subtitle": "Et år i Saiye",
     "banner": {
       "title": "Oppsummeringen din for 2025 er klar!",
       "description": "Se året ditt i bokmerker",
@@ -1190,7 +1189,7 @@
         "assets": "Ressurser"
       }
     },
-    "footer": "Laget med Karakeep",
+    "footer": "Laget med Saiye",
     "share": "Del",
     "download": "Last ned",
     "close": "Lukk",

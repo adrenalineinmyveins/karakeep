@@ -7,9 +7,9 @@ import { useTranslation } from "@/lib/i18n/client";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { MoreHorizontal, Sparkles } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { parseSearchQuery } from "@karakeep/shared/searchQueryParser";
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { parseSearchQuery } from "@saiye/shared/searchQueryParser";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
 
 import QueryExplainerTooltip from "../search/QueryExplainerTooltip";
 import { ListOptions } from "./ListOptions";

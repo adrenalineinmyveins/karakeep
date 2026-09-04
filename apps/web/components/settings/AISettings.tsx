@@ -43,21 +43,21 @@ import { Info, Plus, Save, Trash2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import type { ZBookmarkTags } from "@karakeep/shared/types/tags";
-import { useDebounce } from "@karakeep/shared-react/hooks/use-debounce";
-import { useUpdateUserSettings } from "@karakeep/shared-react/hooks/users";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import type { ZBookmarkTags } from "@saiye/shared/types/tags";
+import { useDebounce } from "@saiye/shared-react/hooks/use-debounce";
+import { useUpdateUserSettings } from "@saiye/shared-react/hooks/users";
+import { useTRPC } from "@saiye/shared-react/trpc";
 import {
   buildImagePrompt,
   buildSummaryPromptUntruncated,
   buildTextPromptUntruncated,
-} from "@karakeep/shared/prompts";
+} from "@saiye/shared/prompts";
 import {
   zNewPromptSchema,
   ZPrompt,
   zUpdatePromptSchema,
-} from "@karakeep/shared/types/prompts";
-import { zUpdateUserSettingsSchema } from "@karakeep/shared/types/users";
+} from "@saiye/shared/types/prompts";
+import { zUpdateUserSettingsSchema } from "@saiye/shared/types/users";
 
 import { SettingsPage, SettingsSection } from "./SettingsPage";
 

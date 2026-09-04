@@ -36,8 +36,8 @@ import {
   BookmarkTypes,
   ZBookmark,
   ZBookmarkedLink,
-} from "@karakeep/shared/types/bookmarks";
-import { READER_FONT_FAMILIES } from "@karakeep/shared/types/readers";
+} from "@saiye/shared/types/bookmarks";
+import { READER_FONT_FAMILIES } from "@saiye/shared/types/readers";
 
 import { contentRendererRegistry } from "./content-renderers";
 import ReaderSettingsPopover from "./ReaderSettingsPopover";

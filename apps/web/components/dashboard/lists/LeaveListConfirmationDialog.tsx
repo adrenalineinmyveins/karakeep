@@ -6,8 +6,8 @@ import { toast } from "@/components/ui/sonner";
 import { useTranslation } from "@/lib/i18n/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 export default function LeaveListConfirmationDialog({
   list,

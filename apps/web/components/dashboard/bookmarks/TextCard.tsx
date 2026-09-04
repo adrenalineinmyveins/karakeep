@@ -6,9 +6,9 @@ import { BookmarkMarkdownComponent } from "@/components/dashboard/bookmarks/Book
 import { bookmarkLayoutSwitch } from "@/lib/userLocalSettings/bookmarksLayout";
 import { cn } from "@/lib/utils";
 
-import type { ZBookmarkTypeText } from "@karakeep/shared/types/bookmarks";
-import { getAssetUrl } from "@karakeep/shared/utils/assetUtils";
-import { getSourceUrl } from "@karakeep/shared/utils/bookmarkUtils";
+import type { ZBookmarkTypeText } from "@saiye/shared/types/bookmarks";
+import { getAssetUrl } from "@saiye/shared/utils/assetUtils";
+import { getSourceUrl } from "@saiye/shared/utils/bookmarkUtils";
 
 import { BookmarkLayoutAdaptingCard } from "./BookmarkLayoutAdaptingCard";
 import FooterLinkURL from "./FooterLinkURL";

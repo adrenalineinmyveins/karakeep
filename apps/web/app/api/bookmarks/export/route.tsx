@@ -6,18 +6,18 @@ import {
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
-import { db } from "@karakeep/db";
+import { db } from "@saiye/db";
 import {
   bookmarksInLists,
   bookmarks as bookmarksTable,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   toExportFormat,
   toExportListFormat,
   toNetscapeFormat,
   zExportSchema,
-} from "@karakeep/shared/import-export";
-import { MAX_NUM_BOOKMARKS_PER_PAGE } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/import-export";
+import { MAX_NUM_BOOKMARKS_PER_PAGE } from "@saiye/shared/types/bookmarks";
 
 export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         "Content-type": "application/json",
-        "Content-disposition": `attachment; filename="karakeep-export-${new Date().toISOString()}.json"`,
+        "Content-disposition": `attachment; filename="saiye-export-${new Date().toISOString()}.json"`,
       },
     });
   } else if (format === "netscape") {

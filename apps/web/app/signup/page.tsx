@@ -1,12 +1,12 @@
 import { redirect } from "next/dist/client/components/navigation";
-import KarakeepLogo from "@/components/KarakeepIcon";
+import SaiyeLogo from "@/components/SaiyeIcon";
 import SignUpForm from "@/components/signup/SignUpForm";
 import { getServerAuthSession } from "@/server/auth";
 
 import {
   isMobileAppRedirect,
   validateRedirectUrl,
-} from "@karakeep/shared/utils/redirectUrl";
+} from "@saiye/shared/utils/redirectUrl";
 
 export default async function SignUpPage({
   searchParams,
@@ -28,7 +28,7 @@ export default async function SignUpPage({
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div className="flex items-center justify-center">
-          <KarakeepLogo height={80} />
+          <SaiyeLogo height={80} />
         </div>
         <SignUpForm redirectUrl={redirectUrl} />
       </div>

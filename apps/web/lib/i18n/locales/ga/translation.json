@@ -401,7 +401,7 @@
       "import_bookmarks_from_matter_export": "Iompórtáil Leabharmharcanna ó onnmhairiú Matter",
       "import_bookmarks_from_omnivore_export": "Iompórtáil Leabharcmharcanna ó onnmhairiú Omnivore",
       "import_bookmarks_from_linkwarden_export": "Iompórtáil Leabharmharcanna ó onnmhairiú Linkwarden",
-      "import_bookmarks_from_karakeep_export": "Iompórtáil Leabharmharcanna ó onnmhairiú Karakeep",
+      "import_bookmarks_from_karakeep_export": "Iompórtáil Leabharmharcanna ó onnmhairiú Saiye",
       "import_bookmarks_from_tab_session_manager_export": "Iompórtáil Leabhair Mharcála ó Bhainisteoir Seisiúin Cluaisíní",
       "export_links_and_notes": "Easpórtáil Naisc agus Nótaí",
       "imported_bookmarks": "Leabharmharcanna Allmhairithe",
@@ -788,7 +788,7 @@
     "is_from_source": "Ní foinse é foinse",
     "is_not_from_source": "Ní foinse é foinse ní",
     "mode_label": "Mód cuardaigh",
-    "mode_label_description": "Roghnaigh an chaoi a bhfaigheann Karakeep leabharmharcanna comheala.",
+    "mode_label_description": "Roghnaigh an chaoi a bhfaigheann Saiye leabharmharcanna comheala.",
     "mode_keyword": "Eochairfhocal",
     "mode_keyword_description": "Meaitseáil focail bheacht i dteidil, in ábhar, in URLanna, agus i nótaí. Beagnach an mheandar.",
     "mode_hybrid": "Hibrideach",
@@ -1086,8 +1086,7 @@
     "dark_mode": "Mód Dorcha",
     "light_mode": "Mód Solais",
     "apps_extensions": "Aipeanna & Eisínteachtaí",
-    "documentation": "Doiciméadú",
-    "follow_us_on_x": "Lean muid ar X"
+    "documentation": "Doiciméadú"
   },
   "preview": {
     "view_original": "Féach ar an mBunleagan",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "{{year}} Fillte agat",
-    "subtitle": "Bliain i gKarakeep",
+    "subtitle": "Bliain i gSaiye",
     "banner": {
       "title": "Tá do Fillte 2025 réidh!",
       "description": "Féach ar do bhliain i leabharmharcanna",
@@ -1190,7 +1189,7 @@
         "assets": "Sócmhainní"
       }
     },
-    "footer": "Déanta le Karakeep",
+    "footer": "Déanta le Saiye",
     "share": "Comhroinn",
     "download": "Íoslódáil",
     "close": "Dún",

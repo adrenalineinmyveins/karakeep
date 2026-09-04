@@ -206,7 +206,7 @@
       "import_bookmarks_from_pocket_export": "Importovať záložky z Pocket exportu",
       "import_bookmarks_from_matter_export": "Importovať záložky z Matter exportu",
       "import_bookmarks_from_linkwarden_export": "Importovať záložky z Linkwarden exportu",
-      "import_bookmarks_from_karakeep_export": "Importovať záložky z Karakeep exportu",
+      "import_bookmarks_from_karakeep_export": "Importovať záložky z Saiye exportu",
       "export_links_and_notes": "Exportovať odkazy a poznámky",
       "imported_bookmarks": "Importovať záložky",
       "import_export": "Importovať / exportovať",
@@ -758,7 +758,7 @@
     "is_from_source": "Zdroj je",
     "is_not_from_source": "Zdroj nie je",
     "mode_label": "Režim vyhľadávania",
-    "mode_label_description": "Vyberte si, ako Karakeep hľadá zodpovedajúce záložky.",
+    "mode_label_description": "Vyberte si, ako Saiye hľadá zodpovedajúce záložky.",
     "mode_keyword": "Kľúčové slovo",
     "mode_keyword_description": "Vyhľadať presné slová v názvoch, obsahu, adresách URL a poznámkach. Takmer okamžité.",
     "mode_hybrid": "Hybridný",
@@ -959,8 +959,7 @@
     "dark_mode": "Tmavý motív",
     "light_mode": "Svetlý motív",
     "apps_extensions": "Aplikácie a rozšírenia",
-    "documentation": "Dokumentácia",
-    "follow_us_on_x": "Sleduj nás na X"
+    "documentation": "Dokumentácia"
   },
   "tags": {
     "all_tags": "Všetky značky",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Tvoj {{year}} Wrapped",
-    "subtitle": "Rok v Karakeep",
+    "subtitle": "Rok v Saiye",
     "banner": {
       "title": "Tvoj 2025 Wrapped je pripravený!",
       "description": "Pozri si svoj rok v záložkách",
@@ -1190,7 +1189,7 @@
         "assets": "Aktíva"
       }
     },
-    "footer": "Vyrobené pomocou Karakeep",
+    "footer": "Vyrobené pomocou Saiye",
     "share": "Zdieľať",
     "download": "Stiahnuť",
     "close": "Zavrieť",

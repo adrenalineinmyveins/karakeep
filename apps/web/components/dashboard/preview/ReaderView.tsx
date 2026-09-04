@@ -4,16 +4,16 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useQuery } from "@tanstack/react-query";
 import { FileX } from "lucide-react";
 
-import BookmarkHTMLHighlighter from "@karakeep/shared-react/components/BookmarkHtmlHighlighter";
-import ScrollProgressTracker from "@karakeep/shared-react/components/ScrollProgressTracker";
+import BookmarkHTMLHighlighter from "@saiye/shared-react/components/BookmarkHtmlHighlighter";
+import ScrollProgressTracker from "@saiye/shared-react/components/ScrollProgressTracker";
 import {
   useCreateHighlight,
   useDeleteHighlight,
   useUpdateHighlight,
-} from "@karakeep/shared-react/hooks/highlights";
-import { useReadingProgress } from "@karakeep/shared-react/hooks/reading-progress";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared-react/hooks/highlights";
+import { useReadingProgress } from "@saiye/shared-react/hooks/reading-progress";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import ReadingProgressBanner from "./ReadingProgressBanner";
 

@@ -4,7 +4,7 @@ import { AdminCard } from "@/components/admin/AdminCard";
 import { useTranslation } from "@/lib/i18n/client";
 import { useQuery } from "@tanstack/react-query";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 function ConnectionStatus({
   label,

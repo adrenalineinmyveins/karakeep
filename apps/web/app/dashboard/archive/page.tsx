@@ -7,7 +7,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // oxlint-disable-next-line rules-of-hooks
   const { t } = await useTranslation();
   return {
-    title: `${t("common.archive")} | Karakeep`,
+    title: `${t("common.archive")} | Saiye`,
   };
 }
 

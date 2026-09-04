@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import ChatPanel from "@/components/dashboard/chat/ChatPanel";
 import ChatSessionList from "@/components/dashboard/chat/ChatSessionList";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 export default function ChatPageClient() {
   const [sessionId, setSessionId] = useState<string | undefined>();

@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import type { ButtonProps } from "@karakeep/shared-react/components/ui/button";
-import { Button } from "@karakeep/shared-react/components/ui/button";
+import type { ButtonProps } from "@saiye/shared-react/components/ui/button";
+import { Button } from "@saiye/shared-react/components/ui/button";
 
 import {
   Tooltip,
@@ -14,7 +14,7 @@ export {
   Button,
   buttonVariants,
   type ButtonProps,
-} from "@karakeep/shared-react/components/ui/button";
+} from "@saiye/shared-react/components/ui/button";
 
 const ButtonWithTooltip = React.forwardRef<
   HTMLButtonElement,

@@ -712,7 +712,7 @@ describe("isBookmarkMindNode", () => {
 
 describe("createBookmarkMindNode", () => {
   it("由卡片构造 mind_child：topic 承载标题、data.bookmark 保留完整载荷", () => {
-    const card = makeCard({ title: "Karakeep", favicon: "https://x/f.png" });
+    const card = makeCard({ title: "Saiye", favicon: "https://x/f.png" });
     const node = createBookmarkMindNode(card);
 
     expect(node.type).toBe("mind_child");
@@ -721,11 +721,11 @@ describe("createBookmarkMindNode", () => {
     expect(node.children).toEqual([]);
     expect(node.data.topic).toEqual({
       type: "paragraph",
-      children: [{ text: "Karakeep" }],
+      children: [{ text: "Saiye" }],
     });
     expect(node.data.bookmark).toEqual({
       bookmarkId: "bm-1",
-      title: "Karakeep",
+      title: "Saiye",
       url: "https://example.com",
       favicon: "https://x/f.png",
     });

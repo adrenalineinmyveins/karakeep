@@ -33,9 +33,9 @@ import { AlertCircle, UserX } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { zSignUpSchema } from "@karakeep/shared/types/users";
-import { isMobileAppRedirect } from "@karakeep/shared/utils/redirectUrl";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { zSignUpSchema } from "@saiye/shared/types/users";
+import { isMobileAppRedirect } from "@saiye/shared/utils/redirectUrl";
 
 const VERIFY_EMAIL_ERROR = "Please verify your email address before signing in";
 
@@ -102,7 +102,7 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
           Create Your Account
         </CardTitle>
         <CardDescription>
-          Join Karakeep to start organizing your bookmarks
+          Join Saiye to start organizing your bookmarks
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

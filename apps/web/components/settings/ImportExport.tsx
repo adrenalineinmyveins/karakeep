@@ -65,7 +65,7 @@ function ExportButton() {
         ?.match(/filename\*?=(?:UTF-8''|")?([^"]+)/i);
       const filename = match
         ? match[1]
-        : `karakeep-export-${new Date().toISOString()}.${format}`;
+        : `saiye-export-${new Date().toISOString()}.${format}`;
       return { blob: res.blob(), filename };
     },
     enabled: false,
@@ -110,7 +110,7 @@ function ExportButton() {
               <SelectValue placeholder="Format" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="json">JSON (Karakeep format)</SelectItem>
+              <SelectItem value="json">JSON (Saiye format)</SelectItem>
               <SelectItem value="netscape">HTML (Netscape format)</SelectItem>
             </SelectContent>
           </Select>
@@ -291,7 +291,7 @@ export function ImportExportRow() {
           </FilePickerButton>
         </ImportCard>
         <ImportCard
-          text="Karakeep"
+          text="Saiye"
           description={t(
             "settings.import.import_bookmarks_from_karakeep_export",
           )}
@@ -303,7 +303,7 @@ export function ImportExportRow() {
             multiple={false}
             className="flex items-center gap-2"
             onFileSelect={(file) =>
-              runUploadBookmarkFile({ file, source: "karakeep" })
+              runUploadBookmarkFile({ file, source: "saiye" })
             }
           >
             <p>Import</p>

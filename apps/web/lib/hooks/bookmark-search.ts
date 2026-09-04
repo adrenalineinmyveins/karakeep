@@ -4,9 +4,9 @@ import { useClientConfig } from "@/lib/clientConfig";
 import { useSortOrderStore } from "@/lib/store/useSortOrderStore";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 
-import type { ZBookmarkSearchMode } from "@karakeep/shared/types/bookmarks";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { parseSearchQuery } from "@karakeep/shared/searchQueryParser";
+import type { ZBookmarkSearchMode } from "@saiye/shared/types/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { parseSearchQuery } from "@saiye/shared/searchQueryParser";
 
 import { useInSearchPageStore } from "../store/useInSearchPageStore";
 

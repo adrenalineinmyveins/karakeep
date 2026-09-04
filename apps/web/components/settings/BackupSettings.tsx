@@ -39,11 +39,11 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useUpdateUserSettings } from "@karakeep/shared-react/hooks/users";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { zBackupSchema } from "@karakeep/shared/types/backups";
-import { zUpdateBackupSettingsSchema } from "@karakeep/shared/types/users";
-import { getAssetUrl } from "@karakeep/shared/utils/assetUtils";
+import { useUpdateUserSettings } from "@saiye/shared-react/hooks/users";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { zBackupSchema } from "@saiye/shared/types/backups";
+import { zUpdateBackupSettingsSchema } from "@saiye/shared/types/users";
+import { getAssetUrl } from "@saiye/shared/utils/assetUtils";
 
 import ActionConfirmingDialog from "../ui/action-confirming-dialog";
 import { Button } from "../ui/button";

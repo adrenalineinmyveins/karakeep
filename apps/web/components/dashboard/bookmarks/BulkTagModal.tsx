@@ -10,10 +10,10 @@ import {
 import { toast } from "@/components/ui/sonner";
 import { useQueries } from "@tanstack/react-query";
 
-import { useUpdateBookmarkTags } from "@karakeep/shared-react/hooks/bookmarks";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { limitConcurrency } from "@karakeep/shared/concurrency";
-import { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import { useUpdateBookmarkTags } from "@saiye/shared-react/hooks/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { limitConcurrency } from "@saiye/shared/concurrency";
+import { ZBookmark } from "@saiye/shared/types/bookmarks";
 
 import { TagsEditor } from "./TagsEditor";
 

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
 
-import type { RuleEngineRuleEvent } from "@karakeep/shared/types/rules";
+import type { RuleEngineRuleEvent } from "@saiye/shared/types/rules";
 
 import { BookmarkListSelector } from "../lists/BookmarkListSelector";
 import { TagAutocomplete } from "../tags/TagAutocomplete";

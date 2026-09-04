@@ -3,7 +3,7 @@ import type {
   ZApiKeyScope,
   ZApiKeyScopeAccess,
   ZApiKeyScopeResource,
-} from "@karakeep/shared/types/apiKeys";
+} from "@saiye/shared/types/apiKeys";
 import type { TFunction } from "i18next";
 import {
   API_KEY_ADMIN_SCOPE_RESOURCES,
@@ -11,7 +11,7 @@ import {
   API_KEY_SCOPE_RESOURCES,
   getAdminApiKeyScope,
   getApiKeyScope,
-} from "@karakeep/shared/types/apiKeys";
+} from "@saiye/shared/types/apiKeys";
 
 export type ScopeAccessChoice = "none" | ZApiKeyScopeAccess;
 

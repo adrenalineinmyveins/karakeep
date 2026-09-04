@@ -221,7 +221,7 @@
       "import_bookmarks_from_pocket_export": "Importer des favoris depuis une exportation Pocket",
       "import_bookmarks_from_matter_export": "Importer des favoris depuis une exportation Matter",
       "import_bookmarks_from_omnivore_export": "Importer des favoris depuis une exportation Omnivore",
-      "import_bookmarks_from_karakeep_export": "Importer des favoris depuis une exportation Karakeep",
+      "import_bookmarks_from_karakeep_export": "Importer des favoris depuis une exportation Saiye",
       "export_links_and_notes": "Exporter les liens et les notes",
       "imported_bookmarks": "Favoris importés",
       "import_bookmarks_from_linkwarden_export": "Importer des marque-pages depuis l'export Linkwarden",
@@ -802,8 +802,7 @@
     "dark_mode": "Mode sombre",
     "light_mode": "Mode clair",
     "apps_extensions": "Applications et extensions",
-    "documentation": "Documentation",
-    "follow_us_on_x": "Suivez-nous sur X"
+    "documentation": "Documentation"
   },
   "lists": {
     "all_lists": "Toutes les listes",
@@ -1088,7 +1087,7 @@
     "is_from_source": "La source est",
     "is_not_from_source": "La source n'est pas",
     "mode_label": "Mode de recherche",
-    "mode_label_description": "Choisissez comment Karakeep trouve les favoris correspondants.",
+    "mode_label_description": "Choisissez comment Saiye trouve les favoris correspondants.",
     "mode_keyword": "Mot-clé",
     "mode_keyword_description": "Faites correspondre des mots exacts dans les titres, le contenu, les URL et les notes. Presque instantané.",
     "mode_hybrid": "Hybride",
@@ -1149,7 +1148,7 @@
   },
   "wrapped": {
     "title": "Votre récap de {{year}}",
-    "subtitle": "Une année dans Karakeep",
+    "subtitle": "Une année dans Saiye",
     "banner": {
       "title": "Votre récap 2025 est prêt !",
       "description": "Consultez votre année en signets",
@@ -1190,7 +1189,7 @@
         "assets": "Ressources"
       }
     },
-    "footer": "Fait avec Karakeep",
+    "footer": "Fait avec Saiye",
     "share": "Partager",
     "download": "Télécharger",
     "close": "Fermer",

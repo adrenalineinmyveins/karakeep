@@ -13,10 +13,10 @@ import { useReaderSettings } from "@/lib/readerSettings";
 import { useQuery } from "@tanstack/react-query";
 import { HighlighterIcon as Highlight, Printer, X } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
-import { READER_FONT_FAMILIES } from "@karakeep/shared/types/readers";
-import { getBookmarkTitle } from "@karakeep/shared/utils/bookmarkUtils";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
+import { READER_FONT_FAMILIES } from "@saiye/shared/types/readers";
+import { getBookmarkTitle } from "@saiye/shared/utils/bookmarkUtils";
 
 export default function ReaderViewPage() {
   const api = useTRPC();

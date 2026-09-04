@@ -4,8 +4,8 @@ import ActionConfirmingDialog from "@/components/ui/action-confirming-dialog";
 import { toast } from "@/components/ui/sonner";
 import { useTranslation } from "@/lib/i18n/client";
 
-import { useDeleteBookmark } from "@karakeep/shared-react/hooks//bookmarks";
-import { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import { useDeleteBookmark } from "@saiye/shared-react/hooks//bookmarks";
+import { ZBookmark } from "@saiye/shared/types/bookmarks";
 
 export default function DeleteBookmarkConfirmationDialog({
   bookmark,

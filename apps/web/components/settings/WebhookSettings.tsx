@@ -28,12 +28,12 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 import {
   zNewWebhookSchema,
   zUpdateWebhookSchema,
   ZWebhook,
-} from "@karakeep/shared/types/webhooks";
+} from "@saiye/shared/types/webhooks";
 
 import ActionConfirmingDialog from "../ui/action-confirming-dialog";
 import { Button } from "../ui/button";

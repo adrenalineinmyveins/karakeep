@@ -26,14 +26,14 @@ import {
   User,
 } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
 import {
   getBookmarkRefreshInterval,
   getBookmarkTitle,
   getSourceUrl,
   isBookmarkStillCrawling,
-} from "@karakeep/shared/utils/bookmarkUtils";
+} from "@saiye/shared/utils/bookmarkUtils";
 
 import SummarizeBookmarkArea from "../bookmarks/SummarizeBookmarkArea";
 import ActionBar from "./ActionBar";

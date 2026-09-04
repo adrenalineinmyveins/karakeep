@@ -46,8 +46,8 @@ import {
 } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 
-import type { ZImportSessionStatus } from "@karakeep/shared/types/importSessions";
-import { switchCase } from "@karakeep/shared/utils/switch";
+import type { ZImportSessionStatus } from "@saiye/shared/types/importSessions";
+import { switchCase } from "@saiye/shared/utils/switch";
 
 type FilterType =
   | "all"

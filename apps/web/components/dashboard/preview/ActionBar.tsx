@@ -10,8 +10,8 @@ import {
 import { useTranslation } from "@/lib/i18n/client";
 import { Pencil, Trash2 } from "lucide-react";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { useUpdateBookmark } from "@karakeep/shared-react/hooks/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import { useUpdateBookmark } from "@saiye/shared-react/hooks/bookmarks";
 
 import DeleteBookmarkConfirmationDialog from "../bookmarks/DeleteBookmarkConfirmationDialog";
 import { EditBookmarkDialog } from "../bookmarks/EditBookmarkDialog";

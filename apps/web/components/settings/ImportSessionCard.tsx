@@ -32,8 +32,8 @@ import {
 import type {
   ZImportSessionStatus,
   ZImportSessionWithStats,
-} from "@karakeep/shared/types/importSessions";
-import { switchCase } from "@karakeep/shared/utils/switch";
+} from "@saiye/shared/types/importSessions";
+import { switchCase } from "@saiye/shared/utils/switch";
 
 interface ImportSessionCardProps {
   session: ZImportSessionWithStats;

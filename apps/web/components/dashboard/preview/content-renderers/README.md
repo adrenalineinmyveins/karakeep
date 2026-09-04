@@ -19,7 +19,7 @@ To add support for a new website or content type:
 
 ```typescript
 import { ContentRenderer } from "./types";
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
 import { MyIcon } from "lucide-react";
 
 function canRenderMyWebsite(bookmark: ZBookmark): boolean {

@@ -9,7 +9,7 @@ import {
 import { authOptions } from "@/server/auth";
 import { Info } from "lucide-react";
 
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 
 import CredentialsForm from "./CredentialsForm";
 import OAuthAutoRedirect from "./OAuthAutoRedirect";
@@ -24,6 +24,9 @@ export default async function SignInForm() {
       (p) => p.id != "credentials",
     );
   }
+  // 微信扫码为主入口；其余 OAuth 提供方与密码登录作为备选
+  const wechatProvider = providerValues?.find((p) => p.id === "wechat");
+  const otherProviders = providerValues?.filter((p) => p.id !== "wechat");
 
   return (
     <div className="w-full">
@@ -34,7 +37,7 @@ export default async function SignInForm() {
       <Card className="w-full">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-          <CardDescription>Sign in to your Karakeep account</CardDescription>
+          <CardDescription>Sign in to your Saiye account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {serverConfig.demoMode && (
@@ -50,9 +53,26 @@ export default async function SignInForm() {
             </Alert>
           )}
 
+          {wechatProvider && (
+            <>
+              <SignInProviderButton
+                provider={{ id: wechatProvider.id, name: wechatProvider.name }}
+                label="微信扫码登录"
+                className="h-12 bg-[#07C160] text-lg hover:bg-[#06AD56]"
+              />
+              <div className="flex w-full items-center">
+                <div className="flex-1 grow border-t border-gray-200"></div>
+                <span className="bg-white px-3 text-sm text-gray-500">
+                  或使用邮箱密码
+                </span>
+                <div className="flex-1 grow border-t border-gray-200"></div>
+              </div>
+            </>
+          )}
+
           <CredentialsForm />
 
-          {providerValues && providerValues.length > 0 && (
+          {otherProviders && otherProviders.length > 0 && (
             <>
               <div className="flex w-full items-center">
                 <div className="flex-1 grow border-t border-gray-200"></div>
@@ -60,7 +80,7 @@ export default async function SignInForm() {
                 <div className="flex-1 grow border-t border-gray-200"></div>
               </div>
               <div className="space-y-2">
-                {providerValues.map((provider) => (
+                {otherProviders.map((provider) => (
                   <SignInProviderButton
                     key={provider.id}
                     provider={{ id: provider.id, name: provider.name }}

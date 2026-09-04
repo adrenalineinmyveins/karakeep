@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "@/lib/auth/client";
 
-import { useSearchHistory } from "@karakeep/shared-react/hooks/search-history";
+import { useSearchHistory } from "@saiye/shared-react/hooks/search-history";
 
 export default function Logout() {
   const router = useRouter();

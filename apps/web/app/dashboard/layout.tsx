@@ -21,10 +21,10 @@ import {
   Tag,
 } from "lucide-react";
 
-import { PluginManager, PluginType } from "@karakeep/shared/plugins";
-import { tryCatch } from "@karakeep/shared/tryCatch";
+import { PluginManager, PluginType } from "@saiye/shared/plugins";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 
 export default async function Dashboard({
   children,

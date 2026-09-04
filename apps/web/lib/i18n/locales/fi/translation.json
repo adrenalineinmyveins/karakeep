@@ -246,7 +246,7 @@
       "import_bookmarks_from_hoarder_export": "Tuo kirjanmerkit Hoarder-viennistä",
       "export_links_and_notes": "Vie linkit ja muistiinpanot",
       "imported_bookmarks": "Tuodut kirjanmerkit",
-      "import_bookmarks_from_karakeep_export": "Tuo kirjanmerkit Karakeep-viennistä",
+      "import_bookmarks_from_karakeep_export": "Tuo kirjanmerkit Saiye-viennistä",
       "import_bookmarks_from_tab_session_manager_export": "Tuo kirjanmerkit Tab Session Managerista",
       "import_bookmarks_from_mymind_export": "Tuodaan kirjanmerkit mymind-viennistä",
       "import_bookmarks_from_instapaper_export": "Importoi kirjanmerkit Instapaper-viennistä",
@@ -806,8 +806,7 @@
     "dark_mode": "Tumma tila",
     "light_mode": "Vaalea tila",
     "apps_extensions": "Sovellukset ja laajennukset",
-    "documentation": "Dokumentaatio",
-    "follow_us_on_x": "Seuraa meitä X:ssä"
+    "documentation": "Dokumentaatio"
   },
   "lists": {
     "all_lists": "Kaikki listat",
@@ -985,7 +984,7 @@
     "is_from_source": "Lähde on",
     "is_not_from_source": "Lähdettä ei ole",
     "mode_label": "Hakutila",
-    "mode_label_description": "Valitse, miten Karakeep löytää vastaavia kirjanmerkkejä.",
+    "mode_label_description": "Valitse, miten Saiye löytää vastaavia kirjanmerkkejä.",
     "mode_keyword": "Avainsana",
     "mode_keyword_description": "Etsi tarkkoja sanoja otsikoista, sisällöstä, URL-osoitteista ja muistiinpanoista. Lähes välitön.",
     "mode_hybrid": "Hybridi",
@@ -1150,7 +1149,7 @@
   },
   "wrapped": {
     "title": "Sinun {{year}}-koosteesi",
-    "subtitle": "Vuosi Karakeepissä",
+    "subtitle": "Vuosi Saiyeissä",
     "banner": {
       "title": "Sinun 2025 -koosteesi on valmis!",
       "description": "Katso vuotesi kirjanmerkeissä",
@@ -1191,7 +1190,7 @@
         "assets": "Resurssit"
       }
     },
-    "footer": "Tehty Karakeepillä",
+    "footer": "Tehty Saiyeillä",
     "share": "Jaa",
     "download": "Lataa",
     "close": "Sulje",

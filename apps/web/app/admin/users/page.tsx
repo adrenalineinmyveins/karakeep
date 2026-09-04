@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // oxlint-disable-next-line rules-of-hooks
   const { t } = await useTranslation();
   return {
-    title: `${t("admin.users_list.users_list")} | Karakeep`,
+    title: `${t("admin.users_list.users_list")} | Saiye`,
   };
 }
 

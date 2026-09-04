@@ -19,7 +19,7 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useMutation } from "@tanstack/react-query";
 import { RefreshCcw } from "lucide-react";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import ApiKeySuccess from "./ApiKeySuccess";
 

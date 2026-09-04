@@ -13,7 +13,7 @@ import {
   READER_DEFAULTS,
   READER_FONT_FAMILIES,
   READER_SETTING_CONSTRAINTS,
-} from "@karakeep/shared/types/readers";
+} from "@saiye/shared/types/readers";
 
 import { Alert, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";

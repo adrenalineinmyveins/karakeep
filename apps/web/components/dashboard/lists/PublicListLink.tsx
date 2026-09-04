@@ -7,8 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { useClientConfig } from "@/lib/clientConfig";
 import { useTranslation } from "react-i18next";
 
-import { useEditBookmarkList } from "@karakeep/shared-react/hooks/lists";
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
+import { useEditBookmarkList } from "@saiye/shared-react/hooks/lists";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
 
 export default function PublicListLink({ list }: { list: ZBookmarkList }) {
   const { t } = useTranslation();

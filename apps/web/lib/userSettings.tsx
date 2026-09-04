@@ -3,8 +3,8 @@
 import { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { ZUserSettings } from "@karakeep/shared/types/users";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { ZUserSettings } from "@saiye/shared/types/users";
 
 export const UserSettingsContext = createContext<ZUserSettings>({
   bookmarkClickAction: "open_original_link",

@@ -18,11 +18,11 @@ import type {
   RuleEngineCondition,
   RuleEngineRule,
   RuleEngineRuleEvent,
-} from "@karakeep/shared/types/rules";
+} from "@saiye/shared/types/rules";
 import {
   useCreateRule,
   useUpdateRule,
-} from "@karakeep/shared-react/hooks/rules";
+} from "@saiye/shared-react/hooks/rules";
 
 interface RuleEditorProps {
   rule: Omit<RuleEngineRule, "id"> & { id: string | null };
