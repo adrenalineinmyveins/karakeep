@@ -5,7 +5,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import { useScrollToTop } from "expo-router";
 import { Highlighter } from "lucide-react-native";
 
-import type { ZHighlight } from "@karakeep/shared/types/highlights";
+import type { ZHighlight } from "@saiye/shared/types/highlights";
 
 import HighlightCard from "./HighlightCard";
 

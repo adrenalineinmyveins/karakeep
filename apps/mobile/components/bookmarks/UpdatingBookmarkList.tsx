@@ -2,9 +2,9 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import useAppSettings from "@/lib/settings";
 import QueryPageState from "@/components/QueryPageState";
 
-import type { ZGetBookmarksRequest } from "@karakeep/shared/types/bookmarks";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import type { ZGetBookmarksRequest } from "@saiye/shared/types/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import BookmarkList from "./BookmarkList";
 

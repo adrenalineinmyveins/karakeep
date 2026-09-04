@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Karakeep",
+  "productName": "Saiye",
   "version": "0.1.0",
-  "identifier": "app.karakeep.desktop",
+  "identifier": "app.saiye.desktop",
   "build": {
     "frontendDist": "ui"
   },
@@ -10,7 +10,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Karakeep",
+        "title": "Saiye",
         "width": 1280,
         "height": 800,
         "minWidth": 960,

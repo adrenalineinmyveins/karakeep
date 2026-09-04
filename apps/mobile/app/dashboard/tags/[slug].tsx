@@ -6,7 +6,7 @@ import FullPageSpinner from "@/components/ui/FullPageSpinner";
 import { useArchiveFilter } from "@/lib/hooks";
 import { useQuery } from "@tanstack/react-query";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 export default function TagView() {
   const { slug } = useLocalSearchParams();

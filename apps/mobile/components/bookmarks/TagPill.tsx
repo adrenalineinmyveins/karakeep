@@ -2,7 +2,7 @@ import { Text, View } from "react-native";
 import { Link } from "expo-router";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-import { ZBookmarkTags } from "@karakeep/shared/types/tags";
+import { ZBookmarkTags } from "@saiye/shared/types/tags";
 
 const TAG_PILL_COLORS = {
   light: {

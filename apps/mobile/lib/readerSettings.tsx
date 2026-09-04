@@ -4,9 +4,9 @@ import { Platform } from "react-native";
 import {
   ReaderSettingsProvider as BaseReaderSettingsProvider,
   useReaderSettingsContext,
-} from "@karakeep/shared-react/hooks/reader-settings";
-import { ReaderSettingsPartial } from "@karakeep/shared/types/readers";
-import { ZReaderFontFamily } from "@karakeep/shared/types/users";
+} from "@saiye/shared-react/hooks/reader-settings";
+import { ReaderSettingsPartial } from "@saiye/shared/types/readers";
+import { ZReaderFontFamily } from "@saiye/shared/types/users";
 
 import { useSettings } from "./settings";
 

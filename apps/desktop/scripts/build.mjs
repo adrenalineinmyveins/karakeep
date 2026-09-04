@@ -1,10 +1,10 @@
 /**
  * 桌面版打包脚本（M0.3：对应设计文档 §5.1 七步）。
  *
- * 产出：dist/karakeep-desktop/ + dist/karakeep-desktop-<version>-win-x64.zip
+ * 产出：dist/saiye-desktop/ + dist/saiye-desktop-<version>-win-x64.zip
  * 安装目录结构（见设计 §2.2）：
- *   karakeep-desktop/
- *   ├─ karakeep.cmd              入口
+ *   saiye-desktop/
+ *   ├─ saiye.cmd              入口
  *   ├─ node/node.exe             官方 win-x64 zip（锁 24.x，与构建机一致）
  *   ├─ runtime/
  *   │  ├─ supervisor/run.mjs     生产 supervisor（与 dev.mjs 同结构，路径不同）
@@ -20,10 +20,10 @@
  *   1. turbo 全量构建（pnpm build）
  *   2. runtime/migrate：ncc build packages/db/migrate.ts + 拷贝 drizzle/
  *   3. runtime/web：standalone + public + static + @plait-board/mermaid-to-drawnix/dist 补丁
- *   4. runtime/workers：tsdown（apps/workers build）+ pnpm deploy --filter @karakeep/workers --prod
+ *   4. runtime/workers：tsdown（apps/workers build）+ pnpm deploy --filter @saiye/workers --prod
  *   5. bin/：下载并缓存二进制（meili/ffmpeg/yt-dlp；monolith 可选，缺失跳过并 warn）
  *   6. node/：官方 win-x64 zip（版本 = process.version）
- *   7. 拷贝 runtime/supervisor + karakeep.cmd → dist 目录并打 zip
+ *   7. 拷贝 runtime/supervisor + saiye.cmd → dist 目录并打 zip
  */
 
 import { exec, spawn, execSync } from "node:child_process";
@@ -48,7 +48,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
 const DESKTOP_DIR = path.join(ROOT, "apps", "desktop");
 const DIST = path.join(DESKTOP_DIR, "dist");
-const STAGE = path.join(DIST, "karakeep-desktop"); // 安装目录 staging
+const STAGE = path.join(DIST, "saiye-desktop"); // 安装目录 staging
 const BIN_CACHE = path.join(DESKTOP_DIR, "bin-cache"); // 下载缓存（可重入）
 const IS_WIN = process.platform === "win32";
 
@@ -173,7 +173,7 @@ async function step1_turboBuild() {
     step("  [跳过] web standalone 已存在（如需重建请删除 apps/web/.next）");
   } else {
     await pnpmRun(
-      ["--filter", "@karakeep/web", "--config.verify-deps-before-run=false", "build"],
+      ["--filter", "@saiye/web", "--config.verify-deps-before-run=false", "build"],
       { env },
     );
   }
@@ -183,7 +183,7 @@ async function step1_turboBuild() {
     step("  [跳过] workers dist/index.js 已存在（如需重建请删除 apps/workers/dist）");
   } else {
     await pnpmRun(
-      ["--filter", "@karakeep/workers", "--config.verify-deps-before-run=false", "build"],
+      ["--filter", "@saiye/workers", "--config.verify-deps-before-run=false", "build"],
       { env },
     );
   }
@@ -308,8 +308,8 @@ async function step4_workers() {
   //     junction（EACCES 中断后留下 dangling reparse point），故不可用。
   //   - isolated linker 在 Windows 上用绝对路径 junction，目录一旦移动/打 zip
   //     就全部 dangling，故不使用（新实现默认 hoisted）。
-  //   - workspace 包（@karakeep/*）由 tsdown noExternal 全部 bundle 进 dist/index.js，
-  //     产物里的 @karakeep/* 源码目录仅冗余、不参与运行时解析。
+  //   - workspace 包（@saiye/*）由 tsdown noExternal 全部 bundle 进 dist/index.js，
+  //     产物里的 @saiye/* 源码目录仅冗余、不参与运行时解析。
   //   - 不用 --ignore-scripts：better-sqlite3 / re2 都靠 install 脚本下载预编译 .node
   //     （re2 的 install 脚本：install-from-cache 拉 GitHub release 预编译，失败才
   //     fallback node-gyp；本机无 VS C++ 工具链，fallback 必败，故必须让预编译下载成功。
@@ -321,7 +321,7 @@ async function step4_workers() {
       "--config.inject-workspace-packages=true",
       "deploy",
       "--filter",
-      "@karakeep/workers",
+      "@saiye/workers",
       "--prod",
       out,
     ],
@@ -456,11 +456,11 @@ async function step6_node() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 步骤 7：组装运行时文件（supervisor/run.mjs、karakeep.cmd）+ zip
+// 步骤 7：组装运行时文件（supervisor/run.mjs、saiye.cmd）+ zip
 // ─────────────────────────────────────────────────────────────
 
 async function step7_assemble() {
-  step("步骤 7/7：组装 runtime/supervisor + karakeep.cmd + zip ...");
+  step("步骤 7/7：组装 runtime/supervisor + saiye.cmd + zip ...");
 
   // runtime/supervisor/run.mjs：由 apps/desktop/scripts/run.mjs 拷贝（单独的生产 supervisor）
   const srcSupervisor = path.join(DESKTOP_DIR, "scripts", "run.mjs");
@@ -470,14 +470,14 @@ async function step7_assemble() {
   mkdirSync(dstSupervisor, { recursive: true });
   copyFileSync(srcSupervisor, path.join(dstSupervisor, "run.mjs"));
 
-  // karakeep.cmd（根入口）
+  // saiye.cmd（根入口）
   // 注意：内容只用 ASCII。cmd.exe 按系统代码页（中文 Windows = GBK）解析批处理，
   // UTF-8 中文注释会被误读成乱码命令逐行报错
-  const cmdPath = path.join(STAGE, "karakeep.cmd");
+  const cmdPath = path.join(STAGE, "saiye.cmd");
   writeFileSync(
     cmdPath,
     `@echo off
-REM Karakeep desktop entrypoint
+REM Saiye desktop entrypoint
 REM Run bundled node on runtime\\supervisor\\run.mjs (cwd = install dir)
 setlocal
 set "INSTALL_DIR=%~dp0"
@@ -502,14 +502,14 @@ endlocal
   step(`  安装目录合计  ${dirSizeMB(STAGE)} MB`);
 
   // zip
-  const zipName = `karakeep-desktop-${VERSION}-win-x64.zip`;
+  const zipName = `saiye-desktop-${VERSION}-win-x64.zip`;
   const zipPath = path.join(DIST, zipName);
   rmrf(zipPath);
   step(`生成 ${zipName} ...`);
   // 用系统自带 bsdtar（Windows 10+ 内置；-a 按 .zip 扩展名选 zip 格式，边压边写）。
   // 不用 Compress-Archive：PS 5.1 对 GB 级目录会把 zip 缓冲在内存且极慢。
-  // -C DIST + karakeep-desktop → zip 内一级目录是 karakeep-desktop/
-  await run("tar.exe", ["-a", "-cf", zipPath, "-C", DIST, "karakeep-desktop"]);
+  // -C DIST + saiye-desktop → zip 内一级目录是 saiye-desktop/
+  await run("tar.exe", ["-a", "-cf", zipPath, "-C", DIST, "saiye-desktop"]);
   const zipSize = (statSync(zipPath).size / 1024 / 1024).toFixed(1);
   step(`  zip  ${zipSize} MB  →  ${path.relative(ROOT, zipPath)}`);
 }
@@ -545,7 +545,7 @@ async function step8_installer() {
   step(`  payload  ${payloadMB} MB  →  ${path.relative(ROOT, payloadPath)}`);
 
   // tauri build：cargo release 编译 + NSIS bundle（resources 只含 payload.tar.gz 单档案）
-  await pnpmRun(["--filter", "@karakeep/desktop", "exec", "tauri", "build"], {
+  await pnpmRun(["--filter", "@saiye/desktop", "exec", "tauri", "build"], {
     cwd: DESKTOP_DIR,
     env,
   });

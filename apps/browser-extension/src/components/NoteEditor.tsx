@@ -4,7 +4,7 @@ import { Check, Save } from "lucide-react";
 import {
   useAutoRefreshingBookmarkQuery,
   useUpdateBookmark,
-} from "@karakeep/shared-react/hooks/bookmarks";
+} from "@saiye/shared-react/hooks/bookmarks";
 
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";

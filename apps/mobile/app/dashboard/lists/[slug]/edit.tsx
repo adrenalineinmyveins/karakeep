@@ -9,8 +9,8 @@ import { Text } from "@/components/ui/Text";
 import { useToast } from "@/components/ui/Toast";
 import { useQuery } from "@tanstack/react-query";
 
-import { useEditBookmarkList } from "@karakeep/shared-react/hooks/lists";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useEditBookmarkList } from "@saiye/shared-react/hooks/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 const EditListPage = () => {
   const { slug: listId } = useLocalSearchParams<{ slug?: string | string[] }>();

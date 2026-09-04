@@ -1,6 +1,6 @@
 import { Text } from "@/components/ui/Text";
 import useAppSettings from "@/lib/settings";
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
 import { createContext, useContext } from "react";
 import { Pressable, View } from "react-native";
 

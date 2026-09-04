@@ -1,5 +1,5 @@
-import { useAutoRefreshingBookmarkQuery } from "@karakeep/shared-react/hooks/bookmarks";
-import { isBookmarkStillTagging } from "@karakeep/shared/utils/bookmarkUtils";
+import { useAutoRefreshingBookmarkQuery } from "@saiye/shared-react/hooks/bookmarks";
+import { isBookmarkStillTagging } from "@saiye/shared/utils/bookmarkUtils";
 
 import { Badge } from "./ui/badge";
 

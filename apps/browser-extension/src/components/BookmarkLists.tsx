@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import {
   useBookmarkLists,
   useRemoveBookmarkFromList,
-} from "@karakeep/shared-react/hooks/lists";
+} from "@saiye/shared-react/hooks/lists";
 
 import { useTRPC } from "../utils/trpc";
 import { Button } from "./ui/button";

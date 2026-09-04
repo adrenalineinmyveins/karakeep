@@ -6,11 +6,11 @@ import { z } from "zod";
 import {
   BookmarkTypes,
   zBookmarkSchema,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 import {
   getBookmarkTitle,
   getSourceUrl,
-} from "@karakeep/shared/utils/bookmarkUtils";
+} from "@saiye/shared/utils/bookmarkUtils";
 
 import type { Settings } from "./settings";
 
@@ -24,7 +24,7 @@ const ARTICLE_PREFIX = `article:v${OFFLINE_LIBRARY_SCHEMA_VERSION}:`;
 const CONTENT_PREFIX = `content:v${OFFLINE_LIBRARY_SCHEMA_VERSION}:`;
 
 const offlineLibraryStorage = createMMKV({
-  id: "karakeep-offline-library",
+  id: "saiye-offline-library",
 });
 
 // Callers hand this in with the content populated; the body is split out before

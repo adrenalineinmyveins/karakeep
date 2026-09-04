@@ -110,7 +110,9 @@ function isPortFree(port) {
 function findFreePort(preferred) {
   return new Promise((resolve) => {
     const srv = net.createServer();
-    srv.once("error", () => resolve(preferred + 1 + Math.floor(Math.random() * 100)));
+    srv.once("error", () =>
+      resolve(preferred + 1 + Math.floor(Math.random() * 100)),
+    );
     srv.listen(preferred, () => {
       const { port } = srv.address();
       srv.close(() => resolve(port));
@@ -125,7 +127,9 @@ async function download(url, dest) {
   }
   const buf = Buffer.from(await res.arrayBuffer());
   writeFileSync(dest, buf);
-  log(`已下载 ${path.basename(dest)} (${(buf.length / 1024 / 1024).toFixed(1)} MB)`);
+  log(
+    `已下载 ${path.basename(dest)} (${(buf.length / 1024 / 1024).toFixed(1)} MB)`,
+  );
 }
 
 function waitHealth(url, timeoutMs) {
@@ -176,7 +180,10 @@ function isPidAlive(pid) {
 function writeLock() {
   const cs = {};
   for (const [name, proc] of children) cs[name] = proc.pid;
-  writeFileSync(LOCK_PATH, JSON.stringify({ pid: process.pid, children: cs }, null, 2));
+  writeFileSync(
+    LOCK_PATH,
+    JSON.stringify({ pid: process.pid, children: cs }, null, 2),
+  );
 }
 
 /**
@@ -304,18 +311,18 @@ function onChildCrash(name, code, signal) {
     shutdown(1);
     return;
   }
-  const delaySec = RESTART_BACKOFF_SEC[Math.min(times.length - 1, RESTART_BACKOFF_SEC.length - 1)];
+  const delaySec =
+    RESTART_BACKOFF_SEC[
+      Math.min(times.length - 1, RESTART_BACKOFF_SEC.length - 1)
+    ];
   log(
     `${name} 异常退出（code=${code} signal=${signal}），${delaySec}s 后自动重启（窗口内第 ${times.length}/${CRASH_LIMIT} 次）`,
   );
-  setTimeout(
-    () => {
-      if (stopping || children.has(name)) return;
-      startChild(name);
-      probeAfterRestart(name);
-    },
-    delaySec * 1000,
-  );
+  setTimeout(() => {
+    if (stopping || children.has(name)) return;
+    startChild(name);
+    probeAfterRestart(name);
+  }, delaySec * 1000);
 }
 
 /** 重启后健康复探：失败仅记日志（进程已拉起，不再杀掉避免重启循环） */
@@ -393,7 +400,9 @@ async function main() {
     const old = config.webPort;
     config.webPort = await findFreePort(old + 1);
     writeFileSync(configPath, JSON.stringify(config, null, 2));
-    log(`端口 ${old} 被占用，web 改用 :${config.webPort}（已回写 config.json）`);
+    log(
+      `端口 ${old} 被占用，web 改用 :${config.webPort}（已回写 config.json）`,
+    );
   }
 
   // meilisearch 二进制（缺失则下载，本地即 M0.3 的二进制缓存雏形）
@@ -413,7 +422,8 @@ async function main() {
     NEXTAUTH_URL: `http://127.0.0.1:${config.webPort}`,
     NEXTAUTH_URL_INTERNAL: `http://127.0.0.1:${config.webPort}`,
     API_URL: `http://127.0.0.1:${config.webPort}`,
-    KARAKEEP_LOCAL_MODE: "true",
+    // 走真实登录页（微信扫码/邮箱密码）；如需免登录可在 config.json 的
+    // userEnv 里设 SAIYE_LOCAL_MODE=true 恢复本地旁路
     DISABLE_NEW_RELEASE_CHECK: "true",
     NEXT_TELEMETRY_DISABLED: "1",
     // 显式置空 → 无浏览器抓取降级（覆盖 .env 里的 chrome:9222）
@@ -442,7 +452,7 @@ async function main() {
       probeTimeoutMs: 30_000,
     },
     web: {
-      // 等价 `pnpm --filter @karakeep/web run dev`（= next dev），
+      // 等价 `pnpm --filter @saiye/web run dev`（= next dev），
       // 直接 spawn 真实进程而非 pnpm.cmd，pid 即 next 进程本身
       cmd: process.execPath,
       args: [pkgFile("next", "dist/bin/next", APPS_WEB), "dev"],
@@ -452,7 +462,7 @@ async function main() {
       probeTimeoutMs: 240_000,
     },
     workers: {
-      // 等价 `pnpm --filter @karakeep/workers run start:prod`（= tsx index.ts），
+      // 等价 `pnpm --filter @saiye/workers run start:prod`（= tsx index.ts），
       // cwd 必须是 apps/workers（tsconfig 路径别名依赖）
       cmd: process.execPath,
       args: [pkgFile("tsx", "cli", APPS_WORKERS), "index.ts"],
@@ -461,7 +471,7 @@ async function main() {
     },
   };
 
-  // 1. 数据库迁移（幂等；等价 `pnpm --filter @karakeep/db run migrate`）
+  // 1. 数据库迁移（幂等；等价 `pnpm --filter @saiye/db run migrate`）
   log("运行数据库迁移 ...");
   await runAndWait(
     "migrate",
@@ -487,7 +497,9 @@ async function main() {
 
   // 5. 打开系统浏览器
   exec(`start "" http://127.0.0.1:${config.webPort}`, { shell: "cmd.exe" });
-  log(`已在浏览器打开 http://127.0.0.1:${config.webPort}（Ctrl+C 停止全部进程）`);
+  log(
+    `已在浏览器打开 http://127.0.0.1:${config.webPort}（Ctrl+C 停止全部进程）`,
+  );
 }
 
 main().catch(async (err) => {

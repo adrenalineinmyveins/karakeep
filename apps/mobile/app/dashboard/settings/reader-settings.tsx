@@ -16,8 +16,8 @@ import {
   formatFontSize,
   formatLineHeight,
   READER_SETTING_CONSTRAINTS,
-} from "@karakeep/shared/types/readers";
-import { ZReaderFontFamily } from "@karakeep/shared/types/users";
+} from "@saiye/shared/types/readers";
+import { ZReaderFontFamily } from "@saiye/shared/types/users";
 
 export default function ReaderSettingsPage() {
   const { isDarkColorScheme: isDark } = useColorScheme();

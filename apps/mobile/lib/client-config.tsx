@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ClientConfigProvider as SharedClientConfigProvider,
   useClientConfig,
-} from "@karakeep/shared-react/providers/client-config-provider";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+} from "@saiye/shared-react/providers/client-config-provider";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 export function ClientConfigProvider({
   children,

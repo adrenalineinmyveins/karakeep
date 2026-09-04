@@ -26,7 +26,7 @@ import { useSession } from "@/lib/session";
 import useAppSettings from "@/lib/settings";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 function SectionHeader({ title }: { title: string }) {
   return (

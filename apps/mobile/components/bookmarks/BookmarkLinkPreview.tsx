@@ -24,10 +24,10 @@ import {
   useCreateHighlight,
   useDeleteHighlight,
   useUpdateHighlight,
-} from "@karakeep/shared-react/hooks/highlights";
-import { useReadingProgress } from "@karakeep/shared-react/hooks/reading-progress";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared-react/hooks/highlights";
+import { useReadingProgress } from "@saiye/shared-react/hooks/reading-progress";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
 
 import BookmarkAssetImage from "./BookmarkAssetImage";
 import BookmarkHtmlHighlighterDom from "./BookmarkHtmlHighlighterDom";

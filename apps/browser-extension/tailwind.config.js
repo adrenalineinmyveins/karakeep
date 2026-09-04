@@ -1,4 +1,4 @@
-import web from "@karakeep/tailwind-config/web";
+import web from "@saiye/tailwind-config/web";
 
 const config = {
   darkMode: "selector",

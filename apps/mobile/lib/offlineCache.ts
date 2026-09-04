@@ -54,7 +54,7 @@ const QUERY_PREFIX = "query:v1:";
 const PERSIST_THROTTLE = 5_000;
 
 const queryCacheStorage = createMMKV({
-  id: "karakeep-query-cache",
+  id: "saiye-query-cache",
 });
 
 function shardKey(queryHash: string) {

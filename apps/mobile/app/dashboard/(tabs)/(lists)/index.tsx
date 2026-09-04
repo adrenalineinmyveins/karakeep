@@ -17,9 +17,9 @@ import { condProps } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react-native";
 
-import { useBookmarkLists } from "@karakeep/shared-react/hooks/lists";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { ZBookmarkListTreeNode } from "@karakeep/shared/utils/listUtils";
+import { useBookmarkLists } from "@saiye/shared-react/hooks/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { ZBookmarkListTreeNode } from "@saiye/shared/utils/listUtils";
 
 interface ListLink {
   id: string;

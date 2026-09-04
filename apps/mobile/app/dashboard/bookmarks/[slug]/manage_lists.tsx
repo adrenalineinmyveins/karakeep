@@ -10,13 +10,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Check } from "lucide-react-native";
 import { useHeaderHeight } from "expo-router/react-navigation";
 
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
 import {
   useAddBookmarkToList,
   useBookmarkLists,
   useRemoveBookmarkFromList,
-} from "@karakeep/shared-react/hooks/lists";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+} from "@saiye/shared-react/hooks/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 const ListPickerPage = () => {
   const headerHeight = useHeaderHeight();

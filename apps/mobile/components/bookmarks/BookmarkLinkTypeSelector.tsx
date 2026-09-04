@@ -4,7 +4,7 @@ import { useMenuIconColors } from "@/lib/useMenuIconColors";
 import { MenuView } from "@react-native-menu/menu";
 import { ChevronDown } from "lucide-react-native";
 
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
 
 export type BookmarkLinkType =
   | "browser"

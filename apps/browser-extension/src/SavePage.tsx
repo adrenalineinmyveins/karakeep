@@ -6,7 +6,7 @@ import {
   BookmarkTypes,
   ZNewBookmarkRequest,
   zNewBookmarkRequestSchema,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 
 import { NEW_BOOKMARK_REQUEST_KEY_NAME } from "./background/protocol";
 import { Button } from "./components/ui/button";

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/Input";
 import { Text } from "@/components/ui/Text";
 import { useToast } from "@/components/ui/Toast";
 
-import { useCreateBookmarkList } from "@karakeep/shared-react/hooks/lists";
+import { useCreateBookmarkList } from "@saiye/shared-react/hooks/lists";
 
 type ListType = "manual" | "smart";
 

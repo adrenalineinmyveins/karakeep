@@ -43,11 +43,11 @@ fn main() {
             }
         })
         .run(tauri::generate_context!())
-        .expect("error while running karakeep desktop");
+        .expect("error while running saiye desktop");
 }
 
 fn setup_tray(app: &tauri::App) -> tauri::Result<()> {
-    let open = MenuItem::with_id(app, "open", "打开 Karakeep", true, None::<&str>)?;
+    let open = MenuItem::with_id(app, "open", "打开 Saiye", true, None::<&str>)?;
     let data_dir = MenuItem::with_id(app, "data", "打开数据目录", true, None::<&str>)?;
     let logs_dir = MenuItem::with_id(app, "logs", "打开日志目录", true, None::<&str>)?;
     let sep = PredefinedMenuItem::separator(app)?;
@@ -65,7 +65,7 @@ fn setup_tray(app: &tauri::App) -> tauri::Result<()> {
 
     TrayIconBuilder::with_id("main-tray")
         .icon(app.default_window_icon().unwrap().clone())
-        .tooltip("Karakeep")
+        .tooltip("Saiye")
         .menu(&menu)
         .show_menu_on_left_click(true)
         .on_menu_event(|app, event| match event.id.as_ref() {
@@ -118,6 +118,6 @@ fn open_explorer(sub: &str) {
 
 fn appdata_sub_dir(sub: &str) -> std::path::PathBuf {
     std::path::PathBuf::from(std::env::var("APPDATA").unwrap_or_default())
-        .join("karakeep-desktop")
+        .join("saiye-desktop")
         .join(sub)
 }

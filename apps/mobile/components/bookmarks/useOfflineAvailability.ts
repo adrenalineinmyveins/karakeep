@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert } from "react-native";
 import { onlineManager, useQueryClient } from "@tanstack/react-query";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import { useToast } from "../ui/Toast";
 import {

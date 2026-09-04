@@ -4,7 +4,7 @@ import WebView from "react-native-webview";
 import { WEBVIEW_FONT_FAMILIES } from "@/lib/readerSettings";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-import { ZReaderFontFamily } from "@karakeep/shared/types/users";
+import { ZReaderFontFamily } from "@saiye/shared/types/users";
 
 const PREVIEW_TEXT =
   "The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick daft zebras jump!";

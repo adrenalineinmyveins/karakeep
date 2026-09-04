@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import FullPageSpinner from "@/components/ui/FullPageSpinner";
 import { Text } from "@/components/ui/Text";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 export default function CanvasListScreen() {
   const api = useTRPC();

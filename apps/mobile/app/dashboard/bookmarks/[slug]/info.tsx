@@ -45,10 +45,10 @@ import {
   useDeleteBookmark,
   useSummarizeBookmark,
   useUpdateBookmark,
-} from "@karakeep/shared-react/hooks/bookmarks";
-import { useWhoAmI } from "@karakeep/shared-react/hooks/users";
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { isBookmarkStillTagging } from "@karakeep/shared/utils/bookmarkUtils";
+} from "@saiye/shared-react/hooks/bookmarks";
+import { useWhoAmI } from "@saiye/shared-react/hooks/users";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
+import { isBookmarkStillTagging } from "@saiye/shared/utils/bookmarkUtils";
 
 // --- Section Components ---
 

@@ -6,12 +6,12 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { useSearchHistory } from "@karakeep/shared-react/hooks/search-history";
-import { useDebounce } from "@karakeep/shared-react/hooks/use-debounce";
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { parseSearchQuery } from "@karakeep/shared/searchQueryParser";
+import { useSearchHistory } from "@saiye/shared-react/hooks/search-history";
+import { useDebounce } from "@saiye/shared-react/hooks/use-debounce";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { parseSearchQuery } from "@saiye/shared/searchQueryParser";
 
-import type { ZBookmarkSearchMode } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmarkSearchMode } from "@saiye/shared/types/bookmarks";
 
 import { useClientConfig } from "./client-config";
 

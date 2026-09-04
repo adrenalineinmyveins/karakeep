@@ -3,7 +3,7 @@ import FullPageSpinner from "@/components/ui/FullPageSpinner";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { Toaster } from "sonner-native";
 
-import { TRPCSettingsProvider } from "@karakeep/shared-react/providers/trpc-provider";
+import { TRPCSettingsProvider } from "@saiye/shared-react/providers/trpc-provider";
 
 import {
   CACHE_MAX_AGE,

@@ -5,7 +5,7 @@ import BookmarkAssetImage from "@/components/bookmarks/BookmarkAssetImage";
 import { PDFViewer } from "@/components/bookmarks/PDFViewer";
 import { useAssetUrl } from "@/lib/hooks";
 
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
 
 interface BookmarkAssetViewProps {
   bookmark: ZBookmark;

@@ -4,9 +4,9 @@ import "@/globals.css";
 
 import { useEffect } from "react";
 
-import type { Highlight } from "@karakeep/shared-react/components/BookmarkHtmlHighlighter";
-import BookmarkHTMLHighlighter from "@karakeep/shared-react/components/BookmarkHtmlHighlighter";
-import ScrollProgressTracker from "@karakeep/shared-react/components/ScrollProgressTracker";
+import type { Highlight } from "@saiye/shared-react/components/BookmarkHtmlHighlighter";
+import BookmarkHTMLHighlighter from "@saiye/shared-react/components/BookmarkHtmlHighlighter";
+import ScrollProgressTracker from "@saiye/shared-react/components/ScrollProgressTracker";
 
 export default function BookmarkHtmlHighlighterDom({
   htmlContent,

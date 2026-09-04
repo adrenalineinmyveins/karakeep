@@ -3,7 +3,7 @@ import QueryPageState from "@/components/QueryPageState";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 export default function BookmarkHighlightsPage() {
   const { slug } = useLocalSearchParams();

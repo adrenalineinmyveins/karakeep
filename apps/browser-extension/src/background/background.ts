@@ -1,7 +1,7 @@
 import {
   BookmarkTypes,
   ZNewBookmarkRequest,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 
 import { clearBadgeStatus, getBadgeStatus } from "../utils/badgeCache";
 import {
@@ -14,12 +14,12 @@ import { MessageType } from "../utils/type";
 import { isHttpUrl } from "../utils/url";
 import { NEW_BOOKMARK_REQUEST_KEY_NAME } from "./protocol";
 
-const OPEN_KARAKEEP_ID = "open-karakeep";
-const ADD_LINK_TO_KARAKEEP_ID = "add-link";
+const OPEN_SAIYE_ID = "open-saiye";
+const ADD_LINK_TO_SAIYE_ID = "add-link";
 const CLEAR_CURRENT_CACHE_ID = "clear-current-cache";
 const CLEAR_ALL_CACHE_ID = "clear-all-cache";
 const SEPARATOR_ID = "separator-1";
-const VIEW_PAGE_IN_KARAKEEP = "view-page-in-karakeep";
+const VIEW_PAGE_IN_SAIYE = "view-page-in-saiye";
 
 /**
  * Check the current settings state and register or remove context menus accordingly.
@@ -48,29 +48,29 @@ function removeContextMenus() {
 
 /**
  * Register context menus in the browser.
- * * A context menu button to open a tab with the currently configured karakeep instance.
+ * * A context menu button to open a tab with the currently configured saiye instance.
  * * * If the "show count badge" setting is enabled, add context menu buttons to clear the cache for the current page or all pages.
- * * A context menu button to add a link to karakeep without loading the page.
+ * * A context menu button to add a link to saiye without loading the page.
  * @param settings The current plugin settings.
  */
 function registerContextMenus(settings: Settings) {
   removeContextMenus();
   chrome.contextMenus.create({
-    id: OPEN_KARAKEEP_ID,
-    title: "Open Karakeep",
+    id: OPEN_SAIYE_ID,
+    title: "Open Saiye",
     contexts: ["action"],
   });
 
   chrome.contextMenus.create({
-    id: ADD_LINK_TO_KARAKEEP_ID,
-    title: "Add to Karakeep",
+    id: ADD_LINK_TO_SAIYE_ID,
+    title: "Add to Saiye",
     contexts: ["link", "page", "selection", "image"],
   });
 
   if (settings?.showCountBadge) {
     chrome.contextMenus.create({
-      id: VIEW_PAGE_IN_KARAKEEP,
-      title: "View this page in Karakeep",
+      id: VIEW_PAGE_IN_SAIYE,
+      title: "View this page in Saiye",
       contexts: ["action", "page"],
     });
     if (settings?.useBadgeCache) {
@@ -97,7 +97,7 @@ function registerContextMenus(settings: Settings) {
 }
 
 /**
- * Handle context menu clicks by opening a new tab with karakeep or adding a link to karakeep.
+ * Handle context menu clicks by opening a new tab with saiye or adding a link to saiye.
  * @param info Information about the context menu click event.
  * @param tab The current tab.
  */
@@ -106,7 +106,7 @@ async function handleContextMenuClick(
   tab?: chrome.tabs.Tab,
 ) {
   const { menuItemId, selectionText, srcUrl, linkUrl, pageUrl } = info;
-  if (menuItemId === OPEN_KARAKEEP_ID) {
+  if (menuItemId === OPEN_SAIYE_ID) {
     getPluginSettings().then((settings: Settings) => {
       chrome.tabs.create({ url: settings.address, active: true });
     });
@@ -114,12 +114,12 @@ async function handleContextMenuClick(
     await clearCurrentPageCache();
   } else if (menuItemId === CLEAR_ALL_CACHE_ID) {
     await clearAllCache();
-  } else if (menuItemId === ADD_LINK_TO_KARAKEEP_ID) {
+  } else if (menuItemId === ADD_LINK_TO_SAIYE_ID) {
     // Only pass the current page title when the URL being saved is the
     // page itself. When saving a link or image, the title would
     // incorrectly be the current page's title instead of the target's.
     const isCurrentPage = !srcUrl && !linkUrl;
-    addLinkToKarakeep({
+    addLinkToSaiye({
       selectionText,
       srcUrl,
       linkUrl,
@@ -130,7 +130,7 @@ async function handleContextMenuClick(
     // NOTE: Firefox only allows opening context menus if it's triggered by a user action.
     // awaiting on any promise before calling this function will lose the "user action" context.
     await chrome.action.openPopup();
-  } else if (menuItemId === VIEW_PAGE_IN_KARAKEEP) {
+  } else if (menuItemId === VIEW_PAGE_IN_SAIYE) {
     if (tab) {
       await searchCurrentUrl(tab.url);
     }
@@ -138,10 +138,10 @@ async function handleContextMenuClick(
 }
 
 /**
- * Add a link to karakeep based on the provided information.
+ * Add a link to saiye based on the provided information.
  * @param options An object containing information about the link to add.
  */
-function addLinkToKarakeep({
+function addLinkToSaiye({
   selectionText,
   srcUrl,
   linkUrl,
@@ -262,13 +262,13 @@ subscribeToSettingsChanges(async (settings) => {
 chrome.contextMenus.onClicked.addListener(handleContextMenuClick);
 
 /**
- * Handle command events, such as adding a link to karakeep.
+ * Handle command events, such as adding a link to saiye.
  * @param command The command to handle.
  * @param tab The current tab.
  */
 function handleCommand(command: string, tab: chrome.tabs.Tab) {
-  if (command === ADD_LINK_TO_KARAKEEP_ID) {
-    addLinkToKarakeep({
+  if (command === ADD_LINK_TO_SAIYE_ID) {
+    addLinkToSaiye({
       selectionText: undefined,
       srcUrl: undefined,
       linkUrl: undefined,

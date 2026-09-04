@@ -2,7 +2,7 @@
 // 用法：node apps/desktop/scripts/deploy-web.mjs <targetRuntimeWebDir> [more...]
 // 例：node apps/desktop/scripts/deploy-web.mjs ^
 //       f:\karakeep\karakeep\apps\desktop\src-tauri\target\debug\runtime\web ^
-//       C:\Users\86151\AppData\Local\Karakeep\runtime\web
+//       C:\Users\86151\AppData\Local\Saiye\runtime\web
 import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -32,7 +32,7 @@ function findPkgDist(pkg, fromDir) {
 function deployWeb(out) {
   const standalone = path.join(APPS_WEB, ".next", "standalone");
   if (!existsSync(standalone)) {
-    throw new Error("未找到 .next/standalone，请先 pnpm --filter @karakeep/web build");
+    throw new Error("未找到 .next/standalone，请先 pnpm --filter @saiye/web build");
   }
 
   rmrf(out);

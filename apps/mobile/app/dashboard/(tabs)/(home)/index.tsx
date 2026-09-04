@@ -17,8 +17,8 @@ import { useMenuIconColors } from "@/lib/useMenuIconColors";
 import { MenuView } from "@react-native-menu/menu";
 import { Plus } from "lucide-react-native";
 import { toast as sonnerToast } from "sonner-native";
-import { useCreateBookmark } from "@karakeep/shared-react/hooks/bookmarks";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { useCreateBookmark } from "@saiye/shared-react/hooks/bookmarks";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 function useNewBookmarkActions(openNewBookmarkModal: () => void) {
   const { settings } = useAppSettings();

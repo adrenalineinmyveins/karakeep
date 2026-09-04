@@ -7,7 +7,7 @@ import {
   useAddBookmarkToList,
   useBookmarkLists,
   useRemoveBookmarkFromList,
-} from "@karakeep/shared-react/hooks/lists";
+} from "@saiye/shared-react/hooks/lists";
 
 import { cn } from "../utils/css";
 import { useTRPC } from "../utils/trpc";

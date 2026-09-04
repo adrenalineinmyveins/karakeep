@@ -14,16 +14,16 @@ import useAppSettings from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 enum LoginType {
   Password,
   ApiKey,
 }
 
-const DEFAULT_SERVER_ADDRESS = "https://cloud.karakeep.app";
+const DEFAULT_SERVER_ADDRESS = "http://localhost:3000";
 const CONNECTION_ERROR_MESSAGE =
-  "Couldn’t connect to this Karakeep server. Check the server address and your internet connection, then try again.";
+  "Couldn’t connect to this Saiye server. Check the server address and your internet connection, then try again.";
 
 function getLoginErrorMessage(
   error: { data?: { code?: string } | null; message: string },
@@ -111,9 +111,9 @@ export default function Signin() {
   const serverAddress = settings.address ?? DEFAULT_SERVER_ADDRESS;
 
   const onSignUp = async () => {
-    const signupUrl = `${serverAddress}/signup?redirectUrl=${encodeURIComponent("karakeep://signin")}&skipSessionRedirect=1`;
+    const signupUrl = `${serverAddress}/signup?redirectUrl=${encodeURIComponent("saiye://signin")}&skipSessionRedirect=1`;
 
-    await WebBrowser.openAuthSessionAsync(signupUrl, "karakeep://signin");
+    await WebBrowser.openAuthSessionAsync(signupUrl, "saiye://signin");
   };
 
   const onSignin = () => {
@@ -308,7 +308,7 @@ export default function Signin() {
             className="active:opacity-60"
           >
             <Text className="text-sm text-muted-foreground">
-              New to Karakeep?{" "}
+              New to Saiye?{" "}
               <Text className="text-sm font-medium text-primary">
                 Create account
               </Text>

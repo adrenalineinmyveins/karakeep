@@ -28,8 +28,8 @@ export default function QueryPageState({
     return (
       <FullPageError
         icon={CloudOff}
-        title="Karakeep is unavailable"
-        error="Karakeep couldn't be reached. Try again in a moment."
+        title="Saiye is unavailable"
+        error="Saiye couldn't be reached. Try again in a moment."
         detail={error?.message}
         onRetry={onRetry}
       />

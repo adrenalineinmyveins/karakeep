@@ -13,7 +13,7 @@ import {
   TextSearch,
 } from "lucide-react-native";
 
-import type { ZBookmarkSearchMode } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmarkSearchMode } from "@saiye/shared/types/bookmarks";
 
 const SEARCH_MODES = [
   {

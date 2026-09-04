@@ -3,12 +3,12 @@ import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
 
-import type { AppRouter } from "@karakeep/trpc/routers/_app";
+import type { AppRouter } from "@saiye/trpc/routers/_app";
 
 import { getPluginSettings } from "./settings";
 import { createChromeStorage } from "./storagePersister";
 
-export { useTRPC } from "@karakeep/shared-react/trpc";
+export { useTRPC } from "@saiye/shared-react/trpc";
 
 let apiClient: ReturnType<typeof createTRPCClient<AppRouter>> | null = null;
 let queryClient: QueryClient | null = null;

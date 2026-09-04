@@ -4,14 +4,14 @@ export default {
   expo: {
     ...(IS_DEV
       ? {
-          name: "Karakeep (Dev)",
-          scheme: "karakeep-dev",
+          name: "Saiye (Dev)",
+          scheme: "saiye-dev",
         }
       : {
-          name: "Karakeep",
-          scheme: "karakeep",
+          name: "Saiye",
+          scheme: "saiye",
         }),
-    slug: "hoarder",
+    slug: "saiye",
     version: "1.10.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
@@ -27,8 +27,8 @@ export default {
         tinted: "./assets/icon-tinted.png",
       },
       bundleIdentifier: IS_DEV
-        ? "app.hoarder.hoardermobile.dev"
-        : "app.hoarder.hoardermobile",
+        ? "app.saiye.mobile.dev"
+        : "app.saiye.mobile",
       splash: {
         image: "./assets/splash.png",
         resizeMode: "contain",
@@ -66,8 +66,8 @@ export default {
         },
       },
       package: IS_DEV
-        ? "app.hoarder.hoardermobile.dev"
-        : "app.hoarder.hoardermobile",
+        ? "app.saiye.mobile.dev"
+        : "app.saiye.mobile",
       versionCode: 44,
     },
     plugins: [
@@ -95,7 +95,7 @@ export default {
         "expo-image-picker",
         {
           photosPermission:
-            "The app access your photo gallary on your request to hoard them.",
+            "The app access your photo gallary on your request to save them.",
         },
       ],
       [

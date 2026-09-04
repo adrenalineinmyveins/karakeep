@@ -6,16 +6,16 @@ import { getPageData, init } from "single-file-core/single-file.js";
 
 declare global {
   interface Window {
-    __karakeepSingleFileLoaded__?: boolean;
+    __saiyeSingleFileLoaded__?: boolean;
   }
 }
 
-if (window.__karakeepSingleFileLoaded__) {
+if (window.__saiyeSingleFileLoaded__) {
   // Already registered in this page context — don't re-register listeners.
   // Using `throw` short-circuits re-injection cleanly.
-  throw new Error("karakeep singlefile content script already loaded");
+  throw new Error("saiye singlefile content script already loaded");
 }
-window.__karakeepSingleFileLoaded__ = true;
+window.__saiyeSingleFileLoaded__ = true;
 
 init({});
 

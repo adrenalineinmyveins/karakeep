@@ -7,8 +7,8 @@ import {
   BookmarkLinkScreenshotPreview,
 } from "@/components/bookmarks/BookmarkLinkPreview";
 
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { isBookmarkStillCrawling } from "@karakeep/shared/utils/bookmarkUtils";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
+import { isBookmarkStillCrawling } from "@saiye/shared/utils/bookmarkUtils";
 
 import { BookmarkLinkType } from "./BookmarkLinkTypeSelector";
 

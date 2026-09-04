@@ -1953,7 +1953,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "karakeep-desktop"
+name = "saiye-desktop"
 version = "0.1.0"
 dependencies = [
  "serde",

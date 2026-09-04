@@ -12,8 +12,8 @@ import { MenuView } from "@react-native-menu/menu";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Ellipsis } from "lucide-react-native";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
 
 export default function ListView() {
   const { slug } = useLocalSearchParams();

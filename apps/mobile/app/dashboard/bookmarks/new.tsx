@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/Input";
 import { Text } from "@/components/ui/Text";
 import { useToast } from "@/components/ui/Toast";
 
-import { useCreateBookmark } from "@karakeep/shared-react/hooks/bookmarks";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { useCreateBookmark } from "@saiye/shared-react/hooks/bookmarks";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 const NoteEditorPage = () => {
   const dismiss = () => {

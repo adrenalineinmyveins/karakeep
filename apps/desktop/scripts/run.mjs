@@ -3,7 +3,7 @@
  *
  * 对应：
  * - 设计 §2.1 进程拓扑：node migrate.cjs → meili → web server.js → workers index.js
- * - 设计 §2.2 用户数据目录：%APPDATA%\karakeep-desktop\（升级不丢）
+ * - 设计 §2.2 用户数据目录：%APPDATA%\saiye-desktop\（升级不丢）
  * - 设计 §3.2 环境变量表：全部按此注入
  * - 设计 §3.1 其他：单实例锁、日志滚动、优雅退出、崩溃重启、健康探活
  *
@@ -13,9 +13,9 @@
  *   <INSTALL>/runtime/web/                （standalone: apps/web/server.js + node_modules + public + .next/static）
  *   <INSTALL>/runtime/workers/            （dist/index.mjs + node_modules）
  *   <INSTALL>/bin/                        （meilisearch.exe、ffmpeg、yt-dlp、monolith）
- *   <INSTALL>/node/node.exe               （被 karakeep.cmd 调用，即 process.execPath = 捆绑 node）
+ *   <INSTALL>/node/node.exe               （被 saiye.cmd 调用，即 process.execPath = 捆绑 node）
  *
- * 通过 karakeep.cmd 启动时：工作目录 = INSTALL_DIR；PATH 前插入 bin\；YTDLP_CONFIG=--js-runtimes node
+ * 通过 saiye.cmd 启动时：工作目录 = INSTALL_DIR；PATH 前插入 bin\；YTDLP_CONFIG=--js-runtimes node
  */
 
 import { exec, spawn } from "node:child_process";
@@ -39,9 +39,10 @@ const INSTALL_DIR = path.resolve(__dirname, "..", ".."); // 安装根：supervis
 const RUNTIME = path.join(INSTALL_DIR, "runtime");
 const BIN_DIR = path.join(INSTALL_DIR, "bin");
 
-// 用户数据目录：设计 §2.2 = %APPDATA%\karakeep-desktop
-const APPDATA = process.env.APPDATA ?? process.env.HOME ?? process.env.USERPROFILE;
-const WS = path.join(APPDATA, "karakeep-desktop");
+// 用户数据目录：设计 §2.2 = %APPDATA%\saiye-desktop
+const APPDATA =
+  process.env.APPDATA ?? process.env.HOME ?? process.env.USERPROFILE;
+const WS = path.join(APPDATA, "saiye-desktop");
 
 const LOGS = path.join(WS, "logs");
 const LOCK_PATH = path.join(WS, "instance.lock");
@@ -71,7 +72,9 @@ function writeLog(name, line) {
     s?.stream.end();
     s = {
       day,
-      stream: createWriteStream(path.join(LOGS, `${name}-${day}.log`), { flags: "a" }),
+      stream: createWriteStream(path.join(LOGS, `${name}-${day}.log`), {
+        flags: "a",
+      }),
     };
     logStreams.set(name, s);
   }
@@ -112,7 +115,9 @@ function isPortFree(port) {
 function findFreePort(preferred) {
   return new Promise((resolve) => {
     const srv = net.createServer();
-    srv.once("error", () => resolve(preferred + 1 + Math.floor(Math.random() * 100)));
+    srv.once("error", () =>
+      resolve(preferred + 1 + Math.floor(Math.random() * 100)),
+    );
     srv.listen(preferred, () => {
       const { port } = srv.address();
       srv.close(() => resolve(port));
@@ -129,7 +134,8 @@ function waitHealth(url, timeoutMs) {
       } catch {
         // 未就绪
       }
-      if (Date.now() > deadline) return reject(new Error(`等待 ${url} 超时（${timeoutMs / 1000}s）`));
+      if (Date.now() > deadline)
+        return reject(new Error(`等待 ${url} 超时（${timeoutMs / 1000}s）`));
       setTimeout(tick, 1000);
     };
     tick();
@@ -139,14 +145,19 @@ function treeKill(pid) {
   if (!pid) return;
   if (IS_WIN) exec(`taskkill /PID ${pid} /T /F`, () => {});
   else {
-    try { process.kill(pid, "SIGTERM"); } catch {
+    try {
+      process.kill(pid, "SIGTERM");
+    } catch {
       // 已退出
     }
   }
 }
 function isPidAlive(pid) {
   if (!pid) return false;
-  try { process.kill(pid, 0); return true; } catch (err) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (err) {
     return err.code === "EPERM";
   }
 }
@@ -157,13 +168,16 @@ const children = new Map();
 function writeLock() {
   const cs = {};
   for (const [name, proc] of children) cs[name] = proc.pid;
-  writeFileSync(LOCK_PATH, JSON.stringify({ pid: process.pid, children: cs }, null, 2));
+  writeFileSync(
+    LOCK_PATH,
+    JSON.stringify({ pid: process.pid, children: cs }, null, 2),
+  );
 }
 // 以桌面窗口打开（Edge --app 模式 = WebView2 独立窗口：无地址栏/独立任务栏项）；
-// Edge 缺失时退回默认浏览器。关窗口不停止服务，再点 karakeep.cmd 走单实例重开。
-// Tauri 壳模式（KARAKEEP_DESKTOP_SHELL=1）下不开窗口，主窗口由壳管理
+// Edge 缺失时退回默认浏览器。关窗口不停止服务，再点 saiye.cmd 走单实例重开。
+// Tauri 壳模式（SAIYE_DESKTOP_SHELL=1）下不开窗口，主窗口由壳管理
 function openWindow(url) {
-  if (process.env.KARAKEEP_DESKTOP_SHELL === "1") return;
+  if (process.env.SAIYE_DESKTOP_SHELL === "1") return;
   const edge = edgeExe();
   if (edge) {
     exec(`start "" "${edge}" --app=${url}`, { shell: "cmd.exe" });
@@ -184,7 +198,8 @@ const edgeExe = () => EDGE_PATHS.find((p) => existsSync(p)) ?? null;
 // playwright install chromium 的落盘位置（%LOCALAPPDATA%\ms-playwright）
 function findPlaywrightChromium() {
   const local =
-    process.env.LOCALAPPDATA ?? path.join(process.env.USERPROFILE ?? "", "AppData", "Local");
+    process.env.LOCALAPPDATA ??
+    path.join(process.env.USERPROFILE ?? "", "AppData", "Local");
   const root = path.join(local, "ms-playwright");
   if (!existsSync(root)) return null;
   for (const d of readdirSync(root)) {
@@ -200,7 +215,13 @@ function findPlaywrightChromium() {
 // 按需下载 Chromium：复用 workers 自带的 playwright 安装器（npmmirror 镜像，国内网络可达）
 // 返回 chrome.exe 路径；失败返回 null（降级为无浏览器抓取，不阻断启动）
 async function downloadChromium() {
-  const cli = path.join(RUNTIME, "workers", "node_modules", "playwright", "cli.js");
+  const cli = path.join(
+    RUNTIME,
+    "workers",
+    "node_modules",
+    "playwright",
+    "cli.js",
+  );
   if (!existsSync(cli)) {
     log(`[crawler] playwright cli 缺失（${cli}），无法自动下载`);
     return null;
@@ -211,11 +232,17 @@ async function downloadChromium() {
       "browser-setup",
       process.execPath,
       [cli, "install", "chromium"],
-      { ...process.env, PLAYWRIGHT_DOWNLOAD_HOST: "https://cdn.npmmirror.com/binaries/playwright" },
+      {
+        ...process.env,
+        PLAYWRIGHT_DOWNLOAD_HOST:
+          "https://cdn.npmmirror.com/binaries/playwright",
+      },
       path.dirname(cli),
     );
   } catch (e) {
-    log(`[crawler] Chromium 下载失败：${e?.message ?? e}，本次降级为无浏览器抓取`);
+    log(
+      `[crawler] Chromium 下载失败：${e?.message ?? e}，本次降级为无浏览器抓取`,
+    );
     return null;
   }
   const exe = findPlaywrightChromium();
@@ -226,7 +253,9 @@ async function downloadChromium() {
 async function acquireLock() {
   if (existsSync(LOCK_PATH)) {
     let lock = null;
-    try { lock = JSON.parse(readFileSync(LOCK_PATH, "utf8")); } catch {
+    try {
+      lock = JSON.parse(readFileSync(LOCK_PATH, "utf8"));
+    } catch {
       // 损坏的锁当残留
     }
     if (lock && isPidAlive(lock.pid)) {
@@ -274,7 +303,9 @@ function spawnLogged(name, cmd, args, env, cwd = INSTALL_DIR) {
         writeLog(name, line);
       }
     });
-    stream.on("end", () => { if (buf) writeLog(name, buf); });
+    stream.on("end", () => {
+      if (buf) writeLog(name, buf);
+    });
   };
   pipe(proc.stdout);
   pipe(proc.stderr);
@@ -284,7 +315,10 @@ function waitExit(proc, timeoutMs) {
   return new Promise((resolve) => {
     if (proc.exitCode !== null || proc.signalCode) return resolve();
     const t = setTimeout(resolve, timeoutMs);
-    proc.once("exit", () => { clearTimeout(t); resolve(); });
+    proc.once("exit", () => {
+      clearTimeout(t);
+      resolve();
+    });
   });
 }
 function startChild(name) {
@@ -303,16 +337,25 @@ function startChild(name) {
 }
 function onChildCrash(name, code, signal) {
   const now = Date.now();
-  const times = (restartTimes.get(name) ?? []).filter((t) => now - t < CRASH_WINDOW_MS);
+  const times = (restartTimes.get(name) ?? []).filter(
+    (t) => now - t < CRASH_WINDOW_MS,
+  );
   times.push(now);
   restartTimes.set(name, times);
   if (times.length > CRASH_LIMIT) {
-    log(`${name} ${CRASH_WINDOW_MS / 60_000} 分钟内崩溃 ${times.length} 次（上限 ${CRASH_LIMIT}），停止服务`);
+    log(
+      `${name} ${CRASH_WINDOW_MS / 60_000} 分钟内崩溃 ${times.length} 次（上限 ${CRASH_LIMIT}），停止服务`,
+    );
     shutdown(1);
     return;
   }
-  const delaySec = RESTART_BACKOFF_SEC[Math.min(times.length - 1, RESTART_BACKOFF_SEC.length - 1)];
-  log(`${name} 异常退出（code=${code} signal=${signal}），${delaySec}s 后自动重启（窗口内第 ${times.length}/${CRASH_LIMIT} 次）`);
+  const delaySec =
+    RESTART_BACKOFF_SEC[
+      Math.min(times.length - 1, RESTART_BACKOFF_SEC.length - 1)
+    ];
+  log(
+    `${name} 异常退出（code=${code} signal=${signal}），${delaySec}s 后自动重启（窗口内第 ${times.length}/${CRASH_LIMIT} 次）`,
+  );
   setTimeout(() => {
     if (stopping || children.has(name)) return;
     startChild(name);
@@ -380,7 +423,9 @@ async function main() {
       userEnv: {}, // 预留：用户可手动配置 OPENAI_* 等
     };
     writeFileSync(configPath, JSON.stringify(config, null, 2));
-    log(`生成新配置：web=:${config.webPort} meili=:${config.meiliPort}（持久化到 ${configPath}）`);
+    log(
+      `生成新配置：web=:${config.webPort} meili=:${config.meiliPort}（持久化到 ${configPath}）`,
+    );
   }
 
   // 单实例：在端口复查之前（避免把已运行实例自占端口误判）
@@ -393,21 +438,27 @@ async function main() {
     const old = config.webPort;
     config.webPort = await findFreePort(old + 1);
     writeFileSync(configPath, JSON.stringify(config, null, 2));
-    log(`端口 ${old} 被占用，web 改用 :${config.webPort}（已回写 config.json）`);
+    log(
+      `端口 ${old} 被占用，web 改用 :${config.webPort}（已回写 config.json）`,
+    );
   }
   if (!(await isPortFree(config.meiliPort))) {
     const old = config.meiliPort;
     config.meiliPort = await findFreePort(old + 1);
     writeFileSync(configPath, JSON.stringify(config, null, 2));
-    log(`端口 ${old} 被占用，meili 改用 :${config.meiliPort}（已回写 config.json）`);
+    log(
+      `端口 ${old} 被占用，meili 改用 :${config.meiliPort}（已回写 config.json）`,
+    );
   }
 
   // 爬取引擎（P1-7）：config.json 加 "crawler": {"enabled": true} 启用（默认关闭）
   // 用户 userEnv 自带 BROWSER_WEB_URL/BROWSER_WEBSOCKET_URL（自建远程浏览器）时不接管
   const userEnv = config.userEnv ?? {};
   const userBrowserUrl =
-    userEnv.BROWSER_WEB_URL || userEnv.BROWSER_WEBSOCKET_URL ||
-    process.env.BROWSER_WEB_URL || process.env.BROWSER_WEBSOCKET_URL;
+    userEnv.BROWSER_WEB_URL ||
+    userEnv.BROWSER_WEBSOCKET_URL ||
+    process.env.BROWSER_WEB_URL ||
+    process.env.BROWSER_WEBSOCKET_URL;
   let browserExe = null;
   let browserDebugPort = null;
   if (config.crawler?.enabled === true && !userBrowserUrl) {
@@ -420,7 +471,8 @@ async function main() {
       writeFileSync(configPath, JSON.stringify(config, null, 2));
     }
     // 浏览器来源优先级：系统 Edge（零下载）→ playwright 已装 chromium → 按需下载
-    browserExe = edgeExe() ?? findPlaywrightChromium() ?? (await downloadChromium());
+    browserExe =
+      edgeExe() ?? findPlaywrightChromium() ?? (await downloadChromium());
     if (browserExe) {
       mkdirSync(BROWSER_PROFILE, { recursive: true });
       log(`爬取引擎已启用：${browserExe}（CDP :${browserDebugPort}）`);
@@ -433,11 +485,13 @@ async function main() {
   // meili 二进制校验（缺失明确报错，便于 M0.4 验收）
   const meiliExe = path.join(BIN_DIR, "meilisearch.exe");
   if (!existsSync(meiliExe)) {
-    throw new Error(`缺少 bin/meilisearch.exe，请先执行打包脚本（见 build.mjs step5）`);
+    throw new Error(
+      `缺少 bin/meilisearch.exe，请先执行打包脚本（见 build.mjs step5）`,
+    );
   }
 
   // bin 注入 PATH（ffmpeg/yt-dlp 被 workers 直接调用时的查找路径）
-  // 与 karakeep.cmd 的 PATH 前缀同逻辑；这里也注入以防 cmd 被绕过直接启动的场景
+  // 与 saiye.cmd 的 PATH 前缀同逻辑；这里也注入以防 cmd 被绕过直接启动的场景
   const PATH_VAR = IS_WIN ? "Path" : "PATH";
   const PATH = process.env[PATH_VAR] ?? process.env.PATH ?? "";
 
@@ -445,7 +499,7 @@ async function main() {
   const baseEnv = {
     ...process.env,
     [PATH_VAR]: `${BIN_DIR}${IS_WIN ? ";" : ":"}${PATH}`,
-    // ── 覆盖用户配置，以下 karakeep 自己保留不允许用户改 ──
+    // ── 覆盖用户配置，以下 saiye 自己保留不允许用户改 ──
     DATA_DIR,
     MEILI_ADDR: `http://127.0.0.1:${config.meiliPort}`,
     MEILI_MASTER_KEY: config.meiliMasterKey,
@@ -455,12 +509,15 @@ async function main() {
     API_URL: `http://127.0.0.1:${config.webPort}`,
     PORT: String(config.webPort),
     HOSTNAME: "127.0.0.1",
-    KARAKEEP_LOCAL_MODE: "true",
+    // 走真实登录页（微信扫码/邮箱密码）；如需免登录可在 config.json 的
+    // userEnv 里设 SAIYE_LOCAL_MODE=true 恢复本地旁路
     DISABLE_NEW_RELEASE_CHECK: "true",
     NEXT_TELEMETRY_DISABLED: "1",
     NODE_ENV: "production",
     // 爬取浏览器（P1-7）：本地 CDP 端点；空 = 无浏览器抓取降级（userEnv 可覆盖为远程浏览器）
-    BROWSER_WEB_URL: browserDebugPort ? `http://127.0.0.1:${browserDebugPort}` : "",
+    BROWSER_WEB_URL: browserDebugPort
+      ? `http://127.0.0.1:${browserDebugPort}`
+      : "",
     BROWSER_WEBSOCKET_URL: "",
     // 构建期注入的同逻辑：adblock 列表国内网络下载阻塞 crawler
     CRAWLER_ENABLE_ADBLOCKER: "false",
@@ -497,11 +554,15 @@ async function main() {
     meili: {
       cmd: meiliExe,
       args: [
-        "--http-addr", `127.0.0.1:${config.meiliPort}`,
-        "--db-path", MEILI_DATA,
-        "--master-key", config.meiliMasterKey,
+        "--http-addr",
+        `127.0.0.1:${config.meiliPort}`,
+        "--db-path",
+        MEILI_DATA,
+        "--master-key",
+        config.meiliMasterKey,
         "--no-analytics",
-        "--env", "production",
+        "--env",
+        "production",
       ],
       env: baseEnv,
       probe: `http://127.0.0.1:${config.meiliPort}/health`,
@@ -580,12 +641,14 @@ async function main() {
 
   // 6. 打开桌面窗口（Edge --app）
   openWindow(`http://127.0.0.1:${config.webPort}`);
-  log(`已打开桌面窗口 http://127.0.0.1:${config.webPort}（Ctrl+C 停止全部进程）`);
+  log(
+    `已打开桌面窗口 http://127.0.0.1:${config.webPort}（Ctrl+C 停止全部进程）`,
+  );
   log(`日志目录：${LOGS}`);
   log(`数据目录：${WS}（升级/卸载保留）`);
 
   // Tauri 壳模式：壳（父进程）退出后优雅停机，防止服务孤儿
-  if (process.env.KARAKEEP_DESKTOP_SHELL === "1" && process.ppid > 1) {
+  if (process.env.SAIYE_DESKTOP_SHELL === "1" && process.ppid > 1) {
     const shellPid = process.ppid;
     log(`桌面壳模式：跟随父进程 pid=${shellPid}（其退出后自动停服）`);
     setInterval(() => {

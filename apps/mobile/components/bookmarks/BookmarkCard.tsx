@@ -1,19 +1,19 @@
 import { Text } from "@/components/ui/Text";
 import useAppSettings from "@/lib/settings";
 import { buildApiHeaders } from "@/lib/utils";
-import { useWhoAmI } from "@karakeep/shared-react/hooks/users";
+import { useWhoAmI } from "@saiye/shared-react/hooks/users";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Linking, View } from "react-native";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { useTRPC } from "@saiye/shared-react/trpc";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import {
   getBookmarkLinkImageUrl,
   getBookmarkRefreshInterval,
-} from "@karakeep/shared/utils/bookmarkUtils";
+} from "@saiye/shared/utils/bookmarkUtils";
 
 import { useToast } from "../ui/Toast";
 import BookmarkAssetImage from "./BookmarkAssetImage";

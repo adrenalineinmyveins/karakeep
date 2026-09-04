@@ -6,9 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ExternalLink, Trash2 } from "lucide-react-native";
 
-import type { ZHighlight } from "@karakeep/shared/types/highlights";
-import { useDeleteHighlight } from "@karakeep/shared-react/hooks/highlights";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import type { ZHighlight } from "@saiye/shared/types/highlights";
+import { useDeleteHighlight } from "@saiye/shared-react/hooks/highlights";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 import { useToast } from "../ui/Toast";
 

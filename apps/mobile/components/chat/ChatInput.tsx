@@ -8,7 +8,7 @@ import {
   setAudioModeAsync,
   useAudioRecorder,
 } from "expo-audio";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 import { toast } from "sonner-native";
 
 import { Button } from "@/components/ui/Button";

@@ -1,8 +1,8 @@
 import { ScrollView, View } from "react-native";
 
-import { useWhoAmI } from "@karakeep/shared-react/hooks/users";
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { isBookmarkStillTagging } from "@karakeep/shared/utils/bookmarkUtils";
+import { useWhoAmI } from "@saiye/shared-react/hooks/users";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import { isBookmarkStillTagging } from "@saiye/shared/utils/bookmarkUtils";
 
 import { Skeleton } from "../../ui/Skeleton";
 import TagPill from "../TagPill";

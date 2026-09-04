@@ -9,9 +9,9 @@ import { Text } from "@/components/ui/Text";
 import { useQueryClient } from "@tanstack/react-query";
 import { Tag } from "lucide-react-native";
 
-import { usePaginatedSearchTags } from "@karakeep/shared-react/hooks/tags";
-import { useDebounce } from "@karakeep/shared-react/hooks/use-debounce";
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { usePaginatedSearchTags } from "@saiye/shared-react/hooks/tags";
+import { useDebounce } from "@saiye/shared-react/hooks/use-debounce";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 interface TagItem {
   id: string;

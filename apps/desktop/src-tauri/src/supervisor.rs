@@ -16,7 +16,7 @@ struct UserConfig {
 }
 
 fn app_data_dir() -> PathBuf {
-    PathBuf::from(std::env::var("APPDATA").unwrap_or_default()).join("karakeep-desktop")
+    PathBuf::from(std::env::var("APPDATA").unwrap_or_default()).join("saiye-desktop")
 }
 
 /// 去掉 Windows verbatim 前缀（\\?\）：CreateProcessW 接受它，但 node 的模块路径解析
@@ -33,19 +33,19 @@ fn strip_verbatim(p: PathBuf) -> PathBuf {
 }
 
 /// 解析 node.exe 与 run.mjs 的位置：
-/// 1. KARAKEEP_DESKTOP_DEV=<apps/desktop 路径>（开发模式：系统 node + 仓库 scripts/run.mjs）
+/// 1. SAIYE_DESKTOP_DEV=<apps/desktop 路径>（开发模式：系统 node + 仓库 scripts/run.mjs）
 /// 2. 安装模式：resource_dir 下 node/node.exe + runtime/supervisor/run.mjs（NSIS 布局）
 ///    首次运行时从 payload.tar.gz 解压（NSIS 只打包单档案避免 86k 文件脚本卡死）
 fn resolve_layout(app: &AppHandle) -> Result<(PathBuf, PathBuf), String> {
-    if let Ok(dev) = std::env::var("KARAKEEP_DESKTOP_DEV") {
+    if let Ok(dev) = std::env::var("SAIYE_DESKTOP_DEV") {
         let run = PathBuf::from(&dev).join("scripts").join("run.mjs");
         if run.exists() {
-            let node = std::env::var("KARAKEEP_DESKTOP_DEV_NODE")
+            let node = std::env::var("SAIYE_DESKTOP_DEV_NODE")
                 .map(PathBuf::from)
                 .unwrap_or_else(|_| PathBuf::from("node"));
             return Ok((node, run));
         }
-        return Err(format!("KARAKEEP_DESKTOP_DEV 已设置但找不到 {}", run.display()));
+        return Err(format!("SAIYE_DESKTOP_DEV 已设置但找不到 {}", run.display()));
     }
     let res = strip_verbatim(
         app.path()
@@ -149,7 +149,7 @@ fn run(app: &AppHandle) -> Result<(), String> {
     eprintln!("[desktop] spawning node={} arg={}", node.display(), script.display());
     let mut child = Command::new(&node)
         .arg(&script)
-        .env("KARAKEEP_DESKTOP_SHELL", "1")
+        .env("SAIYE_DESKTOP_SHELL", "1")
         // CREATE_NO_WINDOW：GUI 壳无控制台，防止 node 弹新控制台窗口；不影响 std 句柄继承（诊断输出仍进重定向）
         .creation_flags(0x0800_0000)
         // run.mjs 自写文件日志；stdout/stderr 继承（debug 诊断用，release 壳无控制台等效 null）

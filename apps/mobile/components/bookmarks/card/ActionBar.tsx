@@ -17,10 +17,10 @@ import {
 import {
   useDeleteBookmark,
   useUpdateBookmark,
-} from "@karakeep/shared-react/hooks/bookmarks";
-import { useWhoAmI } from "@karakeep/shared-react/hooks/users";
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared-react/hooks/bookmarks";
+import { useWhoAmI } from "@saiye/shared-react/hooks/users";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import { useToast } from "../../ui/Toast";
 

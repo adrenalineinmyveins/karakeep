@@ -2,19 +2,19 @@ import React, { useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import QueryPageState from "@/components/QueryPageState";
-import { useTagAutocomplete } from "@karakeep/shared-react/hooks/tags";
+import { useTagAutocomplete } from "@saiye/shared-react/hooks/tags";
 import { GroupedSection, RowSeparator } from "@/components/ui/GroupedList";
 import { Text } from "@/components/ui/Text";
 import { useToast } from "@/components/ui/Toast";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { Check, Plus } from "lucide-react-native";
 import { useHeaderHeight } from "expo-router/react-navigation";
-import { useDebounce } from "@karakeep/shared-react/hooks/use-debounce";
+import { useDebounce } from "@saiye/shared-react/hooks/use-debounce";
 
 import {
   useAutoRefreshingBookmarkQuery,
   useUpdateBookmarkTags,
-} from "@karakeep/shared-react/hooks/bookmarks";
+} from "@saiye/shared-react/hooks/bookmarks";
 
 const NEW_TAG_ID = "new-tag";
 

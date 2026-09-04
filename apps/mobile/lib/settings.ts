@@ -3,7 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import { z } from "zod";
 import { create } from "zustand";
 
-import { zReaderFontFamilySchema } from "@karakeep/shared/types/users";
+import { zReaderFontFamilySchema } from "@saiye/shared/types/users";
 
 const SETTING_NAME = "settings";
 
@@ -37,7 +37,7 @@ export const DEFAULT_OVERFLOW_ACTIONS: ToolbarActionId[] = [
 const zSettingsSchema = z.object({
   apiKey: z.string().optional(),
   apiKeyId: z.string().optional(),
-  address: z.string().optional().default("https://cloud.karakeep.app"),
+  address: z.string().optional().default("http://localhost:3000"),
   imageQuality: z.number().optional().default(0.2),
   theme: z.enum(["light", "dark", "system"]).optional().default("system"),
   defaultBookmarkView: z
@@ -76,7 +76,7 @@ const useSettings = create<AppSettingsState>((set, get) => ({
   settings: {
     isLoading: true,
     settings: {
-      address: "https://cloud.karakeep.app",
+      address: "http://localhost:3000",
       imageQuality: 0.2,
       theme: "system",
       defaultBookmarkView: "reader",

@@ -15,7 +15,7 @@ export default function ServerAddress() {
   const iconColor = colorScheme === "dark" ? "#d1d5db" : "#374151";
   const { settings, setSettings } = useAppSettings();
   const [address, setAddress] = useState(
-    settings.address ?? "https://cloud.karakeep.app",
+    settings.address ?? "http://localhost:3000",
   );
   const [error, setError] = useState<string | undefined>();
 
@@ -110,10 +110,10 @@ export default function ServerAddress() {
         </Text>
         <View className="w-full gap-3 rounded-lg bg-card px-4 py-4">
           <Text className="text-sm text-muted-foreground">
-            Enter the URL of your Karakeep server
+            Enter the URL of your Saiye server
           </Text>
           <Input
-            placeholder="https://cloud.karakeep.app"
+            placeholder="http://localhost:3000"
             value={address}
             onChangeText={(text) => {
               setAddress(text);

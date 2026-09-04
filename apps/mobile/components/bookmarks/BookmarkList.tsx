@@ -5,7 +5,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import { useScrollToTop } from "expo-router";
 import { Bookmark } from "lucide-react-native";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
 
 import BookmarkCard from "./BookmarkCard";
 

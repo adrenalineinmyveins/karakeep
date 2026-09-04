@@ -6,8 +6,8 @@ import { Text } from "@/components/ui/Text";
 import { useToast } from "@/components/ui/Toast";
 import { useColorScheme } from "nativewind";
 
-import { useUpdateBookmark } from "@karakeep/shared-react/hooks/bookmarks";
-import { BookmarkTypes, ZBookmark } from "@karakeep/shared/types/bookmarks";
+import { useUpdateBookmark } from "@saiye/shared-react/hooks/bookmarks";
+import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
 
 interface BookmarkTextViewProps {
   bookmark: ZBookmark;

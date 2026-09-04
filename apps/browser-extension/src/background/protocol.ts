@@ -1,1 +1,1 @@
-export const NEW_BOOKMARK_REQUEST_KEY_NAME = "karakeep-new-bookmark";
+export const NEW_BOOKMARK_REQUEST_KEY_NAME = "saiye-new-bookmark";

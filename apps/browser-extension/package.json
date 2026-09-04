@@ -1,5 +1,5 @@
 {
-  "name": "@karakeep/browser-extension",
+  "name": "@saiye/browser-extension",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,9 +14,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@karakeep/shared": "workspace:^0.1.0",
-    "@karakeep/shared-react": "workspace:^0.1.0",
-    "@karakeep/trpc": "workspace:^0.1.0",
+    "@saiye/shared": "workspace:^0.1.0",
+    "@saiye/shared-react": "workspace:^0.1.0",
+    "@saiye/trpc": "workspace:^0.1.0",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-popover": "^1.1.14",
     "@radix-ui/react-select": "^2.2.5",
@@ -43,8 +43,8 @@
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "2.2.0",
-    "@karakeep/tailwind-config": "workspace:^0.1.0",
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/tailwind-config": "workspace:^0.1.0",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "@types/chrome": "^0.0.260",
     "@types/react": "19.2.15",
     "@types/react-dom": "19.2.3",

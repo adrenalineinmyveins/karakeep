@@ -4,7 +4,7 @@ import { ConnectionStatusIndicator } from "@/components/ConnectionStatusIndicato
 import { Avatar } from "@/components/ui/Avatar";
 import { useQuery } from "@tanstack/react-query";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 const AVATAR_SIZE = 28;
 const HIT_TARGET = 44;

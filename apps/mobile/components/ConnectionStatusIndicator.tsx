@@ -11,7 +11,7 @@ export function ConnectionStatusIndicator() {
   }
 
   const label =
-    status === "device-offline" ? "Offline" : "Karakeep unavailable";
+    status === "device-offline" ? "Offline" : "Saiye unavailable";
 
   return (
     <View

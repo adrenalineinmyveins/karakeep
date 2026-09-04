@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Karakeep",
-  "description": "An extension to bookmark links to karakeep.app",
+  "name": "Saiye",
+  "description": "An extension to bookmark links to your Saiye server",
   "version": "1.2.11",
   "icons": {
     "16": "public/logo-16.png",
@@ -38,7 +38,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "addon@karakeep.app"
+      "id": "addon@saiye.app"
     }
   },
   "content_security_policy": {
@@ -48,7 +48,7 @@
   "optional_host_permissions": ["<all_urls>"],
   "content_scripts": [
     {
-      "matches": ["https://karakeep.invalid/*"],
+      "matches": ["https://saiye.invalid/*"],
       "js": ["src/content-scripts/singlefile-content-script.ts"],
       "run_at": "document_idle",
       "all_frames": false
@@ -65,7 +65,7 @@
       "suggested_key": {
         "default": "Ctrl+Shift+E"
       },
-      "description": "Send the current page URL to Karakeep."
+      "description": "Send the current page URL to Saiye."
     }
   }
 }

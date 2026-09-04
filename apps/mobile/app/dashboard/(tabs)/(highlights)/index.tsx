@@ -2,7 +2,7 @@ import HighlightList from "@/components/highlights/HighlightList";
 import QueryPageState from "@/components/QueryPageState";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
-import { useTRPC } from "@karakeep/shared-react/trpc";
+import { useTRPC } from "@saiye/shared-react/trpc";
 
 export default function Highlights() {
   const api = useTRPC();
