@@ -223,12 +223,436 @@ interface CanvasLineElement {
 /**
  * 把书签列表转换为画布元素：
  * - 卡片：网格布局（每行 3 张，间距 80），尺寸 256×88
- * - 连线：绑定卡片上下中点，vertical connection [0.5,0]→[0.5,1]
+ * - 连线：绑定两卡「相向边」的中点（上下相邻 → 底边↔顶边；左右相邻 → 右边↔左边），
+ *   端点始终落在卡片边框上，避免斜穿/纵穿卡片
  *
  * ⚠️ 字段集必须与编辑器手绘元素逐字段对齐：
  * arrow-line 的 texts / strokeWidth / marker / connection 缺一不可，
  * @plait/draw 的 drawArrowLineMask 会对 texts.forEach 硬解引用，缺字段渲染即崩。
  */
+/**
+ * connection 比例锚点 → 卡片绝对坐标点（[rx, ry] 相对卡片左上角）。
+ * 四边中点：[0.5,0] 上 / [0.5,1] 下 / [0,0.5] 左 / [1,0.5] 右
+ */
+function connectionToPoint(
+  card: BookmarkCardElement,
+  conn: [number, number],
+): [number, number] {
+  return [
+    card.points[0][0] + conn[0] * BOOKMARK_CARD_WIDTH,
+    card.points[0][1] + conn[1] * BOOKMARK_CARD_HEIGHT,
+  ];
+}
+
+/**
+ * 按两卡中心点的相对位置选「相向边」锚点：
+ * 垂直关系为主 → 源底边↔目标顶边（反向则对调）；
+ * 水平关系为主 → 源右边↔目标左边（反向则对调）。
+ * 返回 [sourceConnection, targetConnection]。
+ */
+function facingConnections(
+  src: BookmarkCardElement,
+  tgt: BookmarkCardElement,
+): [[number, number], [number, number]] {
+  const dx = tgt.points[0][0] - src.points[0][0];
+  const dy = tgt.points[0][1] - src.points[0][1];
+  // 同尺寸卡片下用左上角差值即可判断相对方位
+  if (Math.abs(dy) >= Math.abs(dx)) {
+    return dy >= 0
+      ? [
+          [0.5, 1],
+          [0.5, 0],
+        ] // 目标在下方：源底边 → 目标顶边
+      : [
+          [0.5, 0],
+          [0.5, 1],
+        ]; // 目标在上方
+  }
+  return dx >= 0
+    ? [
+        [1, 0.5],
+        [0, 0.5],
+      ] // 目标在右侧：源右边 → 目标左边
+    : [
+        [0, 0.5],
+        [1, 0.5],
+      ]; // 目标在左侧
+}
+
+// ── mermaid 连线重锚 ─────────────────────────────────────
+//
+// mermaid-to-drawnix 的 connection 由折线端点直接换算比例，而
+// mermaid 布局的端点与节点框之间留有 gap（diamond 等尖形状更大），
+// 导致锚点越界（负数 / >1）或悬在框内，渲染时线端点不贴框。
+// 修复：按折线走向从节点中心射线打到矩形边界，重算锚点。
+
+type Pt = [number, number];
+
+function elementRect(el: { points?: Pt[] }): {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+} | null {
+  if (!el.points || el.points.length < 2) return null;
+  const xs = el.points.map((p) => p[0]);
+  const ys = el.points.map((p) => p[1]);
+  const x = Math.min(...xs);
+  const y = Math.min(...ys);
+  return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
+}
+
+/** 从 center 沿 dir 射线，返回与矩形边界的第一个交点；方向无效返回 null */
+function rayToRectEdge(
+  center: Pt,
+  dir: Pt,
+  rect: { x: number; y: number; w: number; h: number },
+): Pt | null {
+  let t = Infinity;
+  if (dir[0] > 0) t = Math.min(t, (rect.x + rect.w - center[0]) / dir[0]);
+  else if (dir[0] < 0) t = Math.min(t, (rect.x - center[0]) / dir[0]);
+  if (dir[1] > 0) t = Math.min(t, (rect.y + rect.h - center[1]) / dir[1]);
+  else if (dir[1] < 0) t = Math.min(t, (rect.y - center[1]) / dir[1]);
+  if (!Number.isFinite(t) || t <= 0) return null;
+  return [center[0] + t * dir[0], center[1] + t * dir[1]];
+}
+
+function reanchorMermaidLines<
+  T extends { type: string; id: string; points?: Pt[] },
+>(elements: T[]): T[] {
+  const rects = new Map<string, ReturnType<typeof elementRect>>();
+  for (const el of elements) {
+    if (el.type === "geometry") rects.set(el.id, elementRect(el));
+  }
+  return elements.map((el) => {
+    if (el.type !== "arrow-line" || !el.points || el.points.length < 2) {
+      return el;
+    }
+    const pts = el.points;
+    const next = { ...el } as T & {
+      source?: { boundId?: string; connection?: [number, number] };
+      target?: { boundId?: string; connection?: [number, number] };
+    };
+    // 起点：沿折线出发方向（pts[0]→pts[1]）从源中心打到边界
+    const srcRect = next.source?.boundId
+      ? rects.get(next.source.boundId)
+      : null;
+    if (srcRect && next.source) {
+      const c: Pt = [srcRect.x + srcRect.w / 2, srcRect.y + srcRect.h / 2];
+      const dir: Pt = [pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]];
+      const hit =
+        rayToRectEdge(c, dir, srcRect) ??
+        rayToRectEdge(
+          c,
+          [
+            pts[pts.length - 1][0] - pts[0][0],
+            pts[pts.length - 1][1] - pts[0][1],
+          ],
+          srcRect,
+        );
+      if (hit) {
+        next.source = {
+          ...next.source,
+          connection: [
+            (hit[0] - srcRect.x) / srcRect.w,
+            (hit[1] - srcRect.y) / srcRect.h,
+          ],
+        };
+      }
+    }
+    // 终点：沿进入方向的反向（末段方向取反，即「从哪条边进入」）从目标中心打到边界
+    const tgtRect = next.target?.boundId
+      ? rects.get(next.target.boundId)
+      : null;
+    if (tgtRect && next.target) {
+      const c: Pt = [tgtRect.x + tgtRect.w / 2, tgtRect.y + tgtRect.h / 2];
+      const last = pts[pts.length - 1];
+      const prev = pts[pts.length - 2];
+      const dir: Pt = [prev[0] - last[0], prev[1] - last[1]];
+      const hit =
+        rayToRectEdge(c, dir, tgtRect) ??
+        rayToRectEdge(c, [pts[0][0] - last[0], pts[0][1] - last[1]], tgtRect);
+      if (hit) {
+        next.target = {
+          ...next.target,
+          connection: [
+            (hit[0] - tgtRect.x) / tgtRect.w,
+            (hit[1] - tgtRect.y) / tgtRect.h,
+          ],
+        };
+      }
+    }
+    return next as T;
+  });
+}
+
+// ── mermaid 流程图整齐化重排 ─────────────────────────────
+//
+// mermaid 的 dagre 布局在服务端 mock 文本测量下偏差明显（节点中心
+// 不对齐、连线歪斜）。对 flowchart（graph/flowchart 语法且无
+// subgraph）：按拓扑分层、同层对齐等距、统一节点尺寸，连线全部
+// 改为横平竖直的正交折线（同层水平直线、跨层垂直直线、回边右侧
+// 绕行）。其他图类型（sequence/class/subgraph）不重排。
+
+interface FlowNode {
+  id: string;
+  layer: number;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+function relayoutMermaidFlowchart<
+  T extends { type: string; id: string; points?: Pt[] },
+>(elements: T[], mermaid: string): T[] {
+  const isFlowchart = /^\s*(?:graph|flowchart)\b/i.test(mermaid);
+  if (!isFlowchart) return elements;
+
+  const nodes = elements.filter((e) => e.type === "geometry");
+  const lines = elements.filter(
+    (e) =>
+      e.type === "arrow-line" &&
+      e.points &&
+      (e as { source?: { boundId?: string } }).source?.boundId &&
+      (e as { target?: { boundId?: string } }).target?.boundId,
+  );
+  if (nodes.length === 0 || lines.length === 0) return elements;
+
+  // 节点原矩形
+  const oldRect = new Map<
+    string,
+    NonNullable<ReturnType<typeof elementRect>>
+  >();
+  for (const n of nodes) {
+    const r = elementRect(n);
+    if (r) oldRect.set(n.id, r);
+  }
+  if (oldRect.size === 0) return elements;
+
+  // 拓扑分层（最长路径）：先用 DFS 找出回边（成环边）并从分层中剔除，
+  // 避免环上节点层级随迭代抬升；回边由连线阶段走右侧绕行
+  const layerOf = new Map<string, number>();
+  for (const id of oldRect.keys()) layerOf.set(id, 0);
+  const edges = lines.map((l) => {
+    const bound = l as unknown as {
+      source: { boundId: string };
+      target: { boundId: string };
+    };
+    return [bound.source.boundId, bound.target.boundId] as [string, string];
+  });
+  const adj = new Map<string, string[]>();
+  for (const [s, t] of edges) {
+    if (!adj.has(s)) adj.set(s, []);
+    adj.get(s)!.push(t);
+  }
+  const dfsState = new Map<string, number>(); // 1=栈上 2=完成
+  const backEdges = new Set<string>();
+  const dfs = (u: string) => {
+    dfsState.set(u, 1);
+    for (const v of adj.get(u) ?? []) {
+      if (dfsState.get(v) === 1) backEdges.add(`${u}\u0000${v}`);
+      else if (dfsState.get(v) !== 2) dfs(v);
+    }
+    dfsState.set(u, 2);
+  };
+  for (const id of oldRect.keys()) if (dfsState.get(id) !== 2) dfs(id);
+  const acyclicEdges = edges.filter(
+    ([s, t]) => !backEdges.has(`${s}\u0000${t}`),
+  );
+  for (let i = 0; i < oldRect.size; i++) {
+    let changed = false;
+    for (const [s, t] of acyclicEdges) {
+      const next = layerOf.get(s)! + 1;
+      if (next > layerOf.get(t)!) {
+        layerOf.set(t, next);
+        changed = true;
+      }
+    }
+    if (!changed) break;
+  }
+
+  // 贴靠：未被连线引用的节点（如 doublecircle 内圈）跟随与其重叠的
+  // 引用节点移动（保持原相对偏移），不独立参与布局
+  const refIds = new Set(edges.flat());
+  const follow = new Map<string, string>(); // orphanId -> 宿主 id
+  for (const [id, r] of oldRect) {
+    if (refIds.has(id)) continue;
+    const cx = r.x + r.w / 2;
+    const cy = r.y + r.h / 2;
+    let host: string | null = null;
+    let best = Infinity;
+    for (const [hid, hr] of oldRect) {
+      if (!refIds.has(hid) || hid === id) continue;
+      const d = Math.hypot(hr.x + hr.w / 2 - cx, hr.y + hr.h / 2 - cy);
+      if (d < Math.max(hr.w, hr.h) && d < best) {
+        best = d;
+        host = hid;
+      }
+    }
+    if (host) follow.set(id, host);
+  }
+  // 分组感知排序：subgraph 组框由 plait 根据子元素动态计算，移动节点后
+  // 组框自动跟随；同层内按（组中心x, 原x）排序，让同组成员相邻、组框
+  // 收敛成块（无组节点按原 x 与组块自然交错）
+  const groupIdOf = new Map<string, string>();
+  for (const el of elements) {
+    if (el.type !== "geometry") continue;
+    const gid = (el as { groupId?: string }).groupId;
+    if (gid) groupIdOf.set(el.id, gid);
+  }
+  const groupAcc = new Map<string, { sum: number; n: number }>();
+  for (const [id, r] of oldRect) {
+    if (follow.has(id)) continue;
+    const gid = groupIdOf.get(id);
+    if (!gid) continue;
+    const acc = groupAcc.get(gid) ?? { sum: 0, n: 0 };
+    acc.sum += r.x + r.w / 2;
+    acc.n++;
+    groupAcc.set(gid, acc);
+  }
+  const sortKeyOf = (id: string): [number, number] => {
+    const gid = groupIdOf.get(id);
+    const acc = gid ? groupAcc.get(gid) : undefined;
+    const x = oldRect.get(id)!.x;
+    return acc ? [acc.sum / acc.n, x] : [x, x];
+  };
+
+  // 布局集合：引用节点 + 真孤立节点（无宿主贴靠的不独立布局）
+
+  // 统一尺寸（同图同尺寸最整齐；下限保证文本空间）
+  const W = Math.max(140, ...[...oldRect.values()].map((r) => r.w));
+  const H = Math.max(60, ...[...oldRect.values()].map((r) => r.h));
+  const LAYER_GAP = 80;
+  const NODE_GAP = 80;
+
+  // 分层布局：层内等距居中，层间距统一
+  const byLayer = new Map<number, string[]>();
+  for (const [id, layer] of layerOf) {
+    if (follow.has(id)) continue;
+    if (!byLayer.has(layer)) byLayer.set(layer, []);
+    byLayer.get(layer)!.push(id);
+  }
+  const placed = new Map<string, FlowNode>();
+  for (const [layer, ids] of byLayer) {
+    ids.sort((a, b) => {
+      const [ax, ay] = sortKeyOf(a);
+      const [bx, by] = sortKeyOf(b);
+      return ax - bx || ay - by;
+    });
+    ids.forEach((id, i) => {
+      const n = ids.length;
+      placed.set(id, {
+        id,
+        layer,
+        x: (i - (n - 1) / 2) * (W + NODE_GAP),
+        y: layer * (H + LAYER_GAP),
+        w: W,
+        h: H,
+      });
+    });
+  }
+
+  // 更新节点 points：布局节点直接用新位置；贴靠节点跟随宿主位移
+  const moved = elements.map((el) => {
+    if (el.type !== "geometry") return el;
+    const p = placed.get(el.id);
+    if (p) {
+      return {
+        ...el,
+        points: [
+          [p.x, p.y],
+          [p.x + p.w, p.y + p.h],
+        ],
+      } as T;
+    }
+    const hostId = follow.get(el.id);
+    const old = oldRect.get(el.id);
+    if (hostId && old) {
+      const host = placed.get(hostId);
+      const oldHost = oldRect.get(hostId);
+      if (host && oldHost) {
+        const dx = host.x - oldHost.x;
+        const dy = host.y - oldHost.y;
+        return {
+          ...el,
+          points: [
+            [old.x + dx, old.y + dy],
+            [old.x + old.w + dx, old.y + old.h + dy],
+          ],
+        } as T;
+      }
+    }
+    return el;
+  });
+
+  // 连线全部重设为正交折线
+  const relaid = moved.map((el) => {
+    if (el.type !== "arrow-line") return el;
+    const line = el as T & {
+      source: { boundId: string; marker?: string };
+      target: { boundId: string; marker?: string };
+      points: Pt[];
+    };
+    const s = placed.get(line.source.boundId);
+    const t = placed.get(line.target.boundId);
+    if (!s || !t) return el;
+
+    let points: Pt[];
+    let sourceConn: [number, number];
+    let targetConn: [number, number];
+    const scx = s.x + s.w / 2;
+    const tcx = t.x + t.w / 2;
+    if (s.layer === t.layer) {
+      // 同层：水平直线（相向左右边中点）
+      const [l, r] = scx <= tcx ? [s, t] : [t, s];
+      points = [
+        [l.x + l.w, l.y + l.h / 2],
+        [r.x, r.y + r.h / 2],
+      ];
+      sourceConn = scx <= tcx ? [1, 0.5] : [0, 0.5];
+      targetConn = scx <= tcx ? [0, 0.5] : [1, 0.5];
+    } else if (t.layer > s.layer) {
+      // 正向跨层：源底中 → 目标顶中；x 对齐时退化为垂直直线
+      const sy2 = s.y + s.h;
+      if (Math.abs(scx - tcx) < 0.5) {
+        points = [
+          [scx, sy2],
+          [tcx, t.y],
+        ];
+      } else {
+        const midY = (sy2 + t.y) / 2;
+        points = [
+          [scx, sy2],
+          [scx, midY],
+          [tcx, midY],
+          [tcx, t.y],
+        ];
+      }
+      sourceConn = [0.5, 1];
+      targetConn = [0.5, 0];
+    } else {
+      // 回边：右侧绕行（源右中 → 外侧 → 目标右中）
+      const detourX = Math.max(s.x + s.w, t.x + t.w) + 60;
+      points = [
+        [s.x + s.w, s.y + s.h / 2],
+        [detourX, s.y + s.h / 2],
+        [detourX, t.y + t.h / 2],
+        [t.x + t.w, t.y + t.h / 2],
+      ];
+      sourceConn = [1, 0.5];
+      targetConn = [1, 0.5];
+    }
+    return {
+      ...line,
+      points,
+      source: { ...line.source, connection: sourceConn },
+      target: { ...line.target, connection: targetConn },
+    } as T;
+  });
+  return relaid;
+}
+
 export function buildBookmarkCanvasElements(
   bookmarks: BookmarkCardInput[],
   links: CanvasLinkInput[],
@@ -267,17 +691,18 @@ export function buildBookmarkCanvasElements(
           `links[${i}] 引用了不在 bookmarkNodes 中的书签 id: ${!src ? l.source : l.target}`,
         );
       }
+      const [sourceConn, targetConn] = facingConnections(src, tgt);
       return {
         id: `link-${i}`,
         type: "arrow-line",
         shape: "straight",
-        source: { marker: "none", boundId: src.id, connection: [0.5, 0] },
-        target: { marker: "arrow", boundId: tgt.id, connection: [0.5, 1] },
+        source: { marker: "none", boundId: src.id, connection: sourceConn },
+        target: { marker: "arrow", boundId: tgt.id, connection: targetConn },
         texts: [],
         strokeWidth: 2,
         points: [
-          [src.points[0][0] + BOOKMARK_CARD_WIDTH / 2, src.points[0][1]],
-          [tgt.points[0][0] + BOOKMARK_CARD_WIDTH / 2, tgt.points[1][1]],
+          connectionToPoint(src, sourceConn),
+          connectionToPoint(tgt, targetConn),
         ],
         opacity: 1,
       };
@@ -522,6 +947,15 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
               await import("@plait-board/mermaid-to-drawnix");
             elements = ((await parseMermaidToDrawnix(mermaid)).elements ??
               []) as object[];
+            // ① flowchart 整齐化重排（分层对齐 + 正交直线连线）
+            elements = relayoutMermaidFlowchart(
+              elements as Array<{ type: string; id: string; points?: Pt[] }>,
+              mermaid,
+            ) as Array<BookmarkCardElement | CanvasLineElement | object>;
+            // ② 修复 mermaid 线锚点越界 / 悬空（线端点不贴框）
+            elements = reanchorMermaidLines(
+              elements as Array<{ type: string; id: string; points?: Pt[] }>,
+            ) as Array<BookmarkCardElement | CanvasLineElement | object>;
           } catch (e) {
             return JSON.stringify({
               error: `mermaid 转 drawnix 失败: ${(e as Error).message}`,

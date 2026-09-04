@@ -131,32 +131,246 @@ export function createBookmarkCard(
  * 转换为现行 geometry 两点式格式（递归穿透分组等容器元素）。
  * 在 CanvasEditor 加载画布数据时调用一次，保存时自然写回新格式。
  */
-export function normalizeCanvasValue(
-  elements: PlaitElement[],
-): PlaitElement[] {
-  return elements.map((el) => {
-    if (el.type === LEGACY_BOOKMARK_CARD_TYPE) {
-      const rect = RectangleClient.getRectangleByPoints(
-        (el.points as Point[]) ?? [],
-      );
-      return {
-        ...el,
-        type: "geometry",
-        shape: BasicShapes.rectangle,
-        points: [
-          [rect.x, rect.y],
-          [rect.x + rect.width, rect.y + rect.height],
+export function normalizeCanvasValue(elements: PlaitElement[]): PlaitElement[] {
+  return reanchorAiLines(
+    elements.map((el) => {
+      if (el.type === LEGACY_BOOKMARK_CARD_TYPE) {
+        const rect = RectangleClient.getRectangleByPoints(
+          (el.points as Point[]) ?? [],
+        );
+        return {
+          ...el,
+          type: "geometry",
+          shape: BasicShapes.rectangle,
+          points: [
+            [rect.x, rect.y],
+            [rect.x + rect.width, rect.y + rect.height],
+          ],
+        } as PlaitElement;
+      }
+      if (el.children?.length) {
+        return {
+          ...el,
+          children: normalizeCanvasValue(el.children as PlaitElement[]),
+        };
+      }
+      return el;
+    }),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// AI 连线重锚（修复存量画布）
+//
+// 早期 create_canvas 生成的连线固定锚定「源卡上边 → 目标卡下边」，在网格布局
+// 下视觉上斜穿/纵穿卡片。加载时按两卡相对位置把端点重锚到「相向边」的中点
+// （与 create_canvas 现行实现同规则；锚点选取逻辑在此为纯前端副本）。
+// 只处理 id 以 "link-" 开头的 AI 生成线——手绘连线的 id 是 UUID，不受影响。
+// ---------------------------------------------------------------------------
+
+type Conn = [number, number];
+
+/** connection 比例锚点 → 卡片边框上的绝对坐标（按卡片实际尺寸） */
+function cardAnchor(card: BookmarkCardElement, conn: Conn): Conn {
+  const w = card.points[1][0] - card.points[0][0];
+  const h = card.points[1][1] - card.points[0][1];
+  return [card.points[0][0] + conn[0] * w, card.points[0][1] + conn[1] * h];
+}
+
+/** 两卡中心相对位置 → 相向边锚点（垂直为主：底↔顶；水平为主：右↔左） */
+function facingConnections(
+  src: BookmarkCardElement,
+  tgt: BookmarkCardElement,
+): [Conn, Conn] {
+  const scx = (src.points[0][0] + src.points[1][0]) / 2;
+  const scy = (src.points[0][1] + src.points[1][1]) / 2;
+  const tcx = (tgt.points[0][0] + tgt.points[1][0]) / 2;
+  const tcy = (tgt.points[0][1] + tgt.points[1][1]) / 2;
+  const dx = tcx - scx;
+  const dy = tcy - scy;
+  if (Math.abs(dy) >= Math.abs(dx)) {
+    return dy >= 0
+      ? [
+          [0.5, 1],
+          [0.5, 0],
+        ]
+      : [
+          [0.5, 0],
+          [0.5, 1],
+        ];
+  }
+  return dx >= 0
+    ? [
+        [1, 0.5],
+        [0, 0.5],
+      ]
+    : [
+        [0, 0.5],
+        [1, 0.5],
+      ];
+}
+
+// ---------------------------------------------------------------------------
+// mermaid 连线重锚（修复存量画布）
+//
+// mermaid-to-drawnix 旧产物的 connection 由折线端点直接换算比例，端点带
+// gap → 锚点越界（负数 / >1）或悬在框内，线端点不贴框。手绘线锚点必贴边
+// （某分量为 0/1），据此区分。修复：按折线走向从节点中心射线打到矩形边界。
+// ---------------------------------------------------------------------------
+
+interface SimpleRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+const EDGE_EPS = 0.01;
+const onEdge = (v: number) =>
+  Math.abs(v) < EDGE_EPS || Math.abs(v - 1) < EDGE_EPS;
+
+function rectOfPoints(points: Point[]): SimpleRect | null {
+  if (!points || points.length < 2) return null;
+  const xs = points.map((p) => p[0]);
+  const ys = points.map((p) => p[1]);
+  const x = Math.min(...xs);
+  const y = Math.min(...ys);
+  return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
+}
+
+/** 从 center 沿 dir 射线，返回与矩形边界的第一个交点；方向无效返回 null */
+function rayToRectEdge(center: Conn, dir: Conn, rect: SimpleRect): Conn | null {
+  let t = Infinity;
+  if (dir[0] > 0) t = Math.min(t, (rect.x + rect.w - center[0]) / dir[0]);
+  else if (dir[0] < 0) t = Math.min(t, (rect.x - center[0]) / dir[0]);
+  if (dir[1] > 0) t = Math.min(t, (rect.y + rect.h - center[1]) / dir[1]);
+  else if (dir[1] < 0) t = Math.min(t, (rect.y - center[1]) / dir[1]);
+  if (!Number.isFinite(t) || t <= 0) return null;
+  return [center[0] + t * dir[0], center[1] + t * dir[1]];
+}
+
+function connOnRect(rect: SimpleRect, p: Conn): Conn {
+  return [(p[0] - rect.x) / rect.w, (p[1] - rect.y) / rect.h];
+}
+
+/** 绑定线坏锚判定：source/target 的 connection 两分量都不贴边 */
+function hasDanglingAnchor(line: PlaitArrowLine): boolean {
+  const bad = (h: { connection?: unknown }) =>
+    Array.isArray(h?.connection) &&
+    h.connection.length === 2 &&
+    typeof h.connection[0] === "number" &&
+    typeof h.connection[1] === "number" &&
+    !onEdge(h.connection[0] as number) &&
+    !onEdge(h.connection[1] as number);
+  return bad(line.source) || bad(line.target);
+}
+
+/** mermaid 坏锚线重锚：两端独立按折线走向射线到绑定的 geometry 矩形边界 */
+function reanchorMermaidLine(
+  line: PlaitArrowLine,
+  rects: Map<string, SimpleRect>,
+): PlaitElement {
+  const pts = [...(line.points as Conn[])];
+  const next = { ...line, points: pts } as PlaitArrowLine;
+  const srcRect = line.source.boundId
+    ? rects.get(line.source.boundId)
+    : undefined;
+  if (srcRect) {
+    const c: Conn = [srcRect.x + srcRect.w / 2, srcRect.y + srcRect.h / 2];
+    // 出发方向：首段 pts[0]→pts[1]，失败时退回整线方向
+    const dir: Conn = [pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]];
+    const hit =
+      rayToRectEdge(c, dir, srcRect) ??
+      rayToRectEdge(
+        c,
+        [
+          pts[pts.length - 1][0] - pts[0][0],
+          pts[pts.length - 1][1] - pts[0][1],
         ],
-      } as PlaitElement;
+        srcRect,
+      );
+    if (hit) {
+      next.source = { ...line.source, connection: connOnRect(srcRect, hit) };
+      pts[0] = hit;
     }
-    if (el.children?.length) {
-      return {
-        ...el,
-        children: normalizeCanvasValue(el.children as PlaitElement[]),
-      };
+  }
+  const tgtRect = line.target.boundId
+    ? rects.get(line.target.boundId)
+    : undefined;
+  if (tgtRect) {
+    const c: Conn = [tgtRect.x + tgtRect.w / 2, tgtRect.y + tgtRect.h / 2];
+    // 进入方向的反向：末段 pts[n-2]→pts[n-1] 取反（从哪条边进入）
+    const last = pts[pts.length - 1];
+    const prev = pts[pts.length - 2];
+    const dir: Conn = [prev[0] - last[0], prev[1] - last[1]];
+    const hit =
+      rayToRectEdge(c, dir, tgtRect) ??
+      rayToRectEdge(c, [pts[0][0] - last[0], pts[0][1] - last[1]], tgtRect);
+    if (hit) {
+      next.target = { ...line.target, connection: connOnRect(tgtRect, hit) };
+      pts[pts.length - 1] = hit;
     }
-    return el;
-  });
+  }
+  return next as PlaitElement;
+}
+
+/** 对两端均绑定书签卡片的 AI 连线重算锚点（递归穿透容器元素） */
+function reanchorAiLines(elements: PlaitElement[]): PlaitElement[] {
+  const cardsById = new Map<string, BookmarkCardElement>();
+  const rects = new Map<string, SimpleRect>();
+  const collect = (els: PlaitElement[]) => {
+    for (const el of els) {
+      if (isBookmarkCard(el)) cardsById.set(el.id, el);
+      if (el.type === "geometry") {
+        const rect = rectOfPoints((el.points as Point[]) ?? []);
+        if (rect) rects.set(el.id, rect);
+      }
+      if (el.children?.length) collect(el.children as PlaitElement[]);
+    }
+  };
+  collect(elements);
+  if (cardsById.size === 0 && rects.size === 0) return elements;
+
+  const walk = (els: PlaitElement[]): PlaitElement[] =>
+    els.map((el) => {
+      const isAiLine =
+        PlaitDrawElement.isArrowLine(el) &&
+        typeof el.id === "string" &&
+        el.id.startsWith("link-");
+      if (isAiLine) {
+        const line = el as PlaitArrowLine;
+        const srcId = line.source.boundId;
+        const tgtId = line.target.boundId;
+        if (srcId && tgtId) {
+          const src = cardsById.get(srcId);
+          const tgt = cardsById.get(tgtId);
+          if (src && tgt) {
+            const [sourceConn, targetConn] = facingConnections(src, tgt);
+            return {
+              ...el,
+              source: { ...line.source, connection: sourceConn },
+              target: { ...line.target, connection: targetConn },
+              points: [
+                cardAnchor(src, sourceConn),
+                cardAnchor(tgt, targetConn),
+              ],
+            } as PlaitElement;
+          }
+        }
+      }
+      if (
+        PlaitDrawElement.isArrowLine(el) &&
+        !isAiLine &&
+        hasDanglingAnchor(el as PlaitArrowLine)
+      ) {
+        return reanchorMermaidLine(el as PlaitArrowLine, rects);
+      }
+      if (el.children?.length) {
+        return { ...el, children: walk(el.children as PlaitElement[]) };
+      }
+      return el;
+    });
+  return walk(elements);
 }
 
 function hostnameOf(url: string): string {
@@ -296,19 +510,15 @@ export function attachBookmarkCardToMind(
     }
   }
   if (!root) {
-    root = createEmptyMind(board, [
-      cardCenter[0] - CARD_WIDTH,
-      cardCenter[1],
-    ]);
+    root = createEmptyMind(board, [cardCenter[0] - CARD_WIDTH, cardCenter[1]]);
     Transforms.insertNode(board, root, [board.children.length]);
   }
   const rootPath = PlaitBoard.findPath(board, root);
   const cardPath = PlaitBoard.findPath(board, card);
-  Transforms.insertNode(
-    board,
-    createBookmarkMindNode(card),
-    [...rootPath, root.children?.length ?? 0],
-  );
+  Transforms.insertNode(board, createBookmarkMindNode(card), [
+    ...rootPath,
+    root.children?.length ?? 0,
+  ]);
   if (cardPath) {
     Transforms.removeNode(board, cardPath);
   }
@@ -332,10 +542,7 @@ class BookmarkMindNodeComponent extends MindNodeComponent {
     value: PlaitPluginElementContext<never, never>,
     previous: PlaitPluginElementContext<never, never>,
   ): void {
-    super.onContextChanged(
-      value as never,
-      previous as never,
-    );
+    super.onContextChanged(value as never, previous as never);
     this.drawBookmarkBadge();
   }
 
@@ -394,7 +601,10 @@ class BookmarkMindNodeComponent extends MindNodeComponent {
           fill: "#7a7a7a",
           "font-family": "inherit",
         },
-        hostnameOf(payload.url).slice(0, Math.max(1, Math.floor(maxTextWidth / 6))),
+        hostnameOf(payload.url).slice(
+          0,
+          Math.max(1, Math.floor(maxTextWidth / 6)),
+        ),
       ),
     );
     this.getElementG().append(g);
@@ -458,7 +668,9 @@ class BookmarkCardGenerator extends Generator<BookmarkCardElement> {
         }),
       );
     } else {
-      g.append(svgEl("circle", { cx: x + 24, cy: y + 25, r: 11, fill: "#6698ff" }));
+      g.append(
+        svgEl("circle", { cx: x + 24, cy: y + 25, r: 11, fill: "#6698ff" }),
+      );
       g.append(
         svgEl(
           "text",
@@ -751,7 +963,10 @@ export const withBookmarkCard = (board: PlaitBoardType): PlaitBoardType => {
     if (!PlaitBoard.getHost(board)) return;
     // 注意：toViewBoxPoint 入参是 host 坐标（画布宿主元素左上角为原点），
     // clientX/Y 是视口屏幕坐标，必须先经 toHostPoint 转换
-    const point = toViewBoxPoint(board, toHostPoint(board, event.clientX, event.clientY));
+    const point = toViewBoxPoint(
+      board,
+      toHostPoint(board, event.clientX, event.clientY),
+    );
     const hit = getHitElementByPoint(board, point, (e) => isBookmarkCard(e));
     if (isBookmarkCard(hit)) {
       window.open(hit.url, "_blank", "noopener,noreferrer");
@@ -772,16 +987,15 @@ export const withBookmarkCard = (board: PlaitBoardType): PlaitBoardType => {
     // getHost 一并校验：本监听器是 document 级的，画布卸载后仍存活，
     // 若 host 已注销（BOARD_TO_HOST 已删）而事件先于自毁触发，
     // 后续 toViewBoxPoint 会对 undefined 取 viewBox 而崩溃
-    if (
-      !container ||
-      !container.isConnected ||
-      !PlaitBoard.getHost(board)
-    ) {
+    if (!container || !container.isConnected || !PlaitBoard.getHost(board)) {
       document.removeEventListener("contextmenu", onContextMenu);
       return;
     }
     if (!container.contains(event.target as Node)) return;
-    const point = toViewBoxPoint(board, toHostPoint(board, event.clientX, event.clientY));
+    const point = toViewBoxPoint(
+      board,
+      toHostPoint(board, event.clientX, event.clientY),
+    );
     const hit = getHitElementByPoint(board, point, (e) => isBookmarkCard(e));
     if (isBookmarkCard(hit)) {
       event.preventDefault();

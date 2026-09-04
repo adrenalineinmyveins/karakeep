@@ -45,8 +45,7 @@ vi.mock("@plait/core", async (importOriginal) => {
   return {
     ...actual,
     PlaitBoard: Object.assign(actual.PlaitBoard, {
-      getBoardContainer: (board: object) =>
-        mocks.containerByBoard.get(board),
+      getBoardContainer: (board: object) => mocks.containerByBoard.get(board),
       getHost: (board: object) => mocks.hostByBoard.get(board),
       findPath: mocks.findPath,
     }),
@@ -67,8 +66,7 @@ vi.mock("@plait/mind", () => ({
   createEmptyMind: mocks.createEmptyMind,
   MindNodeComponent: mocks.FakeMindNodeComponent,
   PlaitMind: {
-    isMind: (e: unknown) =>
-      !!e && (e as { type?: string }).type === "mind",
+    isMind: (e: unknown) => !!e && (e as { type?: string }).type === "mind",
   },
 }));
 
@@ -173,9 +171,7 @@ describe("withBookmarkCard 右键菜单", () => {
     // 避免跨测试的 document 级监听器累积
     mocks.containerByBoard.clear();
     mocks.hostByBoard.clear();
-    document.dispatchEvent(
-      new MouseEvent("contextmenu", { bubbles: false }),
-    );
+    document.dispatchEvent(new MouseEvent("contextmenu", { bubbles: false }));
     container.remove();
   });
 
@@ -316,18 +312,14 @@ describe("withBookmarkCard 双击", () => {
     vi.restoreAllMocks();
     mocks.containerByBoard.clear();
     mocks.hostByBoard.clear();
-    document.dispatchEvent(
-      new MouseEvent("contextmenu", { bubbles: false }),
-    );
+    document.dispatchEvent(new MouseEvent("contextmenu", { bubbles: false }));
     container.remove();
   });
 
   it("双击命中卡片：在新标签页打开书签链接", () => {
     mocks.getHitElementByPoint.mockReturnValue(card);
 
-    board.dblClick(
-      new MouseEvent("click", { clientX: 300, clientY: 200 }),
-    );
+    board.dblClick(new MouseEvent("click", { clientX: 300, clientY: 200 }));
 
     expect(openSpy).toHaveBeenCalledWith(
       "https://example.com",
@@ -460,6 +452,146 @@ describe("normalizeCanvasValue", () => {
     expect(result[1]).toBe(line);
     expect(result[2]).toBe(card);
   });
+
+  it("AI 连线（link- 前缀 id）重锚到相向边：左右相邻 → 源右边/目标左边", () => {
+    const cardA = makeCard({
+      id: "card-a",
+      points: [
+        [0, 0],
+        [256, 88],
+      ],
+    });
+    const cardB = makeCard({
+      id: "card-b",
+      points: [
+        [336, 0],
+        [592, 88],
+      ],
+    });
+    const aiLine = {
+      id: "link-0",
+      type: "arrow-line",
+      shape: "straight",
+      // 旧版固定锚：源上边 → 目标下边（视觉斜穿卡片的根源）
+      source: { marker: "none", boundId: "card-a", connection: [0.5, 0] },
+      target: { marker: "arrow", boundId: "card-b", connection: [0.5, 1] },
+      texts: [],
+      strokeWidth: 2,
+      points: [
+        [128, 0],
+        [464, 88],
+      ],
+      opacity: 1,
+    } as unknown as PlaitElement;
+
+    const [, , line] = normalizeCanvasValue([
+      cardA,
+      cardB,
+      aiLine,
+    ]) as unknown as {
+      source: { connection: number[] };
+      target: { connection: number[] };
+      points: number[][];
+    }[];
+
+    expect(line.source.connection).toEqual([1, 0.5]);
+    expect(line.target.connection).toEqual([0, 0.5]);
+    expect(line.points).toEqual([
+      [256, 44],
+      [336, 44],
+    ]);
+  });
+
+  it("手绘连线（UUID id）不受重锚影响", () => {
+    const cardA = makeCard({
+      id: "card-a",
+      points: [
+        [0, 0],
+        [256, 88],
+      ],
+    });
+    const cardB = makeCard({
+      id: "card-b",
+      points: [
+        [336, 0],
+        [592, 88],
+      ],
+    });
+    const manualLine = {
+      id: crypto.randomUUID(),
+      type: "arrow-line",
+      source: { marker: "none", boundId: "card-a", connection: [0.5, 0] },
+      target: { marker: "arrow", boundId: "card-b", connection: [0.5, 1] },
+      texts: [],
+      strokeWidth: 2,
+      points: [
+        [128, 0],
+        [464, 88],
+      ],
+      opacity: 1,
+    } as unknown as PlaitElement;
+
+    const [, , line] = normalizeCanvasValue([cardA, cardB, manualLine]);
+
+    expect(line).toBe(manualLine);
+  });
+
+  it("mermaid 坏锚连线（越界/悬空 connection）重锚到节点边框", () => {
+    // 真实 mermaid-to-drawnix 旧产物：折线端点带 gap，
+    // connection 越界（y=-0.5075）或悬在框内（0.6875）
+    const nodeA = {
+      id: "nodeA",
+      type: "geometry",
+      points: [
+        [42.5, 12.5],
+        [142.5, 52.5],
+      ],
+    } as unknown as PlaitElement;
+    const nodeB = {
+      id: "nodeB",
+      type: "geometry",
+      points: [
+        [35, 125],
+        [135, 165],
+      ],
+    } as unknown as PlaitElement;
+    const mermaidLine = {
+      id: "pSQBC",
+      type: "arrow-line",
+      points: [
+        [50, 40],
+        [50, 65],
+        [50, 104.7],
+      ],
+      source: { marker: "none", boundId: "nodeA", connection: [0.075, 0.6875] },
+      target: {
+        marker: "arrow",
+        boundId: "nodeB",
+        connection: [0.15, -0.5075],
+      },
+      texts: [],
+      strokeWidth: 2,
+      opacity: 1,
+    } as unknown as PlaitElement;
+
+    const [, , line] = normalizeCanvasValue([
+      nodeA,
+      nodeB,
+      mermaidLine,
+    ]) as unknown as {
+      source: { connection: number[] };
+      target: { connection: number[] };
+      points: number[][];
+    }[];
+
+    // 折线垂直向下 → 源下边中点 / 目标上边中点
+    expect(line.source.connection).toEqual([0.5, 1]);
+    expect(line.target.connection).toEqual([0.5, 0]);
+    expect(line.points[0]).toEqual([92.5, 52.5]);
+    expect(line.points[2]).toEqual([85, 125]);
+    // 中间折点保留
+    expect(line.points[1]).toEqual([50, 65]);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -507,7 +639,10 @@ function makeBoardWithChildren(children: PlaitElement[]) {
 }
 
 /** 按引用递归搜索树，返回元素 path；与 plait 的 findPath 语义一致（mock 版） */
-function pathOf(children: PlaitElement[], element: PlaitElement): number[] | null {
+function pathOf(
+  children: PlaitElement[],
+  element: PlaitElement,
+): number[] | null {
   for (let i = 0; i < children.length; i++) {
     if (children[i] === element) return [i];
     const kids = children[i].children;
@@ -520,7 +655,9 @@ function pathOf(children: PlaitElement[], element: PlaitElement): number[] | nul
 }
 
 /** Transforms mock：以可变树语义真实插入/删除，便于断言最终结构 */
-function installMutableTransformMocks(board: PlaitBoardType & { children: PlaitElement[] }) {
+function installMutableTransformMocks(
+  board: PlaitBoardType & { children: PlaitElement[] },
+) {
   mocks.findPath.mockImplementation((b: unknown, el: PlaitElement) =>
     pathOf((b as { children: PlaitElement[] }).children, el),
   );
@@ -597,7 +734,9 @@ describe("createBookmarkMindNode", () => {
   it("标题为空时 topic 回退为 url", () => {
     const card = makeCard({ title: "" });
     const node = createBookmarkMindNode(card);
-    expect(node.data.topic.children[0]).toEqual({ text: "https://example.com" });
+    expect(node.data.topic.children[0]).toEqual({
+      text: "https://example.com",
+    });
   });
 });
 
@@ -641,9 +780,10 @@ describe("attachBookmarkCardToMind", () => {
   it("画布已有思维导图：挂到距离卡片最近的中心主题，并移除原卡片", () => {
     const board = makeBoardWithChildren([]);
     installMutableTransformMocks(board);
-    const nearRoot = makeMindRoot([400, 300], [
-      { id: "existing", type: "mind_child", children: [] } as PlaitElement,
-    ]);
+    const nearRoot = makeMindRoot(
+      [400, 300],
+      [{ id: "existing", type: "mind_child", children: [] } as PlaitElement],
+    );
     const farRoot = makeMindRoot([5000, 9000]);
     const card = createBookmarkCard(
       { bookmarkId: "bm-1", title: "T", url: "https://example.com" },
@@ -832,7 +972,11 @@ describe("撤销重做：悬空线兜底与树恢复", () => {
     //    直调不经过 board.apply，因此不触发悬空线检查
     mocks.insertNode(board, line, [0]);
     mocks.insertNode(board, card, [0]);
-    expect(board.children.map((e) => e.id)).toEqual(["card-1", "l-1", "card-2"]);
+    expect(board.children.map((e) => e.id)).toEqual([
+      "card-1",
+      "l-1",
+      "card-2",
+    ]);
     // undo 阶段不应有新的删除（removeNode 调用数不变）
     expect(mocks.removeNode.mock.calls.length).toBe(removeCallsAfterDelete);
 
