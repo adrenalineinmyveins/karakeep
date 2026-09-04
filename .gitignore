@@ -79,3 +79,17 @@ jean.json
 
 # Tauri installer build artifact
 apps/desktop/src-tauri/payload.tar.gz
+
+# Expo local files
+.expo/
+
+# Local recovery workspace
+.recover/
+
+# Local debug outputs
+.tmp-workers-out.txt
+apps/mobile/tsc-code.txt
+
+# Docker image build downloads
+docker/downloads/
+docker/s6-overlay/
