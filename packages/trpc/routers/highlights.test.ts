@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import type { CustomTestContext } from "../testUtils";
 import { defaultBeforeEach } from "../testUtils";

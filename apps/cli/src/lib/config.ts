@@ -8,7 +8,7 @@ export interface CliConfig {
   serverAddr?: string;
 }
 
-export const DEFAULT_SERVER_ADDR = "https://cloud.karakeep.app";
+export const DEFAULT_SERVER_ADDR = "http://localhost:3000";
 
 export const zCliConfigFileSchema = z
   .object({
@@ -29,7 +29,7 @@ export function normalizeConfig(config: CliConfigFile): CliConfig {
 export function getConfigPath() {
   const configHome =
     process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
-  return path.join(configHome, "karakeep", "config.json");
+  return path.join(configHome, "saiye", "config.json");
 }
 
 export function loadConfigFile(): CliConfigFile {

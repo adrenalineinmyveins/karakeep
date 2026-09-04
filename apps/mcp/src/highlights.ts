@@ -1,7 +1,7 @@
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types";
 import { z } from "zod";
 
-import { karakeepClient, mcpServer } from "./shared";
+import { saiyeClient, mcpServer } from "./shared";
 import { compactHighlight, pickDefined, toMcpToolError } from "./utils";
 
 const highlightColorSchema = z.enum(["yellow", "red", "green", "blue"]);
@@ -27,7 +27,7 @@ export type ListHighlightsInput = z.infer<
 export async function listHighlightsHandler(
   input: ListHighlightsInput,
 ): Promise<CallToolResult> {
-  const res = await karakeepClient.GET("/highlights", {
+  const res = await saiyeClient.GET("/highlights", {
     params: { query: pickDefined(input) },
   });
   if (!res.data) {
@@ -65,7 +65,7 @@ export async function getBookmarkHighlightsHandler({
 }: {
   bookmarkId: string;
 }): Promise<CallToolResult> {
-  const res = await karakeepClient.GET("/bookmarks/{bookmarkId}/highlights", {
+  const res = await saiyeClient.GET("/bookmarks/{bookmarkId}/highlights", {
     params: { path: { bookmarkId } },
   });
   if (!res.data) {
@@ -104,7 +104,7 @@ export async function getHighlightHandler({
 }: {
   highlightId: string;
 }): Promise<CallToolResult> {
-  const res = await karakeepClient.GET("/highlights/{highlightId}", {
+  const res = await saiyeClient.GET("/highlights/{highlightId}", {
     params: { path: { highlightId } },
   });
   if (!res.data) {
@@ -161,7 +161,7 @@ export async function createHighlightHandler(
   if (input.endOffset <= input.startOffset) {
     return toMcpToolError(`endOffset must be greater than startOffset.`);
   }
-  const res = await karakeepClient.POST("/highlights", {
+  const res = await saiyeClient.POST("/highlights", {
     body: input,
   });
   if (!res.data) {
@@ -204,7 +204,7 @@ export async function updateHighlightHandler(
       `update-highlight requires at least one field to update (color or note).`,
     );
   }
-  const res = await karakeepClient.PATCH("/highlights/{highlightId}", {
+  const res = await saiyeClient.PATCH("/highlights/{highlightId}", {
     params: { path: { highlightId } },
     body,
   });
@@ -233,7 +233,7 @@ export async function deleteHighlightHandler({
 }: {
   highlightId: string;
 }): Promise<CallToolResult> {
-  const res = await karakeepClient.DELETE("/highlights/{highlightId}", {
+  const res = await saiyeClient.DELETE("/highlights/{highlightId}", {
     params: { path: { highlightId } },
   });
   if (!res.data) {

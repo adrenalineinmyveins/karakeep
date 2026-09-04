@@ -1,13 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import type { DB } from "@karakeep/db";
-import type { rssFeedsTable } from "@karakeep/db/schema";
-import serverConfig from "@karakeep/shared/config";
+import type { DB } from "@saiye/db";
+import type { rssFeedsTable } from "@saiye/db/schema";
+import serverConfig from "@saiye/shared/config";
 import {
   zNewFeedSchema,
   zUpdateFeedSchema,
-} from "@karakeep/shared/types/feeds";
+} from "@saiye/shared/types/feeds";
 
 import type { Actor, Authorized } from "../lib/actor";
 import { actorUserId, assertOwnership, authorize } from "../lib/actor";

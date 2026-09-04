@@ -6,14 +6,14 @@ import { fromBuffer } from "pdf2pic";
 import { createWorker } from "tesseract.js";
 import { withWorkerEventLog, withWorkerTracing } from "workerTracing";
 
-import type { AssetPreprocessingRequest } from "@karakeep/shared-server";
-import { db } from "@karakeep/db";
+import type { AssetPreprocessingRequest } from "@saiye/shared-server";
+import { db } from "@saiye/db";
 import {
   assets,
   AssetTypes,
   bookmarkAssets,
   bookmarks,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   addLogFields,
   AssetPreprocessingQueue,
@@ -22,17 +22,17 @@ import {
   QuotaService,
   StorageQuotaError,
   triggerSearchReindex,
-} from "@karakeep/shared-server";
-import { newAssetId, readAsset, saveAsset } from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
-import { InferenceClientFactory } from "@karakeep/shared/inference";
-import logger from "@karakeep/shared/logger";
-import { buildOCRPrompt } from "@karakeep/shared/prompts";
+} from "@saiye/shared-server";
+import { newAssetId, readAsset, saveAsset } from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
+import { InferenceClientFactory } from "@saiye/shared/inference";
+import logger from "@saiye/shared/logger";
+import { buildOCRPrompt } from "@saiye/shared/prompts";
 import {
   DequeuedJob,
   EnqueueOptions,
   getQueueClient,
-} from "@karakeep/shared/queueing";
+} from "@saiye/shared/queueing";
 
 export class AssetPreprocessingWorker {
   static async build() {

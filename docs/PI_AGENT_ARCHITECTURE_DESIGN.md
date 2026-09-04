@@ -133,7 +133,7 @@ import { Agent } from "@earendil-works/pi-agent-core";
 import { getModel } from "@earendil-works/pi-ai";
 import { Type } from "typebox";
 import { z } from "zod";
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 
 /**
  * Agent 接口抽象 —— 所有业务代码面向此接口编程。
@@ -430,8 +430,8 @@ export class AgentOrchestrator {
     sessionId: string,
     userId: string,
   ): Promise<Array<{ role: "user" | "assistant"; content: string }>> {
-    const { db } = await import("@karakeep/db");
-    const { chatMessages } = await import("@karakeep/db/schema");
+    const { db } = await import("@saiye/db");
+    const { chatMessages } = await import("@saiye/db/schema");
     const { eq, and, asc } = await import("drizzle-orm");
 
     const rows = await db
@@ -465,8 +465,8 @@ v2.0 核心变化：**优先复用 `config.ts`，`aiSettings` 表降级为可选
 ```typescript
 // packages/trpc/lib/agent/credentials.ts
 
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
 
 /**
  * 凭证桥接层（简化版）
@@ -766,8 +766,8 @@ import { and, desc, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { db } from "@karakeep/db";
-import { chatMessages, chatSessions } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { chatMessages, chatSessions } from "@saiye/db/schema";
 
 import { authedProcedure, router } from "../index";
 import { AgentOrchestrator } from "../lib/agent/orchestrator";

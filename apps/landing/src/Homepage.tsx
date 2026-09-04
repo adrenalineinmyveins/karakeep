@@ -91,7 +91,7 @@ const featuresList = [
   {
     icon: SunMoon,
     title: "Dark Mode",
-    description: "Karakeep supports dark mode for better reading experience.",
+    description: "Saiye supports dark mode for better reading experience.",
   },
 ];
 
@@ -101,7 +101,7 @@ const _showcases = [
     title: "Save Everything",
     headline: "One place for all your bookmarks",
     description:
-      "Save links, notes, images, and PDFs from any device. Karakeep automatically fetches titles, descriptions, and images so you never lose context.",
+      "Save links, notes, images, and PDFs from any device. Saiye automatically fetches titles, descriptions, and images so you never lose context.",
     bullets: [
       { icon: Link2, text: "Save any link with one click" },
       { icon: FileText, text: "Store notes, images, and PDFs" },
@@ -111,7 +111,7 @@ const _showcases = [
       },
     ],
     screenshot: tagsScreenshot,
-    screenshotAlt: "Karakeep tags view",
+    screenshotAlt: "Saiye tags view",
     reverse: false,
   },
   {
@@ -119,14 +119,14 @@ const _showcases = [
     title: "AI-Powered Organization",
     headline: "Let AI organize your bookmarks",
     description:
-      "Karakeep uses AI to automatically tag and categorize your bookmarks. Stop spending time filing things away — just save and let AI do the work.",
+      "Saiye uses AI to automatically tag and categorize your bookmarks. Stop spending time filing things away — just save and let AI do the work.",
     bullets: [
       { icon: BrainCircuit, text: "Automatic AI-powered tagging" },
       { icon: Tag, text: "Smart categorization" },
       { icon: Zap, text: "Instant organization as you save" },
     ],
     screenshot: searchScreenshot,
-    screenshotAlt: "Karakeep search view",
+    screenshotAlt: "Saiye search view",
     reverse: true,
   },
   {
@@ -140,7 +140,7 @@ const _showcases = [
       { icon: Highlighter, text: "Highlight text on any saved page" },
     ],
     screenshot: readerViewScreenshot,
-    screenshotAlt: "Karakeep reader view",
+    screenshotAlt: "Saiye reader view",
     reverse: false,
   },
   {
@@ -155,7 +155,7 @@ const _showcases = [
       { icon: Tag, text: "Auto-tag based on URL patterns or content" },
     ],
     screenshot: ruleEngineScreenshot,
-    screenshotAlt: "Karakeep rule engine",
+    screenshotAlt: "Saiye rule engine",
     reverse: true,
   },
 ];

@@ -7,9 +7,9 @@ import {
   ZAdminMaintenanceTask,
   zAdminMaintenanceTaskSchema,
   ZAdminMaintenanceTidyAssetsTask,
-} from "@karakeep/shared-server";
-import logger from "@karakeep/shared/logger";
-import { DequeuedJob, getQueueClient } from "@karakeep/shared/queueing";
+} from "@saiye/shared-server";
+import logger from "@saiye/shared/logger";
+import { DequeuedJob, getQueueClient } from "@saiye/shared/queueing";
 
 import { runMigrateLargeLinkHtmlTask } from "./adminMaintenance/tasks/migrateLinkHtmlContent";
 import { runTidyAssetsTask } from "./adminMaintenance/tasks/tidyAssets";

@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 
-import type { RateLimitConfig } from "@karakeep/shared/ratelimiting";
-import serverConfig from "@karakeep/shared/config";
-import { getRateLimitClient } from "@karakeep/shared/ratelimiting";
+import type { RateLimitConfig } from "@saiye/shared/ratelimiting";
+import serverConfig from "@saiye/shared/config";
+import { getRateLimitClient } from "@saiye/shared/ratelimiting";
 
 /**
  * Create a tRPC middleware for rate limiting

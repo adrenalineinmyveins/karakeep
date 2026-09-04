@@ -6,7 +6,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { ZTagListResponse } from "@karakeep/shared/types/tags";
+import { ZTagListResponse } from "@saiye/shared/types/tags";
 
 import { useTRPC } from "../trpc";
 import { scheduleInvalidateQueries } from "./query-invalidation";

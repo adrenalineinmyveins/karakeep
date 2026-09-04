@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { apiKeys } from "@karakeep/db/schema";
-import { API_KEY_FULL_ACCESS_SCOPE } from "@karakeep/shared/types/apiKeys";
+import { apiKeys } from "@saiye/db/schema";
+import { API_KEY_FULL_ACCESS_SCOPE } from "@saiye/shared/types/apiKeys";
 
 import type { CustomTestContext } from "../testUtils";
 import {
@@ -11,8 +11,8 @@ import {
   getApiKeyCallerForPlainKey,
 } from "../testUtils";
 
-vi.mock("@karakeep/shared/config", async (original) => {
-  const mod = (await original()) as typeof import("@karakeep/shared/config");
+vi.mock("@saiye/shared/config", async (original) => {
+  const mod = (await original()) as typeof import("@saiye/shared/config");
   return {
     ...mod,
     default: {
@@ -494,7 +494,7 @@ describe("API Keys Routes", () => {
       });
 
       // Mock serverConfig to enable email verification requirement
-      const originalConfig = (await import("@karakeep/shared/config")).default;
+      const originalConfig = (await import("@saiye/shared/config")).default;
       vi.spyOn(
         originalConfig.auth,
         "emailVerificationRequired",

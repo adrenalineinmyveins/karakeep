@@ -4,7 +4,7 @@ import * as z from "zod";
 import {
   updateUserSchema,
   zAdminJobModifiedWithinSecondsSchema,
-} from "@karakeep/shared/types/admin";
+} from "@saiye/shared/types/admin";
 
 import { BearerAuth } from "./common";
 import { ErrorSchema, UnauthorizedResponse } from "./errors";

@@ -4,9 +4,9 @@ import { cors } from "hono/cors";
 import { logger as loggerMiddleware } from "hono/logger";
 import { poweredBy } from "hono/powered-by";
 
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { Context } from "@karakeep/trpc";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { Context } from "@saiye/trpc";
 
 import trpcAdapter from "./middlewares/trpcAdapter";
 import admin from "./routes/admin";

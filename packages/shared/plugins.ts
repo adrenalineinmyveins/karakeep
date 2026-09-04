@@ -33,7 +33,7 @@ export interface PluginProvider<T> {
 // Preserve the key-dependent value type: for K, store TPlugin<K>[]
 type ProviderMap = { [K in PluginType]: TPlugin<K>[] };
 
-const pluginProvidersKey = "__karakeep_plugins_providers__";
+const pluginProvidersKey = "__saiye_plugins_providers__";
 
 function createProviderMap(): ProviderMap {
   return {

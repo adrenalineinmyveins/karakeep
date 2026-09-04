@@ -1,7 +1,7 @@
 import type { Index } from "meilisearch";
 import { Mutex } from "async-mutex";
 
-import logger from "@karakeep/shared/logger";
+import logger from "@saiye/shared/logger";
 
 interface MeiliDocument {
   id: string;

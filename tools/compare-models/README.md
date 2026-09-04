@@ -1,13 +1,13 @@
 # Model Comparison Tool
 
-A standalone CLI tool to compare the tagging performance of AI models using your existing Karakeep bookmarks.
+A standalone CLI tool to compare the tagging performance of AI models using your existing Saiye bookmarks.
 
 ## Features
 
 - **Two comparison modes:**
   - **Model vs Model**: Compare two AI models against each other
   - **Model vs Existing**: Compare a new model against existing AI-generated tags on your bookmarks
-- Fetches existing bookmarks from your Karakeep instance
+- Fetches existing bookmarks from your Saiye instance
 - Runs tagging inference with AI models
 - **Random shuffling**: Models/tags are randomly assigned to "Model A" or "Model B" for each bookmark to eliminate bias
 - Blind comparison: Model names are hidden during voting (only shown as "Model A" and "Model B")
@@ -21,9 +21,9 @@ A standalone CLI tool to compare the tagging performance of AI models using your
 Required environment variables:
 
 ```bash
-# Karakeep API configuration
-KARAKEEP_API_KEY=your_api_key_here
-KARAKEEP_SERVER_ADDR=https://your-karakeep-instance.com
+# Saiye API configuration
+SAIYE_API_KEY=your_api_key_here
+SAIYE_SERVER_ADDR=https://your-saiye-instance.com
 
 # Comparison mode (default: model-vs-model)
 # - "model-vs-model": Compare two models against each other
@@ -75,8 +75,8 @@ pnpm run
 Create a `.env` file:
 
 ```env
-KARAKEEP_API_KEY=your_api_key
-KARAKEEP_SERVER_ADDR=https://your-karakeep-instance.com
+SAIYE_API_KEY=your_api_key
+SAIYE_SERVER_ADDR=https://your-saiye-instance.com
 MODEL1_NAME=gpt-4o-mini
 MODEL2_NAME=claude-3-5-sonnet
 OPENAI_API_KEY=your_openai_key
@@ -94,8 +94,8 @@ If you prefer to run the compiled JavaScript directly:
 
 ```bash
 pnpm build
-export KARAKEEP_API_KEY=your_api_key
-export KARAKEEP_SERVER_ADDR=https://your-karakeep-instance.com
+export SAIYE_API_KEY=your_api_key
+export SAIYE_SERVER_ADDR=https://your-saiye-instance.com
 export MODEL1_NAME=gpt-4o-mini
 export MODEL2_NAME=claude-3-5-sonnet
 export OPENAI_API_KEY=your_openai_key
@@ -135,7 +135,7 @@ This mode is useful for:
 
 ## Usage Flow
 
-1. The tool fetches your latest link bookmarks from Karakeep
+1. The tool fetches your latest link bookmarks from Saiye
    - In **model-vs-existing** mode, only bookmarks with existing AI tags are included
 2. For each bookmark, it randomly assigns the options to "Model A" or "Model B" and runs tagging
 3. You'll see a side-by-side comparison (randomly shuffled each time):
@@ -196,11 +196,11 @@ The tool currently tests only:
 
 ## Architecture
 
-This tool leverages Karakeep's shared infrastructure:
-- **API Client**: Uses `@karakeep/sdk` for type-safe API interactions with proper authentication
-- **Inference**: Reuses `@karakeep/shared/inference` for OpenAI client with structured output support
-- **Prompts**: Uses `@karakeep/shared/prompts` for consistent tagging prompt generation with token management
-- No code duplication - all core functionality is shared with the main Karakeep application
+This tool leverages Saiye's shared infrastructure:
+- **API Client**: Uses `@saiye/sdk` for type-safe API interactions with proper authentication
+- **Inference**: Reuses `@saiye/shared/inference` for OpenAI client with structured output support
+- **Prompts**: Uses `@saiye/shared/prompts` for consistent tagging prompt generation with token management
+- No code duplication - all core functionality is shared with the main Saiye application
 
 
 ## Error Handling
@@ -223,8 +223,8 @@ The built binary will be in `dist/index.js`.
 
 - The tool is designed for manual, human-in-the-loop evaluation
 - No results are persisted - they're only displayed in console
-- Content is fetched with `includeContent=true` from Karakeep API
-- Uses Karakeep SDK (`@karakeep/sdk`) for type-safe API interactions
+- Content is fetched with `includeContent=true` from Saiye API
+- Uses Saiye SDK (`@saiye/sdk`) for type-safe API interactions
 - Inference runs sequentially to keep state management simple
 - Recommended to use `pnpm run` for the best experience (uses tsx for development)
 - **Random shuffling**: For each bookmark, models are randomly assigned to "Model A" or "Model B" to eliminate position bias. The actual model names are only revealed in the final results.

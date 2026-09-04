@@ -3,7 +3,7 @@ import { HttpsProxyAgent } from "https-proxy-agent";
 import metascraperLogo from "metascraper-logo-favicon";
 import { getRandomProxy } from "network";
 
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 
 type FaviconResolver = NonNullable<
   Parameters<typeof metascraperLogo>[0]

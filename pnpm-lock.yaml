@@ -20,7 +20,7 @@ overrides:
   '@types/react-dom': 19.2.3
 
 patchedDependencies:
-  '@drawnix/drawnix': f874737971bdb158b44e12a660b050cb9fa6f196a65c93bb81d6d2706c8222c6
+  '@drawnix/drawnix': 876f485c8f1a3a88e5c165c4af32e3596210ef7e28d626b541f108aa3e9aea2c
   expo-modules-jsi@56.0.12: 25bbfeac6ce3cacb0d88c14be56e063f908a01e58961da32c2c42d98e3bb7491
   playwright-extra@4.3.6: cc2a1c1903e66d7f6cea77c615cb9ae3b36a694502c1c588c3e34d28aa925aac
   react-native-css-interop@0.2.1: d6a165f45c53b03f2c390496a57bf96a4f79884fb2a0f804d896ef7acab1e12a
@@ -54,15 +54,6 @@ importers:
 
   apps/browser-extension:
     dependencies:
-      '@karakeep/shared':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/shared
-      '@karakeep/shared-react':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/shared-react
-      '@karakeep/trpc':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/trpc
       '@radix-ui/react-dialog':
         specifier: ^1.1.14
         version: 1.1.14(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -75,6 +66,15 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.4
         version: 1.2.4(@types/react@19.2.15)(react@19.2.3)
+      '@saiye/shared':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/shared
+      '@saiye/shared-react':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/shared-react
+      '@saiye/trpc':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/trpc
       '@tanstack/query-async-storage-persister':
         specifier: 5.90.2
         version: 5.90.2
@@ -136,10 +136,10 @@ importers:
       '@crxjs/vite-plugin':
         specifier: 2.2.0
         version: 2.2.0
-      '@karakeep/tailwind-config':
+      '@saiye/tailwind-config':
         specifier: workspace:^0.1.0
         version: link:../../tooling/tailwind
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@types/chrome':
@@ -175,13 +175,13 @@ importers:
       '@commander-js/extra-typings':
         specifier: ^12.0.1
         version: 12.1.0(commander@12.1.0)
-      '@karakeep/shared':
+      '@saiye/shared':
         specifier: workspace:^0.1.0
         version: link:../../packages/shared
-      '@karakeep/trpc':
+      '@saiye/trpc':
         specifier: workspace:^0.1.0
         version: link:../../packages/trpc
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@trpc/client':
@@ -263,10 +263,10 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.1)
     devDependencies:
-      '@karakeep/tailwind-config':
+      '@saiye/tailwind-config':
         specifier: workspace:^0.1.0
         version: link:../../tooling/tailwind
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@tailwindcss/typography':
@@ -296,12 +296,12 @@ importers:
 
   apps/mcp:
     dependencies:
-      '@karakeep/sdk':
-        specifier: workspace:*
-        version: link:../../packages/sdk
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
         version: 1.29.0(zod@4.3.6)
+      '@saiye/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
       turndown:
         specifier: ^7.2.0
         version: 7.2.0
@@ -309,10 +309,10 @@ importers:
         specifier: ^4.0.0
         version: 4.3.6
     devDependencies:
-      '@karakeep/shared':
+      '@saiye/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@tsconfig/node22':
@@ -348,15 +348,6 @@ importers:
       '@expo/vector-icons':
         specifier: ^15.0.3
         version: 15.0.3(expo-font@56.0.7)(react-native@0.85.3(patch_hash=7d74c7fbd33e9f3f3f8a8ba47a013acfc098948e39c7faab1232e6edca358ac1)(@babel/core@7.29.0)(@react-native/metro-config@0.85.3(@babel/core@7.29.0))(@types/react@19.2.15)(react@19.2.3))(react@19.2.3)
-      '@karakeep/shared':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/shared
-      '@karakeep/shared-react':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/shared-react
-      '@karakeep/trpc':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/trpc
       '@react-native-async-storage/async-storage':
         specifier: 2.2.0
         version: 2.2.0(react-native@0.85.3(patch_hash=7d74c7fbd33e9f3f3f8a8ba47a013acfc098948e39c7faab1232e6edca358ac1)(@babel/core@7.29.0)(@react-native/metro-config@0.85.3(@babel/core@7.29.0))(@types/react@19.2.15)(react@19.2.3))
@@ -372,6 +363,15 @@ importers:
       '@rn-primitives/slot':
         specifier: ^1.2.0
         version: 1.2.0(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-native@0.85.3(patch_hash=7d74c7fbd33e9f3f3f8a8ba47a013acfc098948e39c7faab1232e6edca358ac1)(@babel/core@7.29.0)(@react-native/metro-config@0.85.3(@babel/core@7.29.0))(@types/react@19.2.15)(react@19.2.3))(react@19.2.3)
+      '@saiye/shared':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/shared
+      '@saiye/shared-react':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/shared-react
+      '@saiye/trpc':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/trpc
       '@sentry/react-native':
         specifier: ^8.14.0
         version: 8.18.0(@expo/env@2.4.1)(dotenv@16.4.5)(expo@56.0.15)(react-native@0.85.3(patch_hash=7d74c7fbd33e9f3f3f8a8ba47a013acfc098948e39c7faab1232e6edca358ac1)(@babel/core@7.29.0)(@react-native/metro-config@0.85.3(@babel/core@7.29.0))(@types/react@19.2.15)(react@19.2.3))(react@19.2.3)
@@ -553,10 +553,10 @@ importers:
       '@babel/core':
         specifier: ^7.29.0
         version: 7.29.0
-      '@karakeep/tailwind-config':
+      '@saiye/tailwind-config':
         specifier: workspace:^0.1.0
         version: link:../../tooling/tailwind
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@types/react':
@@ -579,7 +579,7 @@ importers:
         version: 1.5.3
       '@drawnix/drawnix':
         specifier: 0.4.0-2
-        version: 0.4.0-2(patch_hash=f874737971bdb158b44e12a660b050cb9fa6f196a65c93bb81d6d2706c8222c6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 0.4.0-2(patch_hash=876f485c8f1a3a88e5c165c4af32e3596210ef7e28d626b541f108aa3e9aea2c)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@emoji-mart/data':
         specifier: ^1.1.2
         version: 1.1.2
@@ -589,24 +589,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.62.0(react@19.2.3))
-      '@karakeep/api':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/api
-      '@karakeep/db':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/db
-      '@karakeep/shared':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/shared
-      '@karakeep/shared-react':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/shared-react
-      '@karakeep/shared-server':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/shared-server
-      '@karakeep/trpc':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/trpc
       '@lexical/list':
         specifier: ^0.20.2
         version: 0.20.2
@@ -709,6 +691,24 @@ importers:
       '@radix-ui/react-visually-hidden':
         specifier: ^1.2.3
         version: 1.2.3(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@saiye/api':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/api
+      '@saiye/db':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/db
+      '@saiye/shared':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/shared
+      '@saiye/shared-react':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/shared-react
+      '@saiye/shared-server':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/shared-server
+      '@saiye/trpc':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/trpc
       '@shadcn/react':
         specifier: ^0.2.1
         version: 0.2.1(@types/react@19.2.15)(react@19.2.3)
@@ -899,15 +899,15 @@ importers:
         specifier: ^5.0.5
         version: 5.0.8(@types/react@19.2.15)(immer@11.1.15)(react@19.2.3)(use-sync-external-store@1.5.0(react@19.2.3))
     devDependencies:
-      '@karakeep/tailwind-config':
-        specifier: workspace:^0.1.0
-        version: link:../../tooling/tailwind
-      '@karakeep/tsconfig':
-        specifier: workspace:^0.1.0
-        version: link:../../tooling/typescript
       '@next/bundle-analyzer':
         specifier: 16.2.12
         version: 16.2.12
+      '@saiye/tailwind-config':
+        specifier: workspace:^0.1.0
+        version: link:../../tooling/tailwind
+      '@saiye/tsconfig':
+        specifier: workspace:^0.1.0
+        version: link:../../tooling/typescript
       '@testing-library/react':
         specifier: ^16.3.2
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -965,24 +965,24 @@ importers:
       '@hono/prometheus':
         specifier: ^1.0.2
         version: 1.0.2(hono@4.12.32)(prom-client@15.1.3)
-      '@karakeep/db':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/db
-      '@karakeep/shared':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/shared
-      '@karakeep/shared-server':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/shared-server
-      '@karakeep/trpc':
-        specifier: workspace:^0.1.0
-        version: link:../../packages/trpc
-      '@karakeep/tsconfig':
-        specifier: workspace:^0.1.0
-        version: link:../../tooling/typescript
       '@mozilla/readability':
         specifier: ^0.6.0
         version: 0.6.0
+      '@saiye/db':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/db
+      '@saiye/shared':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/shared
+      '@saiye/shared-server':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/shared-server
+      '@saiye/trpc':
+        specifier: workspace:^0.1.0
+        version: link:../../packages/trpc
+      '@saiye/tsconfig':
+        specifier: workspace:^0.1.0
+        version: link:../../tooling/typescript
       '@tsconfig/node22':
         specifier: ^22.0.0
         version: 22.0.2
@@ -1201,16 +1201,16 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.7.6
         version: 0.7.6(hono@4.12.32)(zod@4.3.6)
-      '@karakeep/db':
+      '@saiye/db':
         specifier: workspace:*
         version: link:../db
-      '@karakeep/shared':
+      '@saiye/shared':
         specifier: workspace:*
         version: link:../shared
-      '@karakeep/shared-server':
+      '@saiye/shared-server':
         specifier: workspace:*
         version: link:../shared-server
-      '@karakeep/trpc':
+      '@saiye/trpc':
         specifier: workspace:*
         version: link:../trpc
       '@trpc/server':
@@ -1235,7 +1235,7 @@ importers:
         specifier: ^4.0.0
         version: 4.3.6
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@types/bcryptjs':
@@ -1256,10 +1256,10 @@ importers:
 
   packages/benchmarks:
     dependencies:
-      '@karakeep/shared':
+      '@saiye/shared':
         specifier: workspace:^0.1.0
         version: link:../shared
-      '@karakeep/trpc':
+      '@saiye/trpc':
         specifier: workspace:^0.1.0
         version: link:../trpc
       '@trpc/client':
@@ -1278,7 +1278,7 @@ importers:
         specifier: ^4.0.0
         version: 4.3.6
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       oxlint:
@@ -1293,15 +1293,15 @@ importers:
       '@auth/core':
         specifier: ^0.27.0
         version: 0.27.0
-      '@karakeep/shared':
-        specifier: workspace:*
-        version: link:../shared
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
       '@paralleldrive/cuid2':
         specifier: ^2.2.2
         version: 2.2.2
+      '@saiye/shared':
+        specifier: workspace:*
+        version: link:../shared
       better-sqlite3:
         specifier: ^12.11.1
         version: 12.11.1
@@ -1318,7 +1318,7 @@ importers:
         specifier: ^4.8.1
         version: 4.20.3
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@types/better-sqlite3':
@@ -1333,13 +1333,13 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1014.0
         version: 3.1014.0
-      '@karakeep/sdk':
+      '@saiye/sdk':
         specifier: workspace:*
         version: link:../sdk
-      '@karakeep/shared':
+      '@saiye/shared':
         specifier: workspace:^0.1.0
         version: link:../shared
-      '@karakeep/trpc':
+      '@saiye/trpc':
         specifier: workspace:^0.1.0
         version: link:../trpc
       '@trpc/client':
@@ -1352,7 +1352,7 @@ importers:
         specifier: ^4.0.0
         version: 4.3.6
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@types/adm-zip':
@@ -1373,14 +1373,14 @@ importers:
       '@asteasolutions/zod-to-openapi':
         specifier: ^8.5.0
         version: 8.5.0(zod@4.3.6)
-      '@karakeep/shared':
+      '@saiye/shared':
         specifier: workspace:^0.1.0
         version: link:../shared
       zod:
         specifier: ^4.0.0
         version: 4.3.6
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       tsx:
@@ -1389,15 +1389,15 @@ importers:
 
   packages/plugins:
     dependencies:
-      '@karakeep/shared':
-        specifier: workspace:*
-        version: link:../shared
       '@restatedev/restate-sdk':
         specifier: ^1.16.2
         version: 1.16.2
       '@restatedev/restate-sdk-clients':
         specifier: ^1.16.2
         version: 1.16.2
+      '@saiye/shared':
+        specifier: workspace:*
+        version: link:../shared
       async-mutex:
         specifier: ^0.4.1
         version: 0.4.1
@@ -1411,7 +1411,7 @@ importers:
         specifier: ^5.11.0
         version: 5.11.0
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       vite-tsconfig-paths:
@@ -1427,7 +1427,7 @@ importers:
         specifier: ^0.13.3
         version: 0.13.8
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@tsconfig/node22':
@@ -1485,7 +1485,7 @@ importers:
         specifier: ^4.0.0
         version: 4.3.6
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@types/html-to-text':
@@ -1503,18 +1503,18 @@ importers:
 
   packages/shared-react:
     dependencies:
-      '@karakeep/shared':
-        specifier: workspace:^0.1.0
-        version: link:../shared
-      '@karakeep/trpc':
-        specifier: workspace:^0.1.0
-        version: link:../trpc
       '@radix-ui/react-popover':
         specifier: ^1.1.14
         version: 1.1.14(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@radix-ui/react-slot':
         specifier: ^1.2.4
         version: 1.2.4(@types/react@19.2.15)(react@19.2.3)
+      '@saiye/shared':
+        specifier: workspace:^0.1.0
+        version: link:../shared
+      '@saiye/trpc':
+        specifier: workspace:^0.1.0
+        version: link:../trpc
       '@tanstack/react-query':
         specifier: 5.90.2
         version: 5.90.2(react@19.2.3)
@@ -1549,21 +1549,12 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
 
   packages/shared-server:
     dependencies:
-      '@karakeep/db':
-        specifier: workspace:^0.1.0
-        version: link:../db
-      '@karakeep/plugins':
-        specifier: workspace:^0.1.0
-        version: link:../plugins
-      '@karakeep/shared':
-        specifier: workspace:^0.1.0
-        version: link:../shared
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
@@ -1594,6 +1585,15 @@ importers:
       '@opentelemetry/winston-transport':
         specifier: ^0.23.0
         version: 0.23.0
+      '@saiye/db':
+        specifier: workspace:^0.1.0
+        version: link:../db
+      '@saiye/plugins':
+        specifier: workspace:^0.1.0
+        version: link:../plugins
+      '@saiye/shared':
+        specifier: workspace:^0.1.0
+        version: link:../shared
       '@trpc/server':
         specifier: ^11.9.0
         version: 11.9.0(typescript@5.9.3)
@@ -1601,7 +1601,7 @@ importers:
         specifier: ^3.11.0
         version: 3.17.0
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       vite-tsconfig-paths:
@@ -1619,18 +1619,18 @@ importers:
       '@earendil-works/pi-ai':
         specifier: ^0.83.0
         version: 0.83.0(@modelcontextprotocol/sdk@1.29.0(zod@4.3.6))(ws@8.21.1)(zod@4.3.6)
-      '@karakeep/db':
-        specifier: workspace:*
-        version: link:../db
-      '@karakeep/shared':
-        specifier: workspace:*
-        version: link:../shared
-      '@karakeep/shared-server':
-        specifier: workspace:*
-        version: link:../shared-server
       '@plait-board/mermaid-to-drawnix':
         specifier: 0.0.8
         version: 0.0.8
+      '@saiye/db':
+        specifier: workspace:*
+        version: link:../db
+      '@saiye/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@saiye/shared-server':
+        specifier: workspace:*
+        version: link:../shared-server
       '@trpc/server':
         specifier: ^11.9.0
         version: 11.9.0(typescript@5.9.3)
@@ -1671,7 +1671,7 @@ importers:
         specifier: ^4.0.0
         version: 4.3.6
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       '@types/bcryptjs':
@@ -1706,7 +1706,7 @@ importers:
         specifier: ^0.5.11
         version: 0.5.14(@ianvs/prettier-plugin-sort-imports@4.4.2(prettier@3.8.1))(prettier@3.8.1)
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../typescript
       typescript:
@@ -1731,7 +1731,7 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.1)
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../typescript
       typescript:
@@ -1746,10 +1746,10 @@ importers:
 
   tools/compare-models:
     dependencies:
-      '@karakeep/sdk':
+      '@saiye/sdk':
         specifier: workspace:^
         version: link:../../packages/sdk
-      '@karakeep/shared':
+      '@saiye/shared':
         specifier: workspace:^
         version: link:../../packages/shared
       chalk:
@@ -1771,10 +1771,10 @@ importers:
 
   tools/seed-snapshot:
     dependencies:
-      '@karakeep/shared':
+      '@saiye/shared':
         specifier: workspace:^0.1.0
         version: link:../../packages/shared
-      '@karakeep/trpc':
+      '@saiye/trpc':
         specifier: workspace:^0.1.0
         version: link:../../packages/trpc
       '@trpc/client':
@@ -1784,7 +1784,7 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1
     devDependencies:
-      '@karakeep/tsconfig':
+      '@saiye/tsconfig':
         specifier: workspace:^0.1.0
         version: link:../../tooling/typescript
       oxlint:
@@ -23703,7 +23703,7 @@ snapshots:
       - uglify-js
       - webpack-cli
 
-  '@drawnix/drawnix@0.4.0-2(patch_hash=f874737971bdb158b44e12a660b050cb9fa6f196a65c93bb81d6d2706c8222c6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@drawnix/drawnix@0.4.0-2(patch_hash=876f485c8f1a3a88e5c165c4af32e3596210ef7e28d626b541f108aa3e9aea2c)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
       '@floating-ui/react': 0.26.28(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@plait-board/markdown-to-drawnix': 0.0.7

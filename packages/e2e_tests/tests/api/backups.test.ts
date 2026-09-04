@@ -1,23 +1,23 @@
 import AdmZip from "adm-zip";
 import { beforeEach, describe, expect, inject, it } from "vitest";
 
-import { createKarakeepClient } from "@karakeep/sdk";
+import { createSaiyeClient } from "@saiye/sdk";
 
 import { createTestUser } from "../../utils/api";
 
 describe("Backups API", () => {
-  const port = inject("karakeepPort");
+  const port = inject("saiyePort");
 
   if (!port) {
     throw new Error("Missing required environment variables");
   }
 
-  let client: ReturnType<typeof createKarakeepClient>;
+  let client: ReturnType<typeof createSaiyeClient>;
   let apiKey: string;
 
   beforeEach(async () => {
     apiKey = await createTestUser();
-    client = createKarakeepClient({
+    client = createSaiyeClient({
       baseUrl: `http://localhost:${port}/api/v1/`,
       headers: {
         "Content-Type": "application/json",
@@ -269,7 +269,7 @@ describe("Backups API", () => {
     // Should contain exactly one JSON file
     expect(zipEntries.length).toBe(1);
     const jsonEntry = zipEntries[0];
-    expect(jsonEntry.entryName).toMatch(/^karakeep-backup-.*\.json$/);
+    expect(jsonEntry.entryName).toMatch(/^saiye-backup-.*\.json$/);
 
     // Extract and parse the JSON content
     const jsonContent = jsonEntry.getData().toString("utf8");

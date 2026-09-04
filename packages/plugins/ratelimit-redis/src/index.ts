@@ -5,9 +5,9 @@ import type {
   RateLimitClient,
   RateLimitConfig,
   RateLimitResult,
-} from "@karakeep/shared/ratelimiting";
-import { throttledLogger } from "@karakeep/shared/logger";
-import { PluginProvider } from "@karakeep/shared/plugins";
+} from "@saiye/shared/ratelimiting";
+import { throttledLogger } from "@saiye/shared/logger";
+import { PluginProvider } from "@saiye/shared/plugins";
 
 const KEY_PREFIX = "ratelimit:v1";
 

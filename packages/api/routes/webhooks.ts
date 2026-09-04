@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 
-import { Context, createCallerFactory } from "@karakeep/trpc";
-import { appRouter } from "@karakeep/trpc/routers/_app";
+import { Context, createCallerFactory } from "@saiye/trpc";
+import { appRouter } from "@saiye/trpc/routers/_app";
 
 const createCaller = createCallerFactory(appRouter);
 

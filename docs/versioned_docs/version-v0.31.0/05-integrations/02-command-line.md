@@ -10,14 +10,14 @@ Karakeep comes with a simple CLI for those users who want to do more advanced ma
 ## Installation (NPM)
 
 ```
-npm install -g @karakeep/cli
+npm install -g @saiye/cli
 ```
 
 
 ## Installation (Docker)
 
 ```
-docker run --rm ghcr.io/karakeep-app/karakeep-cli:release --help
+docker run --rm ghcr.io/adrenalineinmyveins/karakeep-cli:release --help
 ```
 
 ## Usage
@@ -32,8 +32,8 @@ Usage: karakeep [options] [command]
 A CLI interface to interact with the karakeep api
 
 Options:
-  --api-key <key>       the API key to interact with the API (env: KARAKEEP_API_KEY)
-  --server-addr <addr>  the address of the server to connect to (env: KARAKEEP_SERVER_ADDR)
+  --api-key <key>       the API key to interact with the API (env: SAIYE_API_KEY)
+  --server-addr <addr>  the address of the server to connect to (env: SAIYE_SERVER_ADDR)
   -V, --version         output the version number
   -h, --help            display help for command
 

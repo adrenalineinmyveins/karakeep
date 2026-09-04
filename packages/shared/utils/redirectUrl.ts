@@ -2,7 +2,7 @@
  * Validates a redirect URL to prevent open redirect attacks.
  * Only allows:
  * - Relative paths starting with "/" (but not "//" to prevent protocol-relative URLs)
- * - The karakeep:// scheme for the mobile app
+ * - The saiye:// scheme for the mobile app
  *
  * @returns The validated URL if valid, otherwise undefined.
  */
@@ -18,8 +18,8 @@ export function validateRedirectUrl(
     return url;
   }
 
-  // Allow karakeep:// scheme for mobile app deep links
-  if (url.startsWith("karakeep://")) {
+  // Allow saiye:// scheme for mobile app deep links
+  if (url.startsWith("saiye://")) {
     return url;
   }
 
@@ -31,5 +31,5 @@ export function validateRedirectUrl(
  * Checks if the redirect URL is a mobile app deep link.
  */
 export function isMobileAppRedirect(url: string): boolean {
-  return url.startsWith("karakeep://");
+  return url.startsWith("saiye://");
 }

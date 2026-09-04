@@ -1,9 +1,9 @@
 import * as z from "zod";
 
-import { zBookmarkSchema } from "@karakeep/shared/types/bookmarks";
-import { zHighlightSchema } from "@karakeep/shared/types/highlights";
-import { zBookmarkListSchema } from "@karakeep/shared/types/lists";
-import { zGetTagResponseSchema } from "@karakeep/shared/types/tags";
+import { zBookmarkSchema } from "@saiye/shared/types/bookmarks";
+import { zHighlightSchema } from "@saiye/shared/types/highlights";
+import { zBookmarkListSchema } from "@saiye/shared/types/lists";
+import { zGetTagResponseSchema } from "@saiye/shared/types/tags";
 
 export const ListSchema = zBookmarkListSchema.openapi("List");
 

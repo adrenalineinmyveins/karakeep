@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 
-vi.mock("@karakeep/shared/config", () => ({
+vi.mock("@saiye/shared/config", () => ({
   default: {
     allowedInternalHostnames: undefined,
     crawler: { ipValidation: { dnsResolverTimeoutSec: 1 } },

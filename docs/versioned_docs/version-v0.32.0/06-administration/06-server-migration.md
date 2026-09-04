@@ -24,8 +24,8 @@ Notes:
 ## Prerequisites
 
 - Install the CLI:
-  - NPM: `npm install -g @karakeep/cli`
-  - Docker: `docker run --rm ghcr.io/karakeep-app/karakeep-cli:release --help`
+  - NPM: `npm install -g @saiye/cli`
+  - Docker: `docker run --rm ghcr.io/adrenalineinmyveins/karakeep-cli:release --help`
 - Collect API keys and base URLs for both servers:
   - Source: `--server-addr`, `--api-key`
   - Destination: `--dest-server`, `--dest-api-key`

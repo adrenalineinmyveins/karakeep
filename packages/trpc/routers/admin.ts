@@ -10,7 +10,7 @@ import {
   bookmarks,
   subscriptions,
   users,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   AdminMaintenanceQueue,
   AssetPreprocessingQueue,
@@ -26,20 +26,20 @@ import {
   VideoWorkerQueue,
   WebhookQueue,
   zAdminMaintenanceTaskSchema,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { PluginManager, PluginType } from "@karakeep/shared/plugins";
-import { getSearchClient } from "@karakeep/shared/search";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { PluginManager, PluginType } from "@saiye/shared/plugins";
+import { getSearchClient } from "@saiye/shared/search";
 import {
   resetPasswordSchema,
   updateUserSchema,
   zAdminCreateUserSchema,
   zAdminJobModifiedWithinSecondsSchema,
-} from "@karakeep/shared/types/admin";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
-import { setUrlHostnameFromResolvedAddress } from "@karakeep/shared/utils/url";
-import { getVectorStoreClient } from "@karakeep/shared/vectorStore";
+} from "@saiye/shared/types/admin";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
+import { setUrlHostnameFromResolvedAddress } from "@saiye/shared/utils/url";
+import { getVectorStoreClient } from "@saiye/shared/vectorStore";
 
 import { generatePasswordSalt, hashPassword } from "../auth";
 import { createAdminScopedProcedure, router } from "../index";

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "vitest";
 import { z } from "zod";
 
-import { zNewPromptSchema } from "@karakeep/shared/types/prompts";
+import { zNewPromptSchema } from "@saiye/shared/types/prompts";
 
 import type { CustomTestContext } from "../testUtils";
 import { defaultBeforeEach } from "../testUtils";

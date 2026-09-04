@@ -1,13 +1,13 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@karakeep/shared-server",
+  "name": "@saiye/shared-server",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@karakeep/db": "workspace:^0.1.0",
-    "@karakeep/plugins": "workspace:^0.1.0",
-    "@karakeep/shared": "workspace:^0.1.0",
+    "@saiye/db": "workspace:^0.1.0",
+    "@saiye/plugins": "workspace:^0.1.0",
+    "@saiye/shared": "workspace:^0.1.0",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/api-logs": "^0.213.0",
     "@opentelemetry/exporter-logs-otlp-http": "^0.213.0",
@@ -22,7 +22,7 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^3.2.4"
   },

@@ -621,7 +621,7 @@ adminCmd.addCommand(jobsCmd);
 
 // --- Subscriptions subcommand (cloud only) ---
 
-if (process.env.KARAKEEP_CLOUD === "1") {
+if (process.env.SAIYE_CLOUD === "1") {
   const subscriptionsCmd = new Command()
     .name("subscriptions")
     .description("admin subscription management commands");

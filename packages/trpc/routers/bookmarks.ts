@@ -14,7 +14,7 @@ import {
   tagsOnBookmarks,
   userReadingProgress,
   users,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   addLogFields,
   AssetPreprocessingQueue,
@@ -27,23 +27,23 @@ import {
   QueuePriority,
   QuotaService,
   triggerSearchReindex,
-} from "@karakeep/shared-server";
-import { SUPPORTED_BOOKMARK_ASSET_TYPES } from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
+} from "@saiye/shared-server";
+import { SUPPORTED_BOOKMARK_ASSET_TYPES } from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
 import {
   EmbeddingClientFactory,
   InferenceClientFactory,
-} from "@karakeep/shared/inference";
-import logger from "@karakeep/shared/logger";
-import { buildSummaryPrompt } from "@karakeep/shared/prompts.server";
-import { EnqueueOptions } from "@karakeep/shared/queueing";
-import { getRateLimitClient } from "@karakeep/shared/ratelimiting";
-import { FilterQuery, getSearchClient } from "@karakeep/shared/search";
-import { parseSearchQuery } from "@karakeep/shared/searchQueryParser";
+} from "@saiye/shared/inference";
+import logger from "@saiye/shared/logger";
+import { buildSummaryPrompt } from "@saiye/shared/prompts.server";
+import { EnqueueOptions } from "@saiye/shared/queueing";
+import { getRateLimitClient } from "@saiye/shared/ratelimiting";
+import { FilterQuery, getSearchClient } from "@saiye/shared/search";
+import { parseSearchQuery } from "@saiye/shared/searchQueryParser";
 import type {
   ZBookmarkContent,
   ZBookmarkSource,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 import {
   BookmarkTypes,
   DEFAULT_NUM_BOOKMARKS_PER_PAGE,
@@ -58,12 +58,12 @@ import {
   zSearchBookmarksCursor,
   zSearchBookmarksRequestSchema,
   zUpdateBookmarksRequestSchema,
-} from "@karakeep/shared/types/bookmarks";
-import type { ZBookmarkTags } from "@karakeep/shared/types/tags";
-import { ANCHOR_TEXT_MAX_LENGTH } from "@karakeep/shared/utils/reading-progress-dom";
-import { normalizeTagName } from "@karakeep/shared/utils/tag";
-import { getVectorStoreClient } from "@karakeep/shared/vectorStore";
-import type { VectorFilterQuery } from "@karakeep/shared/vectorStore";
+} from "@saiye/shared/types/bookmarks";
+import type { ZBookmarkTags } from "@saiye/shared/types/tags";
+import { ANCHOR_TEXT_MAX_LENGTH } from "@saiye/shared/utils/reading-progress-dom";
+import { normalizeTagName } from "@saiye/shared/utils/tag";
+import { getVectorStoreClient } from "@saiye/shared/vectorStore";
+import type { VectorFilterQuery } from "@saiye/shared/vectorStore";
 import { bookmarkCreationCounter } from "../stats";
 
 import type { AuthedContext } from "../index";

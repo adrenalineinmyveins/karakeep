@@ -17,8 +17,8 @@ import metascraperYoutube from "metascraper-youtube";
 import { getRandomProxy } from "network";
 import winston from "winston";
 
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
 
 import metascraperAmazonImproved from "../metascraper-plugins/metascraper-amazon-improved";
 import metascraperReddit from "../metascraper-plugins/metascraper-reddit";

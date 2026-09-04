@@ -1,17 +1,17 @@
 import { Hono } from "hono";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Context } from "@karakeep/trpc";
+import type { Context } from "@saiye/trpc";
 import type {
   RateLimitClient,
   RateLimitConfig,
-} from "@karakeep/shared/ratelimiting";
+} from "@saiye/shared/ratelimiting";
 
 const { getRateLimitClientMock } = vi.hoisted(() => ({
   getRateLimitClientMock: vi.fn(),
 }));
 
-vi.mock("@karakeep/shared/config", () => ({
+vi.mock("@saiye/shared/config", () => ({
   default: {
     rateLimiting: {
       enabled: true,
@@ -19,7 +19,7 @@ vi.mock("@karakeep/shared/config", () => ({
   },
 }));
 
-vi.mock("@karakeep/shared/ratelimiting", () => ({
+vi.mock("@saiye/shared/ratelimiting", () => ({
   getRateLimitClient: getRateLimitClientMock,
 }));
 

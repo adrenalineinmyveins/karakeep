@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@karakeep/trpc",
+  "name": "@saiye/trpc",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,9 +15,9 @@
   "dependencies": {
     "@earendil-works/pi-agent-core": "^0.83.0",
     "@earendil-works/pi-ai": "^0.83.0",
-    "@karakeep/db": "workspace:*",
-    "@karakeep/shared": "workspace:*",
-    "@karakeep/shared-server": "workspace:*",
+    "@saiye/db": "workspace:*",
+    "@saiye/shared": "workspace:*",
+    "@saiye/shared-server": "workspace:*",
     "@plait-board/mermaid-to-drawnix": "0.0.8",
     "@trpc/server": "^11.9.0",
     "bcryptjs": "^2.4.3",
@@ -34,7 +34,7 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/deep-equal": "^1.0.4",
     "@types/nodemailer": "^6.4.17",

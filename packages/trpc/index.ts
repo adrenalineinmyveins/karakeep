@@ -2,18 +2,18 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError, z } from "zod";
 
-import type { db } from "@karakeep/db";
+import type { db } from "@saiye/db";
 import type {
   ZApiKeyAdminScopeResource,
   ZApiKeyScope,
   ZApiKeyScopeResource,
-} from "@karakeep/shared/types/apiKeys";
+} from "@saiye/shared/types/apiKeys";
 import {
   apiKeyScopesGrantScope,
   getAdminApiKeyScope,
   getApiKeyScope,
-} from "@karakeep/shared/types/apiKeys";
-import serverConfig from "@karakeep/shared/config";
+} from "@saiye/shared/types/apiKeys";
+import serverConfig from "@saiye/shared/config";
 
 import { createRateLimitMiddleware } from "./lib/rateLimit";
 import { createTracingMiddleware } from "./lib/tracing";

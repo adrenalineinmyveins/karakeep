@@ -102,12 +102,12 @@ authCmd
         opts.serverAddr ??
         (await promptForValue(
           rl,
-          "Karakeep server address",
+          "Saiye server address",
           existingAuth.serverAddr ?? DEFAULT_SERVER_ADDR,
         ));
       const apiKey =
         opts.apiKey ??
-        (await promptForValue(rl, "Karakeep API key", existingAuth.apiKey));
+        (await promptForValue(rl, "Saiye API key", existingAuth.apiKey));
       rl.close();
 
       if (!serverAddr || !apiKey) {

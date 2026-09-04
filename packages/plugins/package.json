@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@karakeep/plugins",
+  "name": "@saiye/plugins",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -21,7 +21,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@karakeep/shared": "workspace:*",
+    "@saiye/shared": "workspace:*",
     "@restatedev/restate-sdk": "^1.16.2",
     "@restatedev/restate-sdk-clients": "^1.16.2",
     "async-mutex": "^0.4.1",
@@ -30,7 +30,7 @@
     "redis": "^5.11.0"
   },
   "devDependencies": {
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^3.2.4"
   }

@@ -214,7 +214,7 @@ SELECT id, name FROM bookmarkTags WHERE userId = 'test-user';
 
 | 问题 | 严重性 | 原因 | 影响 | 建议 |
 |------|--------|------|------|------|
-| `create_bookmark` 报 `no such table: tasks` | 低 | 数据库未运行 `tasks` 表迁移 | link 类型书签创建失败 | 运行完整迁移 `pnpm --filter @karakeep/db run migrate` |
+| `create_bookmark` 报 `no such table: tasks` | 低 | 数据库未运行 `tasks` 表迁移 | link 类型书签创建失败 | 运行完整迁移 `pnpm --filter @saiye/db run migrate` |
 | `chatMessages` FK 约束失败 | 低 | 测试脚本未先创建 `chatSessions` 记录 | 消息持久化失败，但不影响工具调用 | 正式使用时通过 API 创建 session |
 
 以上问题均为环境配置问题，**不影响工具集成层的框架验证**。

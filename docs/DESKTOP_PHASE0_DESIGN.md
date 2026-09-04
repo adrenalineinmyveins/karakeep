@@ -107,7 +107,7 @@ karakeep-desktop\
 | `NEXTAUTH_URL` / `NEXTAUTH_URL_INTERNAL` | ✓ | — | `http://127.0.0.1:<webPort>` |
 | `NEXTAUTH_SECRET` | ✓ | — | config.json |
 | `API_URL` | ✓ | — | `http://127.0.0.1:<webPort>` |
-| `KARAKEEP_LOCAL_MODE` | ✓ | — | `true`（见 §4） |
+| `SAIYE_LOCAL_MODE` | ✓ | — | `true`（见 §4） |
 | `DISABLE_NEW_RELEASE_CHECK` | ✓ | ✓ | `true`（本地版无升级检查意义） |
 | `WORKERS_DISABLED_WORKERS` | — | ✓ | 默认空；用户可在 config.json 裁剪（如 video） |
 | `BROWSER_WEB_URL` | — | ✗ 不设置 | **不设即走无浏览器抓取降级路径** |
@@ -140,7 +140,7 @@ karakeep-desktop\
 
 ```text
 getServerAuthSession():
-  if (serverConfig.localMode)            # KARAKEEP_LOCAL_MODE=true
+  if (serverConfig.localMode)            # SAIYE_LOCAL_MODE=true
     return 合成 session { user: { id: localUserId, role: "admin", name: "Local User" } }
   return getServerSession(authOptions)   # 原逻辑不动
 ```
@@ -153,7 +153,7 @@ getServerAuthSession():
 
 | 位置 | 内容 | 规模 |
 |---|---|---|
-| [config.ts](../packages/shared/config.ts) | 新增 `KARAKEEP_LOCAL_MODE: stringBool("false")` → `serverConfig.localMode`（带 KARAKEEP_ 前缀避免裸 LOCAL_MODE 与其他软件的全局 env 冲突） | ~3 行 |
+| [config.ts](../packages/shared/config.ts) | 新增 `SAIYE_LOCAL_MODE: stringBool("false")` → `serverConfig.localMode`（带 SAIYE_ 前缀避免裸 LOCAL_MODE 与其他软件的全局 env 冲突） | ~3 行 |
 | [auth.ts](../apps/web/server/auth.ts) | `getServerAuthSession` 旁路 + 懒建 local user | ~30 行 |
 
 ### 4.4 安全边界（明示风险）
@@ -174,7 +174,7 @@ getServerAuthSession():
    cp public、.next/static                       # standalone 不含二者
    补丁：packages/trpc/node_modules/@plait-board/mermaid-to-drawnix/dist
         → runtime/web/node_modules/.../dist      # Turbopack tracing 缺口，Dockerfile:184-188 已踩坑
-4. runtime/workers：pnpm deploy --prod --filter=@karakeep/workers  # 复用 Dockerfile:81
+4. runtime/workers：pnpm deploy --prod --filter=@saiye/workers  # 复用 Dockerfile:81
 5. bin/：下载锁定版本二进制（本地缓存目录，可重入）：
    - meilisearch v1.41.0 win-amd64（与 docker-compose.yml:35 对齐）
    - ffmpeg（essentials win64）→ 解压取 exe+dll
@@ -217,7 +217,7 @@ getServerAuthSession():
 | # | 位置 | 类型 | 内容 | 复杂度 |
 |---|---|---|---|---|
 | 1 | `apps/desktop/`（新） | 新包 | supervisor（lifecycle/config/procs/logging）+ build.mjs + karakeep.cmd | 中 |
-| 2 | `packages/shared/config.ts` | 修改 | +`KARAKEEP_LOCAL_MODE` | 低 |
+| 2 | `packages/shared/config.ts` | 修改 | +`SAIYE_LOCAL_MODE` | 低 |
 | 3 | `apps/web/server/auth.ts` | 修改 | `getServerAuthSession` 本地旁路 | 低 |
 | 4 | `docs/` | 新增 | 桌面版使用说明（含 AGPL 源码获取指引） | 低 |
 
@@ -228,11 +228,11 @@ getServerAuthSession():
 ## 7. 里程碑与验收
 
 ### M0.1 脚本原型（开发机，不打包）✅ 已完成（2026-09-02）
-用 pnpm 直接拉起三进程 + `KARAKEEP_LOCAL_MODE=true`。
+用 pnpm 直接拉起三进程 + `SAIYE_LOCAL_MODE=true`。
 **验收**：浏览器免登录可用；保存 URL 抓取成功（确认无 BROWSER_WEB_URL 的降级路径存在且质量可接受，产出降级页面清单）；搜索、AI 聊天（配 OPENAI_API_KEY）可用。
 
 **完成记录**：
-- 实现：`packages/shared/config.ts`（`KARAKEEP_LOCAL_MODE`）、`apps/web/server/auth.ts`（`getServerAuthSession` 本地旁路，懒建 `local@desktop.karakeep.local` admin）、`apps/desktop/scripts/dev.mjs`（迁移 + meili + web + workers 四子进程、健康探活、config.json 端口回写）。
+- 实现：`packages/shared/config.ts`（`SAIYE_LOCAL_MODE`）、`apps/web/server/auth.ts`（`getServerAuthSession` 本地旁路，懒建 `local@desktop.karakeep.local` admin）、`apps/desktop/scripts/dev.mjs`（迁移 + meili + web + workers 四子进程、健康探活、config.json 端口回写）。
 - 验证结果：免登录访问 `/`（307→dashboard，whoami=Local User）✓；保存 qq.com 抓取全链路 success（标题/描述/favicon/banner 资产入库，AI 打标与摘要 success，复用既有 bigmodel 配置）✓；搜索 `bookmarks.searchBookmarks`（fts）命中本地 meili ✓；typecheck 通过（workers 包 0 错误；CanvasEditor.tsx 为 fork 既有无关错误）✓。
 - AI 聊天未单独验证（推理链已经 tagging/summarization 验证），随 M0.4 一并覆盖；10 站点降级抽样留待 M0.4 验收项 3（本阶段：qq.com 纯 fetch 降级路径质量可接受；百度搜索页被反爬验证码拦截，属站点特性）。
 - **Windows 实测发现与修复**（均已在代码中处理）：
@@ -285,7 +285,7 @@ build.mjs 全流程 + zip。
 | D3 | meilisearch 捆绑且锁 1.41.0 | 搜索是核心体验；与 Docker 版索引格式一致便于未来同步/迁移 | 不捆绑（搜索降级，体验差）；SQLite FTS5（大改造，远期） |
 | D4 | playwright 不捆浏览器 | Chromium +150MB 违背体积预算；无浏览器抓取是 Phase 0 明确验证项 | 按需下载爬取引擎（Phase 1 可选包） |
 | D5 | zip 分发 + cmd 入口，不做安装器 | 自用验证阶段最小摩擦；安装目录与数据目录分离已保证可迁移 | NSIS/MSIX（Phase 1 随签名一起） |
-| D6 | env 命名 `KARAKEEP_LOCAL_MODE` | 裸 `LOCAL_MODE` 作为全局 env 过于通用，避免与他软件冲突 | `LOCAL_MODE`（贴合现有无前缀风格） |
+| D6 | env 命名 `SAIYE_LOCAL_MODE` | 裸 `LOCAL_MODE` 作为全局 env 过于通用，避免与他软件冲突 | `LOCAL_MODE`（贴合现有无前缀风格） |
 | D7 | v1 明确不做同步 | 见桌面评估报告 L3 = XL 结论；无悔准备（同 schema、应用层 ID、未来 SQLite 触发器做墓碑）已就位 | — |
 
 ---

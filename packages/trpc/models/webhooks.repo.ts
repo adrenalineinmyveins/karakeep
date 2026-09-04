@@ -1,12 +1,12 @@
 import { count, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import type { DB } from "@karakeep/db";
-import { webhooksTable } from "@karakeep/db/schema";
+import type { DB } from "@saiye/db";
+import { webhooksTable } from "@saiye/db/schema";
 import {
   zNewWebhookSchema,
   zUpdateWebhookSchema,
-} from "@karakeep/shared/types/webhooks";
+} from "@saiye/shared/types/webhooks";
 
 type Webhook = typeof webhooksTable.$inferSelect;
 

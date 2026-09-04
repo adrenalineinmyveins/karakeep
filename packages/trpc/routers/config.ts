@@ -1,5 +1,5 @@
-import { clientConfig } from "@karakeep/shared/config";
-import { zClientConfigSchema } from "@karakeep/shared/types/config";
+import { clientConfig } from "@saiye/shared/config";
+import { zClientConfigSchema } from "@saiye/shared/types/config";
 
 import { publicProcedure, router } from "../index";
 

@@ -3,17 +3,17 @@ import { workerStatsCounter } from "metrics";
 import { fetchWithProxy } from "network";
 import { withWorkerEventLog, withWorkerTracing } from "workerTracing";
 
-import { db } from "@karakeep/db";
-import { bookmarks, webhooksTable } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { bookmarks, webhooksTable } from "@saiye/db/schema";
 import {
   addLogFields,
   WebhookQueue,
   ZWebhookRequest,
   zWebhookRequestSchema,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { DequeuedJob, getQueueClient } from "@karakeep/shared/queueing";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { DequeuedJob, getQueueClient } from "@saiye/shared/queueing";
 
 export class WebhookWorker {
   static async build() {

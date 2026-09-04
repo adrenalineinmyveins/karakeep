@@ -1,21 +1,20 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@karakeep/mcp",
+  "name": "@saiye/mcp",
   "version": "0.33.0",
-  "description": "MCP server for Karakeep",
+  "description": "MCP server for Saiye",
   "license": "GNU Affero General Public License version 3",
   "type": "module",
   "keywords": [
-    "hoarder",
-    "karakeep",
+    "saiye",
     "mcp"
   ],
   "bin": {
-    "karakeep-mcp": "dist/index.js"
+    "saiye-mcp": "dist/index.js"
   },
   "devDependencies": {
-    "@karakeep/shared": "workspace:*",
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/shared": "workspace:*",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "@tsconfig/node22": "^22.0.0",
     "@types/turndown": "^5.0.5",
     "shx": "^0.4.0",
@@ -36,11 +35,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/karakeep-app/karakeep.git",
+    "url": "git+https://github.com/adrenalineinmyveins/karakeep.git",
     "directory": "apps/mcp"
   },
   "dependencies": {
-    "@karakeep/sdk": "workspace:*",
+    "@saiye/sdk": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "turndown": "^7.2.0",
     "zod": "^4.0.0"

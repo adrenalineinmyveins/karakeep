@@ -1,8 +1,8 @@
 import pLimit from "p-limit";
 
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
-import type { ZTagBasic } from "@karakeep/shared/types/tags";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
+import type { ZTagBasic } from "@saiye/shared/types/tags";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import { logInfo, logStep, logSuccess } from "./log";
 import { getTrpcClient, TrpcClient } from "./trpc";

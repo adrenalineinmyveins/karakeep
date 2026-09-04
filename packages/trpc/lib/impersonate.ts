@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
-import { db } from "@karakeep/db";
-import { users } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { users } from "@saiye/db/schema";
 
 import { AuthedContext } from "..";
 

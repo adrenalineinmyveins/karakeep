@@ -7,7 +7,7 @@ import {
   RetryAfterError,
 } from "liteque";
 
-import type { PluginProvider } from "@karakeep/shared/plugins";
+import type { PluginProvider } from "@saiye/shared/plugins";
 import type {
   DequeuedJob,
   EnqueueOptions,
@@ -17,12 +17,12 @@ import type {
   Runner,
   RunnerFuncs,
   RunnerOptions,
-} from "@karakeep/shared/queueing";
-import serverConfig from "@karakeep/shared/config";
+} from "@saiye/shared/queueing";
+import serverConfig from "@saiye/shared/config";
 import {
   QueueRetryAfterError,
   queueOptionsEqual,
-} from "@karakeep/shared/queueing";
+} from "@saiye/shared/queueing";
 
 class LitequeQueueWrapper<T> implements Queue<T> {
   constructor(

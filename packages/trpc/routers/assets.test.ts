@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { assets, AssetTypes } from "@karakeep/db/schema";
-import { BookmarkTypes, ZAssetType } from "@karakeep/shared/types/bookmarks";
+import { assets, AssetTypes } from "@saiye/db/schema";
+import { BookmarkTypes, ZAssetType } from "@saiye/shared/types/bookmarks";
 
 import type { CustomTestContext } from "../testUtils";
 import { defaultBeforeEach } from "../testUtils";

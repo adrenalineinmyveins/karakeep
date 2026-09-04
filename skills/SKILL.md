@@ -1,48 +1,48 @@
 ---
-name: karakeep
-description: Official skill for how to use karakeep (the bookmark manager) and interact with it programmatically.
+name: saiye
+description: Official skill for how to use saiye (the bookmark manager) and interact with it programmatically.
 metadata:
   tags: bookmarks, bookmark manager, 2nd brain, productivity
   openclaw:
     envVars:
-      - name: KARAKEEP_API_KEY
+      - name: SAIYE_API_KEY
         required: true
-        description: The API key for your Karakeep instance
-      - name: KARAKEEP_SERVER_ADDR
+        description: The API key for your Saiye instance
+      - name: SAIYE_SERVER_ADDR
         required: false
-        description: The server address for your Karakeep instance.
+        description: The server address for your Saiye instance.
     requires:
       env:
-        - KARAKEEP_API_KEY
-        - KARAKEEP_SERVER_ADDR
+        - SAIYE_API_KEY
+        - SAIYE_SERVER_ADDR
       bins:
-        - karakeep
-    homepage: https://karakeep.app
+        - saiye
+    homepage: https://saiye.app
     links:
-      repository: https://github.com/karakeep-app/karakeep
+      repository: https://github.com/adrenalineinmyveins/karakeep
       documentation: https://docs.karakeep.app
     emoji: 📦
-    cliHelp: karakeep --help
+    cliHelp: saiye --help
     install:
       - kind: node
-        package: "@karakeep/cli"
-        bins: [karakeep]
+        package: "@saiye/cli"
+        bins: [saiye]
 ---
 
-# Karakeep
+# Saiye
 
-Karakeep is an open source self-hosted bookmark manager for collecting, organizing, and searching content. This skill covers the core concepts and how to interact with Karakeep via the CLI.
+Saiye is an open source self-hosted bookmark manager for collecting, organizing, and searching content. This skill covers the core concepts and how to interact with Saiye via the CLI.
 
 ## When to use
 
-Use this skill when the user wants to interact with their Karakeep instance (adding bookmarks, managing lists/tags, searching, etc.).
+Use this skill when the user wants to interact with their Saiye instance (adding bookmarks, managing lists/tags, searching, etc.).
 
 ## Core Concepts
 
 ### Bookmarks
 
-- **Bookmarks**: Core entity in Karakeep. Can be one of links, text or media.
-  - **Links**: Save URLs — Karakeep auto-fetches title, description, image, screenshot, and full-page archive.
+- **Bookmarks**: Core entity in Saiye. Can be one of links, text or media.
+  - **Links**: Save URLs — Saiye auto-fetches title, description, image, screenshot, and full-page archive.
   - **Text**: Quick notes or text snippets stored as bookmarks.
   - **Media**: Images and PDFs uploaded directly.
 - **Favorites**: Star bookmarks for quick access.
@@ -62,7 +62,7 @@ Lightweight labels for any bookmark (topics, sources, workflow states). Multiple
 
 ### Search Query Language
 
-Karakeep has a powerful search query language for finding the right bookmarks. It supports full-text search, boolean logic, qualifiers, and more.
+Saiye has a powerful search query language for finding the right bookmarks. It supports full-text search, boolean logic, qualifiers, and more.
 
 #### Basic Syntax
 
@@ -115,7 +115,7 @@ machine learning is:fav -is:archived
 
 ### RSS Feeds
 
-Karakeep can also be used to consume RSS feeds, but also can itself act as an RSS feed publisher.
+Saiye can also be used to consume RSS feeds, but also can itself act as an RSS feed publisher.
 - **Publishing**: Export any list as an RSS feed with a unique token.
 - **Consuming**: Auto-monitor external RSS feeds and create bookmarks from new items (hourly, with duplicate detection).
 
@@ -124,88 +124,88 @@ Karakeep can also be used to consume RSS feeds, but also can itself act as an RS
 - **Rule Engine**: If-this-then-that rules to auto-tag, favorite, or route bookmarks to lists.
 - **Webhooks**: Subscribe to bookmark events (add/update/archive).
 
-## Interacting with Karakeep via the CLI
+## Interacting with Saiye via the CLI
 
 ### Installation
 
 ```bash
-npm install -g @karakeep/cli
+npm install -g @saiye/cli
 ```
 
 Or via Docker:
 
 ```bash
-docker run --rm ghcr.io/karakeep-app/karakeep-cli:release --help
+docker run --rm ghcr.io/adrenalineinmyveins/karakeep-cli:release --help
 ```
 
 ### Authentication
 
-The CLI requires an API key and server address. Get the API key from your Karakeep instance's settings page.
+The CLI requires an API key and server address. Get the API key from your Saiye instance's settings page.
 
 **Option 1 — Environment variables (recommended):**
 
 ```bash
-export KARAKEEP_API_KEY="your-api-key"
+export SAIYE_API_KEY="your-api-key"
 
 # If self-hosted, pass the server address as well. It defaults to the cloud instance if not set:
-export KARAKEEP_SERVER_ADDR="https://cloud.karakeep.com"
+export SAIYE_SERVER_ADDR="https://cloud.saiye.com"
 ```
 
 **Option 2 — CLI flags:**
 
 ```bash
-karakeep --api-key <key> --server-addr <addr> <command>
+saiye --api-key <key> --server-addr <addr> <command>
 ```
 
 **Verify authentication:**
 
 ```bash
-karakeep whoami
+saiye whoami
 ```
 
 ### Bookmark Commands
 
-Run `karakeep --help` to see all available commands, but the most important ones are:
+Run `saiye --help` to see all available commands, but the most important ones are:
 
 ```bash
 # Add a link bookmark
-karakeep bookmarks add --link "https://example.com"
+saiye bookmarks add --link "https://example.com"
 
 # Add a link with tags and to a specific list
-karakeep bookmarks add --link "https://example.com" --tag-name "reading" --list-id <list-id>
+saiye bookmarks add --link "https://example.com" --tag-name "reading" --list-id <list-id>
 
 # Add a text bookmark
-karakeep bookmarks add --note "Remember to review the PR"
+saiye bookmarks add --note "Remember to review the PR"
 
 # Get bookmark details
-karakeep bookmarks get <bookmark-id>
-karakeep bookmarks get <bookmark-id> --include-content
+saiye bookmarks get <bookmark-id>
+saiye bookmarks get <bookmark-id> --include-content
 
 # Update a bookmark
-karakeep bookmarks update <bookmark-id> --title "New Title"
-karakeep bookmarks update <bookmark-id> --archive
-karakeep bookmarks update <bookmark-id> --favourite
-karakeep bookmarks update-tags <bookmark-id> --add-tag "important"
-karakeep bookmarks update-tags <bookmark-id> --remove-tag "old-tag"
+saiye bookmarks update <bookmark-id> --title "New Title"
+saiye bookmarks update <bookmark-id> --archive
+saiye bookmarks update <bookmark-id> --favourite
+saiye bookmarks update-tags <bookmark-id> --add-tag "important"
+saiye bookmarks update-tags <bookmark-id> --remove-tag "old-tag"
 
 # List management
-karakeep lists list
-karakeep lists get --list <list-id>
-karakeep lists add-bookmark --list <list-id> --bookmark <bookmark-id>
-karakeep lists remove-bookmark --list <list-id> --bookmark <bookmark-id>
-karakeep lists delete <list-id>
+saiye lists list
+saiye lists get --list <list-id>
+saiye lists add-bookmark --list <list-id> --bookmark <bookmark-id>
+saiye lists remove-bookmark --list <list-id> --bookmark <bookmark-id>
+saiye lists delete <list-id>
 
 
 # List all bookmarks
-karakeep bookmarks list
+saiye bookmarks list
 
 # Search bookmarks
-karakeep bookmarks search "is:fav #work"
-karakeep bookmarks search "rust" --limit 10 --sort-order relevance
-karakeep bookmarks search "is:tagged" --all   # paginate through all results
+saiye bookmarks search "is:fav #work"
+saiye bookmarks search "rust" --limit 10 --sort-order relevance
+saiye bookmarks search "is:tagged" --all   # paginate through all results
 
 # Delete a bookmark
-karakeep bookmarks delete <bookmark-id>
+saiye bookmarks delete <bookmark-id>
 ```
 
 You can always pass `--json` to get raw JSON output instead of pretty-printed output.

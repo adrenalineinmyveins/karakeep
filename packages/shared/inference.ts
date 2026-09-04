@@ -213,8 +213,8 @@ const buildOpenAIClient = (config: OpenAIEmbeddingConfig) =>
     timeout:
       config.timeoutSec !== undefined ? config.timeoutSec * 1000 : undefined,
     defaultHeaders: {
-      "X-Title": "Karakeep",
-      "HTTP-Referer": "https://karakeep.app",
+      "X-Title": "Saiye",
+      "HTTP-Referer": "https://saiye.app",
     },
     fetchOptions: config.proxyUrl
       ? { dispatcher: new undici.ProxyAgent(config.proxyUrl) }

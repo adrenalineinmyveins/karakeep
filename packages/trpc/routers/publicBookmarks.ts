@@ -4,9 +4,9 @@ import {
   MAX_NUM_BOOKMARKS_PER_PAGE,
   zPublicBookmarkSchema,
   zSortOrder,
-} from "@karakeep/shared/types/bookmarks";
-import { zBookmarkListSchema } from "@karakeep/shared/types/lists";
-import { zCursorV2 } from "@karakeep/shared/types/pagination";
+} from "@saiye/shared/types/bookmarks";
+import { zBookmarkListSchema } from "@saiye/shared/types/lists";
+import { zCursorV2 } from "@saiye/shared/types/pagination";
 
 import { publicProcedure, router } from "../index";
 import { List } from "../models/lists";

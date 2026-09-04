@@ -9,8 +9,8 @@ import {
   it,
 } from "vitest";
 
-import type { Queue, QueueClient } from "@karakeep/shared/queueing";
-import { QueueRetryAfterError } from "@karakeep/shared/queueing";
+import type { Queue, QueueClient } from "@saiye/shared/queueing";
+import { QueueRetryAfterError } from "@saiye/shared/queueing";
 
 import { AdminClient } from "../admin";
 import { RestateQueueProvider } from "../index";

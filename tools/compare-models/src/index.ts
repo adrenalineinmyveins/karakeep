@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
 import type { ComparisonResult } from "./types";
-import { KarakeepAPIClient } from "./apiClient";
+import { SaiyeAPIClient } from "./apiClient";
 import { runTaggingForModel } from "./bookmarkProcessor";
 import { config } from "./config";
 import { createInferenceClient } from "./inferenceClient";
@@ -30,7 +30,7 @@ interface ShuffleResult {
 }
 
 async function main() {
-  console.log(chalk.cyan("\n🚀 Karakeep Model Comparison Tool\n"));
+  console.log(chalk.cyan("\n🚀 Saiye Model Comparison Tool\n"));
 
   const isExistingMode = config.COMPARISON_MODE === "model-vs-existing";
 
@@ -56,9 +56,9 @@ async function main() {
     );
   }
 
-  const apiClient = new KarakeepAPIClient();
+  const apiClient = new SaiyeAPIClient();
 
-  displayProgress("Fetching bookmarks from Karakeep...");
+  displayProgress("Fetching bookmarks from Saiye...");
   let bookmarks = await apiClient.fetchBookmarks(config.COMPARE_LIMIT);
   clearProgress();
 

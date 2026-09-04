@@ -9,9 +9,9 @@ import { getBookmarkDomain, selectRunProxies } from "network";
 import { withWorkerTracing, withWorkerEventLog } from "workerTracing";
 import { getBookmarkDetails } from "workerUtils";
 
-import type { ZCrawlLinkRequest } from "@karakeep/shared-server";
-import { db } from "@karakeep/db";
-import { bookmarkLinks, bookmarks } from "@karakeep/db/schema";
+import type { ZCrawlLinkRequest } from "@saiye/shared-server";
+import { db } from "@saiye/db";
+import { bookmarkLinks, bookmarks } from "@saiye/db/schema";
 import {
   addLogFields,
   EmbeddingsQueue,
@@ -21,14 +21,14 @@ import {
   VideoWorkerQueue,
   withSpan,
   zCrawlLinkRequestSchema,
-} from "@karakeep/shared-server";
+} from "@saiye/shared-server";
 import {
   ASSET_TYPES,
   IMAGE_ASSET_TYPES,
   SUPPORTED_UPLOAD_ASSET_TYPES,
-} from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
+} from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
 import {
   DequeuedJob,
   DequeuedJobError,
@@ -36,10 +36,10 @@ import {
   getQueueClient,
   Queue,
   QueueRetryAfterError,
-} from "@karakeep/shared/queueing";
-import { getRateLimitClient } from "@karakeep/shared/ratelimiting";
-import { tryCatch } from "@karakeep/shared/tryCatch";
-import { WebhooksService } from "@karakeep/trpc/models/webhooks.service";
+} from "@saiye/shared/queueing";
+import { getRateLimitClient } from "@saiye/shared/ratelimiting";
+import { tryCatch } from "@saiye/shared/tryCatch";
+import { WebhooksService } from "@saiye/trpc/models/webhooks.service";
 
 import {
   getGlobalBrowser,
@@ -60,7 +60,7 @@ import { redactUrlCredentials, truncateUrl } from "./crawler/utils";
 // Re-exported for the adhoc crawl CLI (scripts/crawlAdhoc.ts).
 export { crawlPage } from "./crawler/crawlPage";
 
-const tracer = getTracer("@karakeep/workers");
+const tracer = getTracer("@saiye/workers");
 
 interface CrawlerRunResult {
   status: "completed";

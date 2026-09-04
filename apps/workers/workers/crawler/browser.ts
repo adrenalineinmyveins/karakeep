@@ -17,10 +17,10 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { raceWith, timeoutRace } from "utils";
 import { z } from "zod";
 
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { setUrlHostnameFromResolvedAddress } from "@karakeep/shared/utils/url";
-import { tryCatch } from "@karakeep/shared/tryCatch";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { setUrlHostnameFromResolvedAddress } from "@saiye/shared/utils/url";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
 import { loadAutoconsent } from "./autoconsent";
 import { redactUrlCredentials } from "./utils";
@@ -229,7 +229,7 @@ async function loadAdblocker(): Promise<void> {
   logger.info("[crawler] Loading adblocker ...");
   const globalBlockerResult = await tryCatch(
     PlaywrightBlocker.fromPrebuiltFull(fetchWithProxy, {
-      path: path.join(os.tmpdir(), "karakeep_adblocker.bin"),
+      path: path.join(os.tmpdir(), "saiye_adblocker.bin"),
       read: fs.readFile,
       write: fs.writeFile,
     }),

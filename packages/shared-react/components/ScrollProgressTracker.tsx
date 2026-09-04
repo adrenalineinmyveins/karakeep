@@ -6,13 +6,13 @@ import React, {
   useState,
 } from "react";
 
-import type { ReadingPosition } from "@karakeep/shared/utils/reading-progress-dom";
+import type { ReadingPosition } from "@saiye/shared/utils/reading-progress-dom";
 import {
   findScrollableParent,
   getReadingPosition,
   SCROLL_THROTTLE_MS,
   scrollToReadingPosition,
-} from "@karakeep/shared/utils/reading-progress-dom";
+} from "@saiye/shared/utils/reading-progress-dom";
 
 /** Delay after the last scroll event before reporting position (milliseconds) */
 const IDLE_SAVE_DELAY_MS = 5000;

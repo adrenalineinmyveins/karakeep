@@ -5,7 +5,7 @@ import { z } from "zod";
 import {
   updateUserSchema,
   zAdminJobModifiedWithinSecondsSchema,
-} from "@karakeep/shared/types/admin";
+} from "@saiye/shared/types/admin";
 
 import { adminAuthMiddleware } from "../middlewares/auth";
 

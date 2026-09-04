@@ -17,8 +17,8 @@
  * method, HTTP version, and any URL-encoding overhead.
  *
  * Also see:
- * * https://github.com/karakeep-app/karakeep/issues/281
- * * https://github.com/karakeep-app/karakeep/issues/1619
+ * * https://github.com/adrenalineinmyveins/karakeep/issues/281
+ * * https://github.com/adrenalineinmyveins/karakeep/issues/1619
  * * https://nginx.org/en/docs/http/ngx_http_core_module.html#large_client_header_buffers
  */
 export const TRPC_MAX_URL_LENGTH_INTERNAL = 14000;

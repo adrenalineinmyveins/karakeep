@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { MAX_NUM_BOOKMARKS_PER_PAGE } from "@karakeep/shared/types/bookmarks";
-import { zCursorV2 } from "@karakeep/shared/types/pagination";
+import { MAX_NUM_BOOKMARKS_PER_PAGE } from "@saiye/shared/types/bookmarks";
+import { zCursorV2 } from "@saiye/shared/types/pagination";
 
 export const zPagination = z.object({
   limit: z.coerce.number().max(MAX_NUM_BOOKMARKS_PER_PAGE).optional(),

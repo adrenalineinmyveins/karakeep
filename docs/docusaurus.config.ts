@@ -45,7 +45,7 @@ const config: Config = {
               (item) => !(item.type == "category" && item.label === "API"),
             );
           },
-          editUrl: "https://github.com/karakeep-app/karakeep/tree/main/docs/",
+          editUrl: "https://github.com/adrenalineinmyveins/karakeep/tree/main/docs/",
           routeBasePath: "/",
           docItemComponent: "@theme/ApiItem",
         },
@@ -68,7 +68,7 @@ const config: Config = {
         docsPluginId: "classic",
         config: {
           karakeep: {
-            specPath: "../packages/open-api/karakeep-openapi-spec.json",
+            specPath: "../packages/open-api/saiye-openapi-spec.json",
             outputDir: "docs/api",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -101,7 +101,7 @@ const config: Config = {
           position: "right",
         },
         {
-          href: "https://github.com/karakeep-app/karakeep",
+          href: "https://github.com/adrenalineinmyveins/karakeep",
           label: "GitHub",
           position: "right",
         },

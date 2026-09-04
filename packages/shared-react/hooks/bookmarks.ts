@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { getBookmarkRefreshInterval } from "@karakeep/shared/utils/bookmarkUtils";
+import { getBookmarkRefreshInterval } from "@saiye/shared/utils/bookmarkUtils";
 
 import { useTRPC } from "../trpc";
 import { useBookmarkGridContext } from "./bookmark-grid-context";

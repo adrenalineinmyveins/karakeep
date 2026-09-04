@@ -1,7 +1,7 @@
 import { CallToolResult } from "@modelcontextprotocol/sdk/types";
 import { z } from "zod";
 
-import { karakeepClient, mcpServer, turndownService } from "./shared";
+import { saiyeClient, mcpServer, turndownService } from "./shared";
 import { compactBookmark, compactList, toMcpToolError } from "./utils";
 
 // Tools
@@ -60,7 +60,7 @@ export async function searchBookmarksHandler({
   sortOrder,
   searchMode,
 }: SearchBookmarksInput): Promise<CallToolResult> {
-  const res = await karakeepClient.GET("/bookmarks/search", {
+  const res = await saiyeClient.GET("/bookmarks/search", {
     params: {
       query: {
         q: query,
@@ -103,7 +103,7 @@ mcpServer.tool(
     bookmarkId: z.string().describe(`The bookmarkId to get.`),
   },
   async ({ bookmarkId }): Promise<CallToolResult> => {
-    const res = await karakeepClient.GET(`/bookmarks/{bookmarkId}`, {
+    const res = await saiyeClient.GET(`/bookmarks/{bookmarkId}`, {
       params: {
         path: {
           bookmarkId,
@@ -139,7 +139,7 @@ export async function getBookmarkListsHandler({
 }: {
   bookmarkId: string;
 }): Promise<CallToolResult> {
-  const res = await karakeepClient.GET("/bookmarks/{bookmarkId}/lists", {
+  const res = await saiyeClient.GET("/bookmarks/{bookmarkId}/lists", {
     params: { path: { bookmarkId } },
   });
   if (!res.data) {
@@ -179,7 +179,7 @@ mcpServer.tool(
       ),
   },
   async ({ title, type, content }): Promise<CallToolResult> => {
-    const res = await karakeepClient.POST(`/bookmarks`, {
+    const res = await saiyeClient.POST(`/bookmarks`, {
       body:
         type === "link"
           ? {
@@ -254,7 +254,7 @@ mcpServer.tool(
       .describe(`Override the bookmark's createdAt timestamp (ISO 8601).`),
   },
   async ({ bookmarkId, ...fields }): Promise<CallToolResult> => {
-    const patchRes = await karakeepClient.PATCH(`/bookmarks/{bookmarkId}`, {
+    const patchRes = await saiyeClient.PATCH(`/bookmarks/{bookmarkId}`, {
       params: {
         path: {
           bookmarkId,
@@ -265,7 +265,7 @@ mcpServer.tool(
     if (!patchRes.data) {
       return toMcpToolError(patchRes.error);
     }
-    const getRes = await karakeepClient.GET(`/bookmarks/{bookmarkId}`, {
+    const getRes = await saiyeClient.GET(`/bookmarks/{bookmarkId}`, {
       params: {
         path: {
           bookmarkId,
@@ -298,7 +298,7 @@ export async function getBookmarkContentHandler({
 }: {
   bookmarkId: string;
 }): Promise<CallToolResult> {
-  const res = await karakeepClient.GET(`/bookmarks/{bookmarkId}`, {
+  const res = await saiyeClient.GET(`/bookmarks/{bookmarkId}`, {
     params: {
       path: { bookmarkId },
       query: { includeContent: true },
@@ -342,7 +342,7 @@ export async function deleteBookmarkHandler({
 }: {
   bookmarkId: string;
 }): Promise<CallToolResult> {
-  const getRes = await karakeepClient.GET("/bookmarks/{bookmarkId}", {
+  const getRes = await saiyeClient.GET("/bookmarks/{bookmarkId}", {
     params: { path: { bookmarkId }, query: { includeContent: false } },
   });
   if (!getRes.data) {
@@ -353,7 +353,7 @@ export async function deleteBookmarkHandler({
     getRes.data.content.type === "link" ? getRes.data.content.title : undefined;
   const label = getRes.data.title ?? titleFromContent ?? id;
 
-  const delRes = await karakeepClient.DELETE("/bookmarks/{bookmarkId}", {
+  const delRes = await saiyeClient.DELETE("/bookmarks/{bookmarkId}", {
     params: { path: { bookmarkId: id } },
   });
   if (delRes.error) {

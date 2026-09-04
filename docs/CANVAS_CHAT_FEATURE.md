@@ -149,7 +149,7 @@ Turbopack standalone 对 serverExternalPackages 外部包的 tracing 有缺口�
 - **Chat 前端已存在**（`components/chat/*` + `lib/useChatSync.ts`，非流式，调 `chats.*` tRPC 路由，
   与 Web 共用同一后端）——即 AI 创建画布的"指令入口"手机端已经有了
 - **画布零基础**：无 drawnix/plait/skia/fabric/canvas 任何依赖与代码
-- 鉴权：mobile 用 `apiKey`（Bearer header，`@karakeep/shared-react` 的 TRPCSettingsProvider），
+- 鉴权：mobile 用 `apiKey`（Bearer header，`@saiye/shared-react` 的 TRPCSettingsProvider），
   与 Web 的 next-auth cookie 会话是两套体系
 
 ### 9.2 可移植性分层结论

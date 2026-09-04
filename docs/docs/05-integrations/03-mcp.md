@@ -38,11 +38,11 @@ From NPM:
     "karakeep": {
       "command": "npx",
       "args": [
-        "@karakeep/mcp"
+        "@saiye/mcp"
       ],
       "env": {
-        "KARAKEEP_API_ADDR": "https://<YOUR_SERVER_ADDR>",
-        "KARAKEEP_API_KEY": "<YOUR_TOKEN>"
+        "SAIYE_API_ADDR": "https://<YOUR_SERVER_ADDR>",
+        "SAIYE_API_KEY": "<YOUR_TOKEN>"
       }
     }
   }
@@ -59,10 +59,10 @@ From Docker:
       "args": [
         "run",
         "-e",
-        "KARAKEEP_API_ADDR=https://<YOUR_SERVER_ADDR>",
+        "SAIYE_API_ADDR=https://<YOUR_SERVER_ADDR>",
         "-e",
-        "KARAKEEP_API_KEY=<YOUR_TOKEN>",
-        "ghcr.io/karakeep-app/karakeep-mcp:latest"
+        "SAIYE_API_KEY=<YOUR_TOKEN>",
+        "ghcr.io/adrenalineinmyveins/karakeep-mcp:latest"
       ]
     }
   }

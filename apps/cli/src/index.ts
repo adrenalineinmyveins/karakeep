@@ -53,18 +53,18 @@ function isAuthCommand(command: { name(): string; parent?: unknown }) {
 }
 
 const program = new Command()
-  .name("karakeep")
-  .description("A CLI interface to interact with the karakeep api")
+  .name("saiye")
+  .description("A CLI interface to interact with the saiye api")
   .addOption(
     new Option("--api-key <key>", "the API key to interact with the API").env(
-      "KARAKEEP_API_KEY",
+      "SAIYE_API_KEY",
     ),
   )
   .addOption(
     new Option(
       "--server-addr <addr>",
       "the address of the server to connect to",
-    ).env("KARAKEEP_SERVER_ADDR"),
+    ).env("SAIYE_SERVER_ADDR"),
   )
   .addOption(new Option("--json", "to output the result as JSON"))
   .version(

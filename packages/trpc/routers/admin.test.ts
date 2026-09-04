@@ -14,9 +14,9 @@ import {
   bookmarkLinks,
   bookmarks,
   users,
-} from "@karakeep/db/schema";
-import { QueuePriority } from "@karakeep/shared-server";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/db/schema";
+import { QueuePriority } from "@saiye/shared-server";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import type { CustomTestContext } from "../testUtils";
 import {
@@ -35,11 +35,11 @@ const adminJobMocks = vi.hoisted(() => ({
   getVectorStoreClient: vi.fn(),
 }));
 
-vi.mock("@karakeep/shared/search", () => ({
+vi.mock("@saiye/shared/search", () => ({
   getSearchClient: adminJobMocks.getSearchClient,
 }));
 
-vi.mock("@karakeep/shared/vectorStore", () => ({
+vi.mock("@saiye/shared/vectorStore", () => ({
   getVectorStoreClient: adminJobMocks.getVectorStoreClient,
 }));
 

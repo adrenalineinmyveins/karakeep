@@ -1,7 +1,7 @@
 import { CallToolResult } from "@modelcontextprotocol/sdk/types";
 import { z } from "zod";
 
-import { karakeepClient, mcpServer } from "./shared";
+import { saiyeClient, mcpServer } from "./shared";
 import {
   compactBookmark,
   compactTag,
@@ -17,7 +17,7 @@ mcpServer.tool(
     tagsToAttach: z.array(z.string()).describe(`The tag names to attach.`),
   },
   async ({ bookmarkId, tagsToAttach }): Promise<CallToolResult> => {
-    const res = await karakeepClient.POST(`/bookmarks/{bookmarkId}/tags`, {
+    const res = await saiyeClient.POST(`/bookmarks/{bookmarkId}/tags`, {
       params: {
         path: {
           bookmarkId,
@@ -49,7 +49,7 @@ mcpServer.tool(
     tagsToDetach: z.array(z.string()).describe(`The tag names to detach.`),
   },
   async ({ bookmarkId, tagsToDetach }): Promise<CallToolResult> => {
-    const res = await karakeepClient.DELETE(`/bookmarks/{bookmarkId}/tags`, {
+    const res = await saiyeClient.DELETE(`/bookmarks/{bookmarkId}/tags`, {
       params: {
         path: {
           bookmarkId,
@@ -107,7 +107,7 @@ export type GetTagsInput = z.infer<z.ZodObject<typeof getTagsInputSchema>>;
 export async function getTagsHandler(
   input: GetTagsInput,
 ): Promise<CallToolResult> {
-  const res = await karakeepClient.GET("/tags", {
+  const res = await saiyeClient.GET("/tags", {
     params: { query: pickDefined(input) },
   });
   if (!res.data) {
@@ -142,7 +142,7 @@ export async function getTagHandler({
 }: {
   tagId: string;
 }): Promise<CallToolResult> {
-  const res = await karakeepClient.GET("/tags/{tagId}", {
+  const res = await saiyeClient.GET("/tags/{tagId}", {
     params: { path: { tagId } },
   });
   if (!res.data) {
@@ -174,7 +174,7 @@ export async function updateTagHandler(
   input: UpdateTagInput,
 ): Promise<CallToolResult> {
   const { tagId, name } = input;
-  const res = await karakeepClient.PATCH("/tags/{tagId}", {
+  const res = await saiyeClient.PATCH("/tags/{tagId}", {
     params: { path: { tagId } },
     body: { name },
   });
@@ -207,7 +207,7 @@ export async function deleteTagHandler({
 }: {
   tagId: string;
 }): Promise<CallToolResult> {
-  const getRes = await karakeepClient.GET("/tags/{tagId}", {
+  const getRes = await saiyeClient.GET("/tags/{tagId}", {
     params: { path: { tagId } },
   });
   if (!getRes.data) {
@@ -215,7 +215,7 @@ export async function deleteTagHandler({
   }
   const { id, name } = getRes.data;
 
-  const delRes = await karakeepClient.DELETE("/tags/{tagId}", {
+  const delRes = await saiyeClient.DELETE("/tags/{tagId}", {
     params: { path: { tagId: id } },
   });
   if (delRes.error) {
@@ -274,7 +274,7 @@ export async function getTagBookmarksHandler(
   input: GetTagBookmarksInput,
 ): Promise<CallToolResult> {
   const { tagId, includeContent, ...query } = input;
-  const res = await karakeepClient.GET("/tags/{tagId}/bookmarks", {
+  const res = await saiyeClient.GET("/tags/{tagId}/bookmarks", {
     params: {
       path: { tagId },
       query: pickDefined({ ...query, includeContent }),

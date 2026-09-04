@@ -17,8 +17,8 @@ import { OpenTelemetryTransportV3 } from "@opentelemetry/winston-transport";
 import winston from "winston";
 import type { EventLog, EventLogType } from "./eventLogTypes";
 
-import serverConfig from "@karakeep/shared/config";
-import appLogger from "@karakeep/shared/logger";
+import serverConfig from "@saiye/shared/config";
+import appLogger from "@saiye/shared/logger";
 
 interface LogEventContext {
   name: string;
@@ -39,7 +39,7 @@ declare global {
   // initialized logger state on globalThis lets instrumentation and routes share
   // the same logger instance.
   // eslint-disable-next-line no-var
-  var __karakeepEventLogger: EventLoggerState | undefined;
+  var __saiyeEventLogger: EventLoggerState | undefined;
 }
 
 type EventLogFields<T extends EventLogType> = Omit<
@@ -48,8 +48,8 @@ type EventLogFields<T extends EventLogType> = Omit<
 >;
 
 const eventLoggerState =
-  globalThis.__karakeepEventLogger ??
-  (globalThis.__karakeepEventLogger = {
+  globalThis.__saiyeEventLogger ??
+  (globalThis.__saiyeEventLogger = {
     eventStorage: new AsyncLocalStorage<LogEventContext>(),
     winstonLogger: null,
     loggerProvider: null,

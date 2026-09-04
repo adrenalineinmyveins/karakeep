@@ -1,7 +1,7 @@
 import type Database from "better-sqlite3";
 import { SpanKind, SpanStatusCode, trace } from "@opentelemetry/api";
 
-const TRACER_NAME = "@karakeep/db";
+const TRACER_NAME = "@saiye/db";
 
 function getOperationType(sql: string): string {
   return sql.trimStart().split(/\s/, 1)[0]?.toUpperCase() ?? "UNKNOWN";

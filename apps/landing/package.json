@@ -1,12 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@karakeep/landing",
+  "name": "@saiye/landing",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "dev:portless": "portless run --name karakeep-landing --lan astro dev",
+    "dev:portless": "portless run --name saiye-landing --lan astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "lint": "oxlint --ignore-path=../../.gitignore .",
@@ -30,8 +30,8 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@karakeep/tailwind-config": "workspace:^0.1.0",
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/tailwind-config": "workspace:^0.1.0",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "@tailwindcss/typography": "^0.5.10",
     "@types/react": "19.2.15",
     "@types/react-dom": "19.2.3",

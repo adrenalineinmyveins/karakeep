@@ -3,8 +3,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 
-import { CLOUD_SIGNUP_LINK, DOCS_LINK, GITHUB_LINK } from "./constants";
-import Logo from "/icons/karakeep-full.svg?url";
+import { GITHUB_LINK, DOCS_LINK } from "./constants";
+import Logo from "/icons/saiye-full.svg?url";
 
 export default function NavBar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -41,18 +41,7 @@ export default function NavBar() {
             GitHub
           </a>
           <a
-            href="https://cloud.karakeep.app"
-            target="_blank"
-            className={cn(
-              "text flex h-full w-20 gap-2",
-              buttonVariants({ variant: "outline" }),
-            )}
-            rel="noreferrer"
-          >
-            Login
-          </a>
-          <a
-            href={CLOUD_SIGNUP_LINK}
+            href={GITHUB_LINK}
             target="_blank"
             className={cn(
               "text flex h-full w-32 gap-2",
@@ -107,18 +96,7 @@ export default function NavBar() {
             </a>
             <div className="mt-2 flex gap-3">
               <a
-                href="https://cloud.karakeep.app"
-                target="_blank"
-                className={cn(
-                  "flex-1",
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                )}
-                rel="noreferrer"
-              >
-                Login
-              </a>
-              <a
-                href={CLOUD_SIGNUP_LINK}
+                href={GITHUB_LINK}
                 target="_blank"
                 className={cn(
                   "flex-1",

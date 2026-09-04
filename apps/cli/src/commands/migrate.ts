@@ -6,16 +6,16 @@ import { getAPIClient, getAPIClientFor } from "@/lib/trpc";
 import { Command } from "@commander-js/extra-typings";
 import chalk from "chalk";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
-import type { ZPrompt } from "@karakeep/shared/types/prompts";
-import type { RuleEngineRule } from "@karakeep/shared/types/rules";
-import type { ZGetTagResponse } from "@karakeep/shared/types/tags";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
+import type { ZPrompt } from "@saiye/shared/types/prompts";
+import type { RuleEngineRule } from "@saiye/shared/types/rules";
+import type { ZGetTagResponse } from "@saiye/shared/types/tags";
 import {
   BookmarkTypes,
   MAX_NUM_BOOKMARKS_PER_PAGE,
-} from "@karakeep/shared/types/bookmarks";
-import { ZCursor } from "@karakeep/shared/types/pagination";
+} from "@saiye/shared/types/bookmarks";
+import { ZCursor } from "@saiye/shared/types/pagination";
 
 const OK = chalk.green("✓");
 const FAIL = chalk.red("✗");
@@ -112,7 +112,7 @@ export const migrateCmd = new Command()
 
     try {
       line("");
-      line(`${chalk.bold("Karakeep Migration")}`);
+      line(`${chalk.bold("Saiye Migration")}`);
       line(`${chalk.gray("From:")} ${globals.serverAddr}`);
       line(`${chalk.gray("To:  ")} ${opts.destServer}`);
       line("");

@@ -681,7 +681,7 @@ export { LocalFileSystemAssetStore, S3AssetStore };
  * Example usage of S3AssetStore:
  *
  * import { S3Client } from "@aws-sdk/client-s3";
- * import { S3AssetStore } from "@karakeep/shared/assetdb";
+ * import { S3AssetStore } from "@saiye/shared/assetdb";
  *
  * const s3Client = new S3Client({
  *   region: "us-east-1",

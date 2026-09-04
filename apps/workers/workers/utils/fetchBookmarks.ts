@@ -1,12 +1,12 @@
 import { asc, eq } from "drizzle-orm";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import type { ZCursor } from "@karakeep/shared/types/pagination";
-import type { AuthedContext } from "@karakeep/trpc";
-import { db } from "@karakeep/db";
-import { bookmarks } from "@karakeep/db/schema";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
-import { Bookmark } from "@karakeep/trpc/models/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import type { ZCursor } from "@saiye/shared/types/pagination";
+import type { AuthedContext } from "@saiye/trpc";
+import { db } from "@saiye/db";
+import { bookmarks } from "@saiye/db/schema";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
+import { Bookmark } from "@saiye/trpc/models/bookmarks";
 
 /**
  * Fetches all bookmarks for a user with all necessary relations for export

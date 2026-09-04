@@ -1,5 +1,5 @@
-import type { InferenceClient } from "@karakeep/shared/inference";
-import { buildTextPrompt } from "@karakeep/shared/prompts.server";
+import type { InferenceClient } from "@saiye/shared/inference";
+import { buildTextPrompt } from "@saiye/shared/prompts.server";
 
 import { inferTags } from "./inferenceClient";
 import type { Bookmark } from "./types";

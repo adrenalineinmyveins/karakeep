@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { RuleEngineRule } from "@karakeep/shared/types/rules";
+import { RuleEngineRule } from "@saiye/shared/types/rules";
 
 import type { CustomTestContext } from "../testUtils";
 import { defaultBeforeEach } from "../testUtils";

@@ -5,8 +5,8 @@
  * 内部通过 createCallerFactory 调用已有 tRPC procedure（携带用户认证上下文）。
  */
 
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
-import serverConfig from "@karakeep/shared/config";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
+import serverConfig from "@saiye/shared/config";
 import { z } from "zod";
 
 import { createCallerFactory, type Context } from "../../index";

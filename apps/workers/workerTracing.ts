@@ -1,13 +1,13 @@
-import type { DequeuedJob } from "@karakeep/shared/queueing";
+import type { DequeuedJob } from "@saiye/shared/queueing";
 import {
   addLogFields,
   getTracer,
   withEventLog,
   withSpan,
   EventLogType,
-} from "@karakeep/shared-server";
+} from "@saiye/shared-server";
 
-const tracer = getTracer("@karakeep/workers");
+const tracer = getTracer("@saiye/workers");
 
 type WorkerRunFn<TData, TResult = void> = (
   job: DequeuedJob<TData>,

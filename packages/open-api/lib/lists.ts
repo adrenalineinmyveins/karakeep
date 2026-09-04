@@ -1,11 +1,11 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import * as z from "zod";
 
-import { zSortOrder } from "@karakeep/shared/types/bookmarks";
+import { zSortOrder } from "@saiye/shared/types/bookmarks";
 import {
   zEditBookmarkListSchema,
   zNewBookmarkListSchema,
-} from "@karakeep/shared/types/lists";
+} from "@saiye/shared/types/lists";
 
 import { BookmarkIdSchema } from "./bookmarks";
 import { BearerAuth } from "./common";

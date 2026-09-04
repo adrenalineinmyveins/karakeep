@@ -7,14 +7,14 @@ import { fileURLToPath } from "url";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
 
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import type {
   ZBookmark,
   ZBookmarkedLink,
-} from "@karakeep/shared/types/bookmarks";
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
-import type { ZTagBasic } from "@karakeep/shared/types/tags";
-import type { AppRouter } from "@karakeep/trpc/routers/_app";
+} from "@saiye/shared/types/bookmarks";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
+import type { ZTagBasic } from "@saiye/shared/types/tags";
+import type { AppRouter } from "@saiye/trpc/routers/_app";
 
 type TrpcClient = ReturnType<typeof getTrpcClient>;
 type CrawlStatus = NonNullable<ZBookmarkedLink["crawlStatus"]>;
@@ -173,9 +173,9 @@ async function getRandomPort(): Promise<number> {
 function getTrpcClient(
   apiKey?: string,
 ): ReturnType<typeof createTRPCClient<AppRouter>> {
-  const port = process.env.KARAKEEP_PORT;
+  const port = process.env.SAIYE_PORT;
   if (!port) {
-    throw new Error("KARAKEEP_PORT is not set. Did you start the containers?");
+    throw new Error("SAIYE_PORT is not set. Did you start the containers?");
   }
 
   return createTRPCClient<AppRouter>({
@@ -199,7 +199,7 @@ async function waitForHealthy(port: number): Promise<void> {
       const res = await fetch(`http://localhost:${port}/api/health`);
       return res.status === 200;
     },
-    "Karakeep stack to become healthy",
+    "Saiye stack to become healthy",
     Number(process.env.SEED_SNAPSHOT_HEALTH_TIMEOUT_MS ?? 120_000),
     1_000,
   );
@@ -237,7 +237,7 @@ async function startContainers(composeDir: string, dataDir: string) {
   const buildArg = skipBuild ? "" : "--build";
   const composeEnv = {
     ...process.env,
-    KARAKEEP_PORT: String(port),
+    SAIYE_PORT: String(port),
     SEED_SNAPSHOT_DATA_DIR: dataDir,
   };
 
@@ -248,15 +248,15 @@ async function startContainers(composeDir: string, dataDir: string) {
     env: composeEnv,
   });
 
-  process.env.KARAKEEP_PORT = String(port);
+  process.env.SAIYE_PORT = String(port);
 
   try {
-    logInfo("Waiting for Karakeep to report healthy...");
+    logInfo("Waiting for Saiye to report healthy...");
     await waitForHealthy(port);
     await sleep(5_000);
     logSuccess("Containers are ready");
   } catch (error) {
-    logWarn("Karakeep did not become healthy; stopping docker compose");
+    logWarn("Saiye did not become healthy; stopping docker compose");
     await captureDockerLogs(composeDir, composeEnv);
     execSync("docker compose down", {
       cwd: composeDir,

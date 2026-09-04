@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import {
   zEditBookmarkListSchema,
   zNewBookmarkListSchema,
-} from "@karakeep/shared/types/lists";
+} from "@saiye/shared/types/lists";
 
 import { authMiddleware } from "../middlewares/auth";
 import { adaptPagination, zPagination } from "../utils/pagination";

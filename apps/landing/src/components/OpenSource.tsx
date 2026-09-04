@@ -13,7 +13,7 @@ export default function OpenSource() {
           Open Source & Self-Hostable
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-400">
-          Karakeep is fully open source. Run it on your own server with Docker,
+          Saiye is fully open source. Run it on your own server with Docker,
           keep full control of your data, and contribute to the project.
         </p>
 
@@ -41,13 +41,13 @@ export default function OpenSource() {
 
         <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm">
           <div className="text-center">
-            <div className="text-3xl font-bold text-white">28k+</div>
-            <div className="mt-1 text-gray-400">GitHub Stars</div>
+            <div className="text-3xl font-bold text-white">100%</div>
+            <div className="mt-1 text-gray-400">Open Source</div>
           </div>
           <div className="h-8 w-px bg-gray-700" />
           <div className="text-center">
-            <div className="text-3xl font-bold text-white">150+</div>
-            <div className="mt-1 text-gray-400">Contributors</div>
+            <div className="text-3xl font-bold text-white">Docker</div>
+            <div className="mt-1 text-gray-400">Self-Hosting</div>
           </div>
         </div>
       </div>

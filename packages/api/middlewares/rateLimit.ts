@@ -1,10 +1,10 @@
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 
-import type { RateLimitConfig } from "@karakeep/shared/ratelimiting";
-import serverConfig from "@karakeep/shared/config";
-import { getRateLimitClient } from "@karakeep/shared/ratelimiting";
-import { Context } from "@karakeep/trpc";
+import type { RateLimitConfig } from "@saiye/shared/ratelimiting";
+import serverConfig from "@saiye/shared/config";
+import { getRateLimitClient } from "@saiye/shared/ratelimiting";
+import { Context } from "@saiye/trpc";
 
 export function createRateLimitMiddleware(config: RateLimitConfig) {
   return createMiddleware<{

@@ -1,5 +1,5 @@
 // Auto-register the RateLimit plugin when this package is imported
-import { PluginManager, PluginType } from "@karakeep/shared/plugins";
+import { PluginManager, PluginType } from "@saiye/shared/plugins";
 
 import { RateLimitProvider } from "./src";
 

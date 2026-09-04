@@ -4,7 +4,7 @@ metadata:
   name: web
 spec:
   selector:
-    app: karakeep-web
+    app: saiye-web
   ports:
     - protocol: TCP
       port: 3000

@@ -4,8 +4,8 @@ import { z } from "zod";
 import {
   BookmarkTypes,
   zNewBookmarkRequestSchema,
-} from "@karakeep/shared/types/bookmarks";
-import { zNewBookmarkListSchema } from "@karakeep/shared/types/lists";
+} from "@saiye/shared/types/bookmarks";
+import { zNewBookmarkListSchema } from "@saiye/shared/types/lists";
 
 import type { APICallerType, CustomTestContext } from "../testUtils";
 import { defaultBeforeEach } from "../testUtils";

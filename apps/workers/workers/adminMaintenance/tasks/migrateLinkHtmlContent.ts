@@ -1,19 +1,19 @@
 import { and, asc, eq, gt, isNotNull, isNull, sql } from "drizzle-orm";
 
-import type { ZAdminMaintenanceMigrateLargeLinkHtmlTask } from "@karakeep/shared-server";
-import type { DequeuedJob } from "@karakeep/shared/queueing";
-import { db } from "@karakeep/db";
-import { AssetTypes, bookmarkLinks, bookmarks } from "@karakeep/db/schema";
-import { QuotaService } from "@karakeep/shared-server";
+import type { ZAdminMaintenanceMigrateLargeLinkHtmlTask } from "@saiye/shared-server";
+import type { DequeuedJob } from "@saiye/shared/queueing";
+import { db } from "@saiye/db";
+import { AssetTypes, bookmarkLinks, bookmarks } from "@saiye/db/schema";
+import { QuotaService } from "@saiye/shared-server";
 import {
   ASSET_TYPES,
   deleteAsset,
   newAssetId,
   saveAsset,
-} from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { tryCatch } from "@karakeep/shared/tryCatch";
+} from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
 import { updateAsset } from "../../../workerUtils";
 

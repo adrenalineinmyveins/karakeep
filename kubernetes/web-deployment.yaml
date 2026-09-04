@@ -6,15 +6,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: karakeep-web
+      app: saiye-web
   template:
     metadata:
       labels:
-        app: karakeep-web
+        app: saiye-web
     spec:
       containers:
         - name: web
-          image: ghcr.io/karakeep-app/karakeep
+          image: ghcr.io/adrenalineinmyveins/karakeep
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -31,9 +31,9 @@ spec:
               name: data
           envFrom:
             - secretRef:
-                name: karakeep-secrets
+                name: saiye-secrets
             - configMapRef:
-                name: karakeep-configuration
+                name: saiye-configuration
       volumes:
         - name: data
           persistentVolumeClaim:

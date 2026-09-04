@@ -12,7 +12,7 @@ import { Check, Trash2 } from "lucide-react";
 import {
   SUPPORTED_HIGHLIGHT_COLORS,
   ZHighlightColor,
-} from "@karakeep/shared/types/highlights";
+} from "@saiye/shared/types/highlights";
 
 import { HIGHLIGHT_COLOR_MAP } from "./highlights";
 import { Button } from "./ui/button";

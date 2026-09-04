@@ -1,11 +1,11 @@
 import { CallToolResult } from "@modelcontextprotocol/sdk/types";
 
-import { KarakeepAPISchemas } from "@karakeep/sdk";
+import { SaiyeAPISchemas } from "@saiye/sdk";
 
 import { turndownService } from "./shared";
 
 export function toMcpToolError(
-  error: KarakeepAPISchemas["Error"] | string | undefined,
+  error: SaiyeAPISchemas["Error"] | string | undefined,
 ): CallToolResult {
   return {
     isError: true,
@@ -33,7 +33,7 @@ export function pickDefined<T extends object>(input: T): Partial<T> {
   return out;
 }
 
-export function compactTag(tag: KarakeepAPISchemas["Tag"]): string {
+export function compactTag(tag: SaiyeAPISchemas["Tag"]): string {
   const aiCount = tag.numBookmarksByAttachedType.ai ?? 0;
   const humanCount = tag.numBookmarksByAttachedType.human ?? 0;
   return `Tag ID: ${tag.id}
@@ -41,7 +41,7 @@ Name: ${tag.name}
 Bookmarks: ${tag.numBookmarks} (human: ${humanCount}, ai: ${aiCount})`;
 }
 
-export function compactList(list: KarakeepAPISchemas["List"]): string {
+export function compactList(list: SaiyeAPISchemas["List"]): string {
   return `List ID: ${list.id}
 Name: ${list.name}
 Icon: ${list.icon}
@@ -55,7 +55,7 @@ User role: ${list.userRole}`;
 }
 
 export function compactHighlight(
-  highlight: KarakeepAPISchemas["Highlight"],
+  highlight: SaiyeAPISchemas["Highlight"],
 ): string {
   return `Highlight ID: ${highlight.id}
 Bookmark ID: ${highlight.bookmarkId}
@@ -67,7 +67,7 @@ Note: ${highlight.note ?? ""}`;
 }
 
 export function compactBookmark(
-  bookmark: KarakeepAPISchemas["Bookmark"],
+  bookmark: SaiyeAPISchemas["Bookmark"],
   options: { includeContent?: boolean } = {},
 ): string {
   const includeContent = options.includeContent ?? false;

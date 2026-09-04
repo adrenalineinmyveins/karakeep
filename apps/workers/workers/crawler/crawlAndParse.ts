@@ -11,30 +11,30 @@ import type { RunProxyConfig } from "network";
 import { abortRace, raceWith } from "utils";
 import { updateAsset } from "workerUtils";
 
-import { db } from "@karakeep/db";
+import { db } from "@saiye/db";
 import {
   assets,
   AssetTypes,
   bookmarkAssets,
   bookmarkLinks,
   bookmarks,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   addLogFields,
   AssetPreprocessingQueue,
   getTracer,
   setSpanAttributes,
   withSpan,
-} from "@karakeep/shared-server";
+} from "@saiye/shared-server";
 import {
   ASSET_TYPES,
   readAsset,
   silentDeleteAsset,
-} from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
-import type { ZReaderViewReason } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
+import type { ZReaderViewReason } from "@saiye/shared/types/bookmarks";
 
 import type { ParseSubprocessOutput } from "../utils/parseHtmlSubprocessIpc";
 import {
@@ -53,7 +53,7 @@ import { crawlPage } from "./crawlPage";
 import { runParseSubprocess } from "./parseSubprocess";
 import { redactUrlCredentials, shouldRetryCrawlStatusCode } from "./utils";
 
-const tracer = getTracer("@karakeep/workers");
+const tracer = getTracer("@saiye/workers");
 
 type DBAssetType = typeof assets.$inferInsert;
 

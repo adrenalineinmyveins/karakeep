@@ -492,7 +492,7 @@ describe("importBookmarksFromFile", () => {
 
   it("creates smart lists with their queries during import", async () => {
     const parsers = {
-      karakeep: vi.fn().mockReturnValue({
+      saiye: vi.fn().mockReturnValue({
         bookmarks: [
           {
             title: "Bookmark 1",
@@ -553,7 +553,7 @@ describe("importBookmarksFromFile", () => {
     await importBookmarksFromFile(
       {
         file: fakeFile,
-        source: "karakeep",
+        source: "saiye",
         rootListName: "Imported",
         deps: {
           createList,

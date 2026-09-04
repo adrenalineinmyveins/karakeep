@@ -19,7 +19,7 @@ import invariant from "tiny-invariant";
 import TurndownService from "turndown";
 import { z } from "zod";
 
-import { db as DONT_USE_db } from "@karakeep/db";
+import { db as DONT_USE_db } from "@saiye/db";
 import {
   assets,
   AssetTypes,
@@ -31,17 +31,17 @@ import {
   bookmarkTexts,
   rssFeedImportsTable,
   tagsOnBookmarks,
-} from "@karakeep/db/schema";
-import { EmbeddingsQueue, SearchIndexingQueue } from "@karakeep/shared-server";
+} from "@saiye/db/schema";
+import { EmbeddingsQueue, SearchIndexingQueue } from "@saiye/shared-server";
 
 import { WebhooksService } from "./webhooks.service";
-import { deleteAsset, readAsset } from "@karakeep/shared/assetdb";
-import { getAlignedExpiry } from "@karakeep/shared/signedTokens";
+import { deleteAsset, readAsset } from "@saiye/shared/assetdb";
+import { getAlignedExpiry } from "@saiye/shared/signedTokens";
 import {
   BookmarkTypes,
   DEFAULT_NUM_BOOKMARKS_PER_PAGE,
   zGetBookmarksRequestSchema,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 import type {
   ZBareBookmark,
   ZBookmark,
@@ -49,13 +49,13 @@ import type {
   ZBookmarkReadableContent,
   ZBookmarkReadableContentFormat,
   ZPublicBookmark,
-} from "@karakeep/shared/types/bookmarks";
-import type { ZCursor } from "@karakeep/shared/types/pagination";
+} from "@saiye/shared/types/bookmarks";
+import type { ZCursor } from "@saiye/shared/types/pagination";
 import {
   getBookmarkLinkAssetIdOrUrl,
   getBookmarkTitle,
-} from "@karakeep/shared/utils/bookmarkUtils";
-import { htmlToPlainText } from "@karakeep/shared/utils/htmlUtils";
+} from "@saiye/shared/utils/bookmarkUtils";
+import { htmlToPlainText } from "@saiye/shared/utils/htmlUtils";
 
 import { AuthedContext } from "..";
 import { mapDBAssetTypeToUserType } from "../lib/attachments";

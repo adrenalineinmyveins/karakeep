@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const searchHistorySchema = z.array(z.string());
 
-const BOOKMARK_SEARCH_HISTORY_KEY = "karakeep_search_history";
+const BOOKMARK_SEARCH_HISTORY_KEY = "saiye_search_history";
 const MAX_STORED_ITEMS = 50;
 
 class SearchHistoryUtil {

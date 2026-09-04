@@ -2,28 +2,28 @@ import { eq } from "drizzle-orm";
 import { workerStatsCounter } from "metrics";
 import { withWorkerEventLog, withWorkerTracing } from "workerTracing";
 
-import type { ZEmbeddingsRequest } from "@karakeep/shared-server";
-import { db } from "@karakeep/db";
-import { bookmarks } from "@karakeep/db/schema";
+import type { ZEmbeddingsRequest } from "@saiye/shared-server";
+import { db } from "@saiye/db";
+import { bookmarks } from "@saiye/db/schema";
 import {
   addLogFields,
   EmbeddingsQueue,
   OpenAIQueue,
   zEmbeddingsRequestSchema,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
-import { EmbeddingClientFactory } from "@karakeep/shared/inference";
-import logger from "@karakeep/shared/logger";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
+import { EmbeddingClientFactory } from "@saiye/shared/inference";
+import logger from "@saiye/shared/logger";
 import {
   DequeuedJob,
   DequeuedJobError,
   getQueueClient,
-} from "@karakeep/shared/queueing";
+} from "@saiye/shared/queueing";
 import {
   BookmarkVectorDocument,
   getVectorStoreClient,
-} from "@karakeep/shared/vectorStore";
-import { Bookmark } from "@karakeep/trpc/models/bookmarks";
+} from "@saiye/shared/vectorStore";
+import { Bookmark } from "@saiye/trpc/models/bookmarks";
 
 const MAX_EMBEDDING_CONTENT_EXCERPT_LENGTH = 3000;
 const MAX_EMBEDDING_METADATA_LENGTH = 800;

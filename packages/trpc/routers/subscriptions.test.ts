@@ -1,10 +1,10 @@
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { assets, AssetTypes, subscriptions, users } from "@karakeep/db/schema";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { assets, AssetTypes, subscriptions, users } from "@saiye/db/schema";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 
 import type { CustomTestContext } from "../testUtils";
 import {
@@ -48,8 +48,8 @@ vi.mock("stripe", () => {
 });
 
 // Mock server config with Stripe settings
-vi.mock("@karakeep/shared/config", async (original) => {
-  const mod = (await original()) as typeof import("@karakeep/shared/config");
+vi.mock("@saiye/shared/config", async (original) => {
+  const mod = (await original()) as typeof import("@saiye/shared/config");
   return {
     ...mod,
     default: {
@@ -61,7 +61,7 @@ vi.mock("@karakeep/shared/config", async (original) => {
         webhookSecret: "whsec_123",
         isConfigured: true,
       },
-      publicUrl: "https://test.karakeep.com",
+      publicUrl: "https://test.saiye.com",
       quotas: {
         free: {
           bookmarkLimit: 100,
@@ -761,9 +761,9 @@ describe("Subscription Routes", () => {
         ],
         mode: "subscription",
         success_url:
-          "https://test.karakeep.com/settings/subscription?success=true",
+          "https://test.saiye.com/settings/subscription?success=true",
         cancel_url:
-          "https://test.karakeep.com/settings/subscription?canceled=true",
+          "https://test.saiye.com/settings/subscription?canceled=true",
         metadata: {
           userId: user.id,
         },
@@ -878,7 +878,7 @@ describe("Subscription Routes", () => {
 
       expect(mockBillingPortalSessionsCreate).toHaveBeenCalledWith({
         customer: "cus_123",
-        return_url: "https://test.karakeep.com/settings/subscription",
+        return_url: "https://test.saiye.com/settings/subscription",
       });
     });
 

@@ -1,6 +1,6 @@
-import type { EventLog, EventLogType } from "@karakeep/shared-server";
-import { logEvent } from "@karakeep/shared-server";
-import { getRateLimitClient } from "@karakeep/shared/ratelimiting";
+import type { EventLog, EventLogType } from "@saiye/shared-server";
+import { logEvent } from "@saiye/shared-server";
+import { getRateLimitClient } from "@saiye/shared/ratelimiting";
 
 type EventFields<F extends EventLogType> = Omit<
   Extract<EventLog, { ["event.name"]: F }>,

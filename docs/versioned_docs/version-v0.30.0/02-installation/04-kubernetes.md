@@ -16,7 +16,7 @@ To configure the app, copy the `.env_sample` to `.env` and change to your specif
 
 You should also change the `NEXTAUTH_URL` variable to point to your server address.
 
-Using `KARAKEEP_VERSION=release` will pull the latest stable version. You might want to pin the version instead to control the upgrades (e.g. `KARAKEEP_VERSION=0.10.0`). Check the latest versions [here](https://github.com/karakeep-app/karakeep/pkgs/container/karakeep).
+Using `SAIYE_VERSION=release` will pull the latest stable version. You might want to pin the version instead to control the upgrades (e.g. `SAIYE_VERSION=0.10.0`). Check the latest versions [here](https://github.com/adrenalineinmyveins/karakeep/pkgs/container/karakeep).
 
 To see all available configuration options check the [documentation](../03-configuration/01-environment-variables.md).
 
@@ -107,6 +107,6 @@ Go to the [quick sharing page](../04-using-karakeep/quick-sharing.md) to install
 
 ## Updating
 
-Edit the `KARAKEEP_VERSION` variable in the `kustomization.yaml` file and run `make clean deploy`.
+Edit the `SAIYE_VERSION` variable in the `kustomization.yaml` file and run `make clean deploy`.
 
 If you have chosen `release` as the image tag you can also destroy the web pod, since the deployment has an ImagePullPolicy set to always the pod always pulls the image from the registry, this way we can ensure that the newest release image is pulled.

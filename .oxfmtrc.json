@@ -15,7 +15,7 @@
     "<THIRD_PARTY_MODULES>",
     "",
     "<TYPES>^@karakeep",
-    "^@karakeep/(.*)$",
+    "^@saiye/(.*)$",
     "",
     "<TYPES>^[.|..|~]",
     "^~/",
@@ -34,7 +34,7 @@
     "*.md",
     "*.json",
     "**/migrations/**",
-    "packages/open-api/karakeep-openapi-spec.json",
+    "packages/open-api/saiye-openapi-spec.json",
     "package-lock.json",
     "yarn.lock"
   ]

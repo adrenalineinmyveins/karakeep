@@ -21,8 +21,8 @@ import {
   ATTR_SERVICE_VERSION,
 } from "@opentelemetry/semantic-conventions";
 
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
 
 import type { TracingAttributes } from "./tracingTypes";
 

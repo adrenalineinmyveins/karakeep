@@ -22,7 +22,7 @@ import { parseArgs } from "node:util";
  * transitively opens a SQLite connection (packages/db/drizzle.ts) against
  * DATA_DIR. To guarantee we never touch the real DB, this bootstrap repoints
  * DATA_DIR at a throwaway temp dir BEFORE any app module is imported. Set
- * KARAKEEP_ADHOC_USE_REAL_DB=1 to opt out and use the configured DB instead.
+ * SAIYE_ADHOC_USE_REAL_DB=1 to opt out and use the configured DB instead.
  *
  * The two anti-detection levers are controlled purely by env, so the test
  * driver can flip them per attempt:
@@ -37,9 +37,9 @@ import { parseArgs } from "node:util";
  */
 
 // Repoint the DB at a throwaway location before importing anything that pulls
-// in @karakeep/db. Static imports above are node built-ins + dotenv only.
-if (process.env.KARAKEEP_ADHOC_USE_REAL_DB !== "1") {
-  const scratch = mkdtempSync(path.join(os.tmpdir(), "karakeep-adhoc-"));
+// in @saiye/db. Static imports above are node built-ins + dotenv only.
+if (process.env.SAIYE_ADHOC_USE_REAL_DB !== "1") {
+  const scratch = mkdtempSync(path.join(os.tmpdir(), "saiye-adhoc-"));
   process.env.DATA_DIR = scratch;
   process.env.ASSETS_DIR = path.join(scratch, "assets");
   mkdirSync(process.env.ASSETS_DIR, { recursive: true });
@@ -88,7 +88,7 @@ function scoreHtml(
 
 async function main() {
   // Dynamic imports so the DATA_DIR override above takes effect first.
-  const { default: serverConfig } = await import("@karakeep/shared/config");
+  const { default: serverConfig } = await import("@saiye/shared/config");
   const { selectRunProxies } = await import("network");
   const { crawlPage, CrawlerWorker } = await import("workers/crawlerWorker");
 
@@ -121,7 +121,7 @@ async function main() {
   console.error(
     `[adhoc] arm=${values.arm} browser=${serverConfig.crawler.browserWebUrl ?? "(browserless)"} ` +
       `rebrowserFix=${process.env.REBROWSER_PATCHES_RUNTIME_FIX_MODE === "0" ? "off" : "on"} ` +
-      `db=${process.env.KARAKEEP_ADHOC_USE_REAL_DB === "1" ? "REAL" : "scratch"}`,
+      `db=${process.env.SAIYE_ADHOC_USE_REAL_DB === "1" ? "REAL" : "scratch"}`,
   );
 
   await CrawlerWorker.prepareForAdhoc();

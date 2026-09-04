@@ -8,7 +8,7 @@ import {
   zImportSessionWithStatsSchema,
   zListImportSessionsRequestSchema,
   zListImportSessionsResponseSchema,
-} from "@karakeep/shared/types/importSessions";
+} from "@saiye/shared/types/importSessions";
 
 import type { AuthedContext } from "../index";
 import { createScopedAuthedProcedure, router } from "../index";

@@ -1,6 +1,6 @@
 // Auto-register the RateLimit plugin when this package is imported
-import serverConfig from "@karakeep/shared/config";
-import { PluginManager, PluginType } from "@karakeep/shared/plugins";
+import serverConfig from "@saiye/shared/config";
+import { PluginManager, PluginType } from "@saiye/shared/plugins";
 
 import { RedisRateLimitProvider } from "./src";
 

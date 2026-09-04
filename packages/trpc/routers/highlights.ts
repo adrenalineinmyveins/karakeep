@@ -7,8 +7,8 @@ import {
   zHighlightSchema,
   zNewHighlightSchema,
   zUpdateHighlightSchema,
-} from "@karakeep/shared/types/highlights";
-import { zCursorV2 } from "@karakeep/shared/types/pagination";
+} from "@saiye/shared/types/highlights";
+import { zCursorV2 } from "@saiye/shared/types/pagination";
 
 import type { AuthedContext } from "../index";
 import { createScopedAuthedProcedure, router } from "../index";

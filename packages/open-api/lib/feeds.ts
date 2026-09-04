@@ -5,7 +5,7 @@ import {
   zFeedSchema,
   zNewFeedSchema,
   zUpdateFeedSchema,
-} from "@karakeep/shared/types/feeds";
+} from "@saiye/shared/types/feeds";
 
 import { BearerAuth } from "./common";
 import { ErrorSchema, UnauthorizedResponse } from "./errors";

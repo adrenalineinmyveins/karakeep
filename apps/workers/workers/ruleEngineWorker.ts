@@ -3,18 +3,18 @@ import { workerStatsCounter } from "metrics";
 import { buildImpersonatingAuthedContext } from "trpc";
 import { withWorkerEventLog, withWorkerTracing } from "workerTracing";
 
-import type { ZRuleEngineRequest } from "@karakeep/shared-server";
-import { db } from "@karakeep/db";
-import { bookmarks } from "@karakeep/db/schema";
+import type { ZRuleEngineRequest } from "@saiye/shared-server";
+import { db } from "@saiye/db";
+import { bookmarks } from "@saiye/db/schema";
 import {
   addLogFields,
   RuleEngineQueue,
   zRuleEngineRequestSchema,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { DequeuedJob, getQueueClient } from "@karakeep/shared/queueing";
-import { RuleEngine } from "@karakeep/trpc/lib/ruleEngine";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { DequeuedJob, getQueueClient } from "@saiye/shared/queueing";
+import { RuleEngine } from "@saiye/trpc/lib/ruleEngine";
 
 export class RuleEngineWorker {
   static async build() {

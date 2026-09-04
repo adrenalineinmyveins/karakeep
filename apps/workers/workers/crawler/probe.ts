@@ -7,18 +7,18 @@ import { fetchWithProxy, getBookmarkDomain } from "network";
 import type { RunProxyConfig } from "network";
 import { raceWith, timeoutRejectRace } from "utils";
 
-import { db } from "@karakeep/db";
-import { bookmarkLinks } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { bookmarkLinks } from "@saiye/db/schema";
 import {
   addLogFields,
   getTracer,
   setSpanAttributes,
   withSpan,
-} from "@karakeep/shared-server";
-import { ASSET_TYPES } from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { tryCatch } from "@karakeep/shared/tryCatch";
+} from "@saiye/shared-server";
+import { ASSET_TYPES } from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
 import type { ParseSubprocessOutput } from "../utils/parseHtmlSubprocessIpc";
 import { isLikelyChallengePage } from "../utils/metadataResolver";
@@ -29,7 +29,7 @@ import {
   truncateUrl,
 } from "./utils";
 
-const tracer = getTracer("@karakeep/workers");
+const tracer = getTracer("@saiye/workers");
 
 // Cap how much of the probed page we buffer for metadata extraction.
 // Preview metadata lives in <head>, so a couple of MB is plenty.

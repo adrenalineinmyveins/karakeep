@@ -1,6 +1,6 @@
 import { createContext, use, useMemo } from "react";
 
-import type { ZClientConfig } from "@karakeep/shared/types/config";
+import type { ZClientConfig } from "@saiye/shared/types/config";
 
 export const DEFAULT_CLIENT_CONFIG: ZClientConfig = {
   publicUrl: "",

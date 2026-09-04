@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, inject, it } from "vitest";
 
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import { createTestUser } from "../../utils/api";
 import { getTrpcClient } from "../../utils/trpc";
 
 describe("RSS Feed API", () => {
-  const port = inject("karakeepPort");
+  const port = inject("saiyePort");
 
   if (!port) {
     throw new Error("Missing required environment variables");

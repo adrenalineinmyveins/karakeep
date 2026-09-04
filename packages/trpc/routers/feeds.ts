@@ -1,12 +1,12 @@
 import { experimental_trpcMiddleware } from "@trpc/server";
 import { z } from "zod";
 
-import { FeedQueue } from "@karakeep/shared-server";
+import { FeedQueue } from "@saiye/shared-server";
 import {
   zFeedSchema,
   zNewFeedSchema,
   zUpdateFeedSchema,
-} from "@karakeep/shared/types/feeds";
+} from "@saiye/shared/types/feeds";
 
 import type { AuthedContext } from "../index";
 import { createScopedAuthedProcedure, router } from "../index";

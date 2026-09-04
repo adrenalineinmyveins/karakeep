@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@karakeep/e2e_tests",
+  "name": "@saiye/e2e_tests",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -16,15 +16,15 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1014.0",
-    "@karakeep/sdk": "workspace:*",
-    "@karakeep/shared": "workspace:^0.1.0",
-    "@karakeep/trpc": "workspace:^0.1.0",
+    "@saiye/sdk": "workspace:*",
+    "@saiye/shared": "workspace:^0.1.0",
+    "@saiye/trpc": "workspace:^0.1.0",
     "@trpc/client": "^11.9.0",
     "superjson": "^2.2.1",
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "@types/adm-zip": "^0.5.7",
     "adm-zip": "^0.5.16",
     "vite-tsconfig-paths": "^6.1.1",

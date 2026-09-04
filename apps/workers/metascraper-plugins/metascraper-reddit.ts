@@ -4,7 +4,7 @@ import { decode as decodeHtmlEntities } from "html-entities";
 import { fetchWithProxy } from "network";
 import { z } from "zod";
 
-import logger from "@karakeep/shared/logger";
+import logger from "@saiye/shared/logger";
 
 /**
  * This is a metascraper plugin to select a better
@@ -19,7 +19,7 @@ import logger from "@karakeep/shared/logger";
  * the HTML DOM, and selects the first one.
  *
  * In Reddit posts, the first image is typically
- * the profile picture of the OP, which Karakeep
+ * the profile picture of the OP, which Saiye
  * is using for the thumbnail.
  *
  * This metascraper plugin instead looks for images

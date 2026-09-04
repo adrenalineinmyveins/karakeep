@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@karakeep/shared",
+  "name": "@saiye/shared",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,7 +19,7 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "@types/html-to-text": "^9.0.4",
     "@types/nodemailer": "^6.4.17",
     "vite-tsconfig-paths": "^6.1.1",

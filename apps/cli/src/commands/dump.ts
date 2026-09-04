@@ -8,11 +8,11 @@ import { getAPIClient } from "@/lib/trpc";
 import { Command } from "@commander-js/extra-typings";
 import chalk from "chalk";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
-import type { ZBookmarkList } from "@karakeep/shared/types/lists";
-import { MAX_NUM_BOOKMARKS_PER_PAGE } from "@karakeep/shared/types/bookmarks";
-import { ZCursor } from "@karakeep/shared/types/pagination";
-import { MAX_NUM_TAGS_PER_PAGE } from "@karakeep/shared/types/tags";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
+import type { ZBookmarkList } from "@saiye/shared/types/lists";
+import { MAX_NUM_BOOKMARKS_PER_PAGE } from "@saiye/shared/types/bookmarks";
+import { ZCursor } from "@saiye/shared/types/pagination";
+import { MAX_NUM_TAGS_PER_PAGE } from "@saiye/shared/types/tags";
 
 const OK = chalk.green("✓");
 const FAIL = chalk.red("✗");
@@ -132,13 +132,13 @@ export const dumpCmd = new Command()
       .replace("T", "_")
       .replace("Z", "Z");
     const workRoot = await fsp.mkdtemp(
-      path.join(os.tmpdir(), `karakeep-dump-${ts}-`),
+      path.join(os.tmpdir(), `saiye-dump-${ts}-`),
     );
-    const outFile = opts.output ?? path.resolve(`karakeep-dump-${ts}.tar.gz`);
+    const outFile = opts.output ?? path.resolve(`saiye-dump-${ts}.tar.gz`);
 
     try {
       line("");
-      line(`${chalk.bold("Karakeep Dump")}`);
+      line(`${chalk.bold("Saiye Dump")}`);
       line(`${chalk.gray("Server:")} ${globals.serverAddr}`);
       line(`${chalk.gray("Output:")} ${outFile}`);
       line("");
@@ -146,7 +146,7 @@ export const dumpCmd = new Command()
       // Manifest skeleton
       const whoami = await api.users.whoami.query();
       const manifest = {
-        format: "karakeep.dump",
+        format: "saiye.dump",
         version: 1,
         exportedAt: new Date().toISOString(),
         server: globals.serverAddr,

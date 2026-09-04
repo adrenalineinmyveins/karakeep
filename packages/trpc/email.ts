@@ -1,10 +1,10 @@
 import { createTransport } from "nodemailer";
 
-import { getTracer, withSpan } from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
-import { escapeHtml } from "@karakeep/shared/utils/htmlUtils";
+import { getTracer, withSpan } from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
+import { escapeHtml } from "@saiye/shared/utils/htmlUtils";
 
-const tracer = getTracer("@karakeep/trpc");
+const tracer = getTracer("@saiye/trpc");
 
 function buildTransporter() {
   if (!serverConfig.email.smtp) {
@@ -69,7 +69,7 @@ export const sendVerificationEmail = withTracing(
       subject: "Verify your email address",
       html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>Welcome to Karakeep, ${escapeHtml(name)}!</h2>
+        <h2>Welcome to Saiye, ${escapeHtml(name)}!</h2>
         <p>Please verify your email address by clicking the link below:</p>
         <p>
           <a href="${verificationUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
@@ -83,7 +83,7 @@ export const sendVerificationEmail = withTracing(
       </div>
     `,
       text: `
-Welcome to Karakeep, ${name}!
+Welcome to Saiye, ${name}!
 
 Please verify your email address by visiting this link:
 ${verificationUrl}
@@ -111,11 +111,11 @@ export const sendInviteEmail = withTracing(
     const mailOptions = {
       from: serverConfig.email.smtp!.from,
       to: email,
-      subject: "You've been invited to join Karakeep",
+      subject: "You've been invited to join Saiye",
       html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>You've been invited to join Karakeep!</h2>
-        <p>${escapeHtml(inviterName)} has invited you to join Karakeep, the bookmark everything app.</p>
+        <h2>You've been invited to join Saiye!</h2>
+        <p>${escapeHtml(inviterName)} has invited you to join Saiye, the bookmark everything app.</p>
         <p>Click the link below to accept your invitation and create your account:</p>
         <p>
           <a href="${inviteUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
@@ -129,9 +129,9 @@ export const sendInviteEmail = withTracing(
       </div>
     `,
       text: `
-You've been invited to join Karakeep!
+You've been invited to join Saiye!
 
-${inviterName} has invited you to join Karakeep, a powerful bookmarking and content organization platform.
+${inviterName} has invited you to join Saiye, a powerful bookmarking and content organization platform.
 
 Accept your invitation by visiting this link:
 ${inviteUrl}
@@ -164,7 +164,7 @@ export const sendPasswordResetEmail = withTracing(
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Password Reset Request</h2>
         <p>Hi ${escapeHtml(name)},</p>
-        <p>You requested to reset your password for your Karakeep account. Click the link below to reset your password:</p>
+        <p>You requested to reset your password for your Saiye account. Click the link below to reset your password:</p>
         <p>
           <a href="${resetUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
             Reset Password
@@ -179,7 +179,7 @@ export const sendPasswordResetEmail = withTracing(
       text: `
 Hi ${name},
 
-You requested to reset your password for your Karakeep account. Visit this link to reset your password:
+You requested to reset your password for your Saiye account. Visit this link to reset your password:
 ${resetUrl}
 
 This link will expire in 1 hour.
@@ -210,7 +210,7 @@ export const sendListInvitationEmail = withTracing(
       html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>You've been invited to collaborate on a list!</h2>
-        <p>${escapeHtml(inviterName)} has invited you to collaborate on the list <strong>"${escapeHtml(listName)}"</strong> in Karakeep.</p>
+        <p>${escapeHtml(inviterName)} has invited you to collaborate on the list <strong>"${escapeHtml(listName)}"</strong> in Saiye.</p>
         <p>Click the link below to view and accept or decline the invitation:</p>
         <p>
           <a href="${inviteUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
@@ -219,19 +219,19 @@ export const sendListInvitationEmail = withTracing(
         </p>
         <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
         <p><a href="${inviteUrl}">${inviteUrl}</a></p>
-        <p>You can accept or decline this invitation from your Karakeep dashboard.</p>
+        <p>You can accept or decline this invitation from your Saiye dashboard.</p>
         <p>If you weren't expecting this invitation, you can safely ignore this email or decline it in your dashboard.</p>
       </div>
     `,
       text: `
 You've been invited to collaborate on a list!
 
-${inviterName} has invited you to collaborate on the list "${listName}" in Karakeep.
+${inviterName} has invited you to collaborate on the list "${listName}" in Saiye.
 
 View your invitation by visiting this link:
 ${inviteUrl}
 
-You can accept or decline this invitation from your Karakeep dashboard.
+You can accept or decline this invitation from your Saiye dashboard.
 
 If you weren't expecting this invitation, you can safely ignore this email or decline it in your dashboard.
     `,

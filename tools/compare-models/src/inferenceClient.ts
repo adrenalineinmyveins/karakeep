@@ -1,8 +1,8 @@
-import type { InferenceClient } from "@karakeep/shared/inference";
+import type { InferenceClient } from "@saiye/shared/inference";
 import {
   OpenAIInferenceClient,
   type OpenAIInferenceConfig,
-} from "@karakeep/shared/inference";
+} from "@saiye/shared/inference";
 import { z } from "zod";
 
 import { config } from "./config";

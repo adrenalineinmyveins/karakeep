@@ -14,8 +14,8 @@ import type { Frame, Page } from "playwright";
 import { abortRaceResolve, raceWith, timeoutRace } from "utils";
 import { z } from "zod";
 
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
 
 // The content script exposes/consumes these on the page's global object. In a
 // browser `globalThis === window`; declaring them here keeps the injected

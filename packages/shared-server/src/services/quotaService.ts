@@ -1,8 +1,8 @@
 import { count, eq, sum } from "drizzle-orm";
 
-import type { DB, KarakeepDBTransaction } from "@karakeep/db";
-import { assets, bookmarks, users } from "@karakeep/db/schema";
-import { QuotaApproved } from "@karakeep/shared/storageQuota";
+import type { DB, SaiyeDBTransaction } from "@saiye/db";
+import { assets, bookmarks, users } from "@saiye/db/schema";
+import { QuotaApproved } from "@saiye/shared/storageQuota";
 
 export class StorageQuotaError extends Error {
   constructor(
@@ -23,7 +23,7 @@ export class QuotaService {
   // TODO: Use quota approval tokens for bookmark creation when
   // bookmark creation logic is in the model.
   static async canCreateBookmark(
-    db: DB | KarakeepDBTransaction,
+    db: DB | SaiyeDBTransaction,
     userId: string,
   ) {
     const user = await db.query.users.findFirst({
@@ -52,7 +52,7 @@ export class QuotaService {
   }
 
   static async checkStorageQuota(
-    db: DB | KarakeepDBTransaction,
+    db: DB | SaiyeDBTransaction,
     userId: string,
     requestedSize: number,
   ): Promise<QuotaApproved> {
@@ -83,7 +83,7 @@ export class QuotaService {
   }
 
   static async getCurrentStorageUsage(
-    db: DB | KarakeepDBTransaction,
+    db: DB | SaiyeDBTransaction,
     userId: string,
   ): Promise<number> {
     const currentUsageResult = await db

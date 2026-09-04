@@ -1,5 +1,5 @@
 import { getTrpcClient } from "./trpc";
-import type { ZApiKeyScope } from "@karakeep/shared/types/apiKeys";
+import type { ZApiKeyScope } from "@saiye/shared/types/apiKeys";
 
 export function getAuthHeader(apiKey: string) {
   return {

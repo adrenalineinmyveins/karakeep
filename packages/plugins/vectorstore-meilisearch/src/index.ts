@@ -8,9 +8,9 @@ import type {
   VectorSearchResponse,
   VectorStoreClient,
   VectorSimilarSearchOptions,
-} from "@karakeep/shared/vectorStore";
-import serverConfig from "@karakeep/shared/config";
-import { PluginProvider } from "@karakeep/shared/plugins";
+} from "@saiye/shared/vectorStore";
+import serverConfig from "@saiye/shared/config";
+import { PluginProvider } from "@saiye/shared/plugins";
 
 import { envConfig } from "./env";
 import { BatchingDocumentQueue } from "../../lib/batchingDocumentQueue";

@@ -10,7 +10,7 @@ export * as schema from "./schema";
 export { SqliteError } from "better-sqlite3";
 
 // This is exported here to avoid leaking better-sqlite types outside of this package.
-export type KarakeepDBTransaction = SQLiteTransaction<
+export type SaiyeDBTransaction = SQLiteTransaction<
   "sync",
   Database.RunResult,
   typeof schema,

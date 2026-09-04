@@ -13,17 +13,17 @@ import {
 } from "drizzle-orm";
 import { z } from "zod";
 
-import type { ZAttachedByEnum } from "@karakeep/shared/types/tags";
-import { SqliteError } from "@karakeep/db";
-import { bookmarkTags, tagsOnBookmarks } from "@karakeep/db/schema";
-import { triggerSearchReindex } from "@karakeep/shared-server";
+import type { ZAttachedByEnum } from "@saiye/shared/types/tags";
+import { SqliteError } from "@saiye/db";
+import { bookmarkTags, tagsOnBookmarks } from "@saiye/db/schema";
+import { triggerSearchReindex } from "@saiye/shared-server";
 import {
   zCreateTagRequestSchema,
   zGetTagResponseSchema,
   zTagBasicSchema,
   zUpdateTagRequestSchema,
-} from "@karakeep/shared/types/tags";
-import { switchCase } from "@karakeep/shared/utils/switch";
+} from "@saiye/shared/types/tags";
+import { switchCase } from "@saiye/shared/utils/switch";
 
 import { AuthedContext } from "..";
 

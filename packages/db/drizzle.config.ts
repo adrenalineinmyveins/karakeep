@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import type { Config } from "drizzle-kit";
 
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 
 const databaseURL = serverConfig.dataDir
   ? `${serverConfig.dataDir}/db.db`

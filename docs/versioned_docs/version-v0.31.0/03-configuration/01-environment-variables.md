@@ -1,6 +1,6 @@
 # Configuration
 
-The app is mainly configured by environment variables. All the used environment variables are listed in [packages/shared/config.ts](https://github.com/karakeep-app/karakeep/blob/main/packages/shared/config.ts). The most important ones are:
+The app is mainly configured by environment variables. All the used environment variables are listed in [packages/shared/config.ts](https://github.com/adrenalineinmyveins/karakeep/blob/main/packages/shared/config.ts). The most important ones are:
 
 | Name                                   | Required                              | Default         | Description                                                                                                                                                                                                                                                            |
 | -------------------------------------- | ------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -62,7 +62,7 @@ Only OIDC compliant OAuth providers are supported! For information on how to set
 :::
 
 :::info
-When setting up OAuth, the allowed redirect URLs configured at the provider should be set to `<KARAKEEP_ADDRESS>/api/auth/callback/custom` where `<KARAKEEP_ADDRESS>` is the address you configured in `NEXTAUTH_URL` (for example: `https://try.karakeep.app/api/auth/callback/custom`).
+When setting up OAuth, the allowed redirect URLs configured at the provider should be set to `<SAIYE_ADDRESS>/api/auth/callback/custom` where `<SAIYE_ADDRESS>` is the address you configured in `NEXTAUTH_URL` (for example: `https://try.karakeep.app/api/auth/callback/custom`).
 :::
 
 | Name                                        | Required | Default                | Description                                                                                                                                                                                           |

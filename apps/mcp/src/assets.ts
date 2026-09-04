@@ -1,7 +1,7 @@
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types";
 import { z } from "zod";
 
-import { karakeepClient, mcpServer } from "./shared";
+import { saiyeClient, mcpServer } from "./shared";
 import { toMcpToolError } from "./utils";
 
 export const getAssetInputSchema = {
@@ -13,7 +13,7 @@ export async function getAssetHandler({
 }: {
   assetId: string;
 }): Promise<CallToolResult> {
-  const res = await karakeepClient.GET("/assets/{assetId}/signed-url", {
+  const res = await saiyeClient.GET("/assets/{assetId}/signed-url", {
     params: {
       path: {
         assetId,

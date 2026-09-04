@@ -1,7 +1,7 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import * as z from "zod";
 
-import { zBackupSchema } from "@karakeep/shared/types/backups";
+import { zBackupSchema } from "@saiye/shared/types/backups";
 
 import { BearerAuth } from "./common";
 import { ErrorSchema, UnauthorizedResponse } from "./errors";

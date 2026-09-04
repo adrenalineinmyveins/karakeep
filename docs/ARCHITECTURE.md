@@ -84,7 +84,7 @@ flowchart TB
 
 | 层 | 关键包 | 职责 |
 |---|---|---|
-| 客户端 | `apps/web`, `apps/mobile`, `apps/browser-extension`, `apps/cli`, `apps/mcp` | UI 与用户交互，复用 `@karakeep/trpc` 类型 |
+| 客户端 | `apps/web`, `apps/mobile`, `apps/browser-extension`, `apps/cli`, `apps/mcp` | UI 与用户交互，复用 `@saiye/trpc` 类型 |
 | API 网关 | `packages/api`, `apps/web/app/api/[[...route]]/route.ts` | Hono 路由、认证上下文注入、REST 与 tRPC 适配 |
 | 业务逻辑 | `packages/trpc` | tRPC 路由、领域模型 (models)、规则引擎、搜索排序 |
 | 数据 | `packages/db`, Meilisearch, 资产存储 | 持久化、全文索引、向量索引、二进制资产 |
@@ -126,12 +126,12 @@ flowchart TB
 
 | 应用 | 包名 | 职责 |
 |---|---|---|
-| `apps/web` | `@karakeep/web` | **主应用**，Next.js，承载 UI、挂载 Hono API、认证、tRPC 服务端调用 |
-| `apps/workers` | `@karakeep/workers` | **后台任务进程**，12+ 种 worker，独立 HTTP 指标服务 |
-| `apps/mobile` | `@karakeep/mobile` | Expo 移动端，复用 `@karakeep/shared-react` hooks |
+| `apps/web` | `@saiye/web` | **主应用**，Next.js，承载 UI、挂载 Hono API、认证、tRPC 服务端调用 |
+| `apps/workers` | `@saiye/workers` | **后台任务进程**，12+ 种 worker，独立 HTTP 指标服务 |
+| `apps/mobile` | `@saiye/mobile` | Expo 移动端，复用 `@saiye/shared-react` hooks |
 | `apps/browser-extension` | — | 浏览器扩展，支持 SingleFile 完整页面捕获 |
-| `apps/cli` | `@karakeep/cli` | 命令行（书签/标签/清单/资产/管理员/导入等命令） |
-| `apps/mcp` | `@karakeep/mcp` | Model Context Protocol 服务器，向 LLM 暴露 Karakeep 工具 |
+| `apps/cli` | `@saiye/cli` | 命令行（书签/标签/清单/资产/管理员/导入等命令） |
+| `apps/mcp` | `@saiye/mcp` | Model Context Protocol 服务器，向 LLM 暴露 Karakeep 工具 |
 | `apps/landing` | — | Astro 落地页 |
 
 ### 4.2 包 (`packages/`)
@@ -491,10 +491,10 @@ flowchart TB
     EXT["apps/browser-extension"] --> SHARED
     CLI["apps/cli\n直连 /api (http) + trpc 类型"] --> SDK
     CLI --> TRPC_DEF
-    MCP["apps/mcp\ncreateKarakeepClient → /api/v1"] --> SDK
+    MCP["apps/mcp\ncreateSaiyeClient → /api/v1"] --> SDK
 ```
 
-- **Web**：服务端用 `apps/web/server/api/trpc.ts` 的 `serverTrpc`（`@trpc/tanstack-react-query` proxy，RSC 内调用）；客户端用 `@karakeep/shared-react/providers/trpc-provider`。
+- **Web**：服务端用 `apps/web/server/api/trpc.ts` 的 `serverTrpc`（`@trpc/tanstack-react-query` proxy，RSC 内调用）；客户端用 `@saiye/shared-react/providers/trpc-provider`。
 - **Mobile**：复用 `shared-react` 的 hooks（`useBookmarks` / `useLists` / `useTags` 等）与高亮组件，配置自建服务器地址（`server-address.tsx`）。
 - **浏览器扩展**：通过 `utils/trpc.ts` 连接 Karakeep 实例，支持 SingleFile 完整页面归档并上传为 `precrawledArchiveId`。
 - **CLI / MCP**：不直接连 tRPC，而通过 `packages/sdk` 调用 REST `/api/v1`（Bearer API Key 认证），保证跨网络可用。
@@ -529,7 +529,7 @@ flowchart TB
 - [AGENTS.md](../AGENTS.md) - 项目概览与开发工作流（命令、约定）
 - [配置选项文档](docs/03-configuration.md) - 环境变量与配置详解（`packages/shared/config.ts` 的全部项）
 - [packages/trpc/README 无] - tRPC 路由源码即文档：`packages/trpc/routers/_app.ts`
-- [OpenAPI 规范](../packages/open-api/karakeep-openapi-spec.json) - REST `/api/v1` 自动生成的 OpenAPI 描述
+- [OpenAPI 规范](../packages/open-api/saiye-openapi-spec.json) - REST `/api/v1` 自动生成的 OpenAPI 描述
 - [Docker 部署示例](../docker/docker-compose.yml) - 自托管编排参考
 
 ---

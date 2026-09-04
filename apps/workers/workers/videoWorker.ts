@@ -10,8 +10,8 @@ import {
 } from "network";
 import { withWorkerEventLog, withWorkerTracing } from "workerTracing";
 
-import { db } from "@karakeep/db";
-import { AssetTypes } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { AssetTypes } from "@saiye/db/schema";
 import {
   addLogFields,
   QuotaService,
@@ -19,16 +19,16 @@ import {
   VideoWorkerQueue,
   ZVideoRequest,
   zvideoRequestSchema,
-} from "@karakeep/shared-server";
+} from "@saiye/shared-server";
 import {
   ASSET_TYPES,
   newAssetId,
   saveAssetFromFile,
   silentDeleteAsset,
-} from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { DequeuedJob, getQueueClient } from "@karakeep/shared/queueing";
+} from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { DequeuedJob, getQueueClient } from "@saiye/shared/queueing";
 
 import { getBookmarkDetails, updateAsset } from "../workerUtils";
 

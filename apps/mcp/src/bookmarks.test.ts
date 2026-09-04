@@ -14,7 +14,7 @@ const { mockClient, mockTool, mockTurndown } = vi.hoisted(() => ({
 }));
 
 vi.mock("./shared", () => ({
-  karakeepClient: mockClient,
+  saiyeClient: mockClient,
   mcpServer: { tool: mockTool },
   turndownService: mockTurndown,
 }));

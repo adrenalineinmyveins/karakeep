@@ -1,14 +1,14 @@
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { invites, users } from "@karakeep/db/schema";
+import { invites, users } from "@saiye/db/schema";
 
 import type { CustomTestContext } from "../testUtils";
 import { defaultBeforeEach, getApiCaller } from "../testUtils";
 
 // Mock server config with email settings
-vi.mock("@karakeep/shared/config", async (original) => {
-  const mod = (await original()) as typeof import("@karakeep/shared/config");
+vi.mock("@saiye/shared/config", async (original) => {
+  const mod = (await original()) as typeof import("@saiye/shared/config");
   return {
     ...mod,
     default: {

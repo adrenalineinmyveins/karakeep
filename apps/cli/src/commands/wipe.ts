@@ -6,8 +6,8 @@ import { getAPIClient } from "@/lib/trpc";
 import { Command } from "@commander-js/extra-typings";
 import chalk from "chalk";
 
-import { MAX_NUM_BOOKMARKS_PER_PAGE } from "@karakeep/shared/types/bookmarks";
-import { ZCursor } from "@karakeep/shared/types/pagination";
+import { MAX_NUM_BOOKMARKS_PER_PAGE } from "@saiye/shared/types/bookmarks";
+import { ZCursor } from "@saiye/shared/types/pagination";
 
 const OK = chalk.green("✓");
 const FAIL = chalk.red("✗");
@@ -94,7 +94,7 @@ export const wipeCmd = new Command()
 
     try {
       line("");
-      line(`${chalk.bold("Karakeep Wipe")}`);
+      line(`${chalk.bold("Saiye Wipe")}`);
       line(`${chalk.gray("Server:")} ${globals.serverAddr}`);
       line("");
 

@@ -1,16 +1,16 @@
 import { and, count, eq, gt, lte } from "drizzle-orm";
 import { z } from "zod";
 
-import type { DB } from "@karakeep/db";
+import type { DB } from "@saiye/db";
 import {
   importSessionBookmarks,
   importSessions,
   importStagingBookmarks,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   zCreateImportSessionRequestSchema,
   ZImportSession,
-} from "@karakeep/shared/types/importSessions";
+} from "@saiye/shared/types/importSessions";
 
 type ImportSessionRow = typeof importSessions.$inferSelect;
 type StagingBookmarkRow = typeof importStagingBookmarks.$inferSelect;

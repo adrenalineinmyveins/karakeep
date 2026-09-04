@@ -10,29 +10,29 @@ import { workerStatsCounter } from "metrics";
 import cron from "node-cron";
 import { withWorkerEventLog, withWorkerTracing } from "workerTracing";
 
-import type { ZBackupRequest } from "@karakeep/shared-server";
-import { db } from "@karakeep/db";
+import type { ZBackupRequest } from "@saiye/shared-server";
+import { db } from "@saiye/db";
 import {
   assets,
   AssetTypes,
   bookmarksInLists,
   users,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   addLogFields,
   BackupQueue,
   QuotaService,
-} from "@karakeep/shared-server";
-import { saveAssetFromFile } from "@karakeep/shared/assetdb";
+} from "@saiye/shared-server";
+import { saveAssetFromFile } from "@saiye/shared/assetdb";
 import {
   toExportFormat,
   toExportListFormat,
-} from "@karakeep/shared/import-export";
-import logger from "@karakeep/shared/logger";
-import { DequeuedJob, getQueueClient } from "@karakeep/shared/queueing";
-import { AuthedContext } from "@karakeep/trpc";
-import { Backup } from "@karakeep/trpc/models/backups";
-import { List } from "@karakeep/trpc/models/lists";
+} from "@saiye/shared/import-export";
+import logger from "@saiye/shared/logger";
+import { DequeuedJob, getQueueClient } from "@saiye/shared/queueing";
+import { AuthedContext } from "@saiye/trpc";
+import { Backup } from "@saiye/trpc/models/backups";
+import { List } from "@saiye/trpc/models/lists";
 
 import { buildImpersonatingAuthedContext } from "../trpc";
 import { fetchBookmarksInBatches } from "./utils/fetchBookmarks";
@@ -195,11 +195,11 @@ async function run(req: DequeuedJob<ZBackupRequest>) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const tempJsonPath = join(
     tmpdir(),
-    `karakeep-backup-${userId}-${timestamp}.json`,
+    `saiye-backup-${userId}-${timestamp}.json`,
   );
   const tempZipPath = join(
     tmpdir(),
-    `karakeep-backup-${userId}-${timestamp}.zip`,
+    `saiye-backup-${userId}-${timestamp}.zip`,
   );
 
   let backup: Backup | null = null;
@@ -251,7 +251,7 @@ async function run(req: DequeuedJob<ZBackupRequest>) {
       compressedSize,
     );
     const assetId = createId();
-    const fileName = `karakeep-backup-${timestamp}.zip`;
+    const fileName = `saiye-backup-${timestamp}.zip`;
 
     // Step 4: Create asset record
     await db.insert(assets).values({
@@ -440,7 +440,7 @@ async function createZipArchiveFromFile(
     archive.pipe(output);
 
     // Add the JSON file to the zip (streaming from disk)
-    const jsonFileName = `karakeep-backup-${timestamp}.json`;
+    const jsonFileName = `saiye-backup-${timestamp}.json`;
     archive.file(jsonFilePath, { name: jsonFileName });
 
     archive.finalize();

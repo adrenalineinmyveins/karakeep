@@ -1,11 +1,11 @@
-# Karakeep Benchmarks
+# Saiye Benchmarks
 
-This package spins up a production-like Karakeep stack in Docker, seeds it with a sizeable dataset, then benchmarks a handful of high-signal APIs.
+This package spins up a production-like Saiye stack in Docker, seeds it with a sizeable dataset, then benchmarks a handful of high-signal APIs.
 
 ## Usage
 
 ```bash
-pnpm --filter @karakeep/benchmarks bench
+pnpm --filter @saiye/benchmarks bench
 ```
 
 The command will:

@@ -22,9 +22,9 @@ import {
   startQueue,
   VideoWorkerQueue,
   WebhookQueue,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
 
 import { shutdownPromise } from "./exit";
 import { AdminMaintenanceWorker } from "./workers/adminMaintenanceWorker";

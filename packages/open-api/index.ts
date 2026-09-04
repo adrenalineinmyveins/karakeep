@@ -38,13 +38,13 @@ function getOpenApiDocumentation() {
     openapi: "3.0.0",
     info: {
       version: "1.0.0",
-      title: "Karakeep API",
+      title: "Saiye API",
       description:
-        "Karakeep is a self-hostable bookmarking and read-it-later service. " +
+        "Saiye is a self-hostable bookmarking and read-it-later service. " +
         "This API allows you to manage bookmarks, lists, tags, highlights, feeds, assets, and backups programmatically.\n\n" +
         "## Authentication\n\n" +
         "All endpoints require a Bearer token passed in the `Authorization` header. " +
-        "You can generate an API key from the Karakeep web UI under **Settings > API Keys**.\n\n" +
+        "You can generate an API key from the Saiye web UI under **Settings > API Keys**.\n\n" +
         "## Pagination\n\n" +
         "List endpoints support cursor-based pagination via `cursor` and `limit` query parameters. " +
         "The response includes a `nextCursor` field — pass it as the `cursor` parameter to fetch the next page. " +
@@ -108,8 +108,8 @@ function getOpenApiDocumentation() {
         url: "{address}/api/v1",
         variables: {
           address: {
-            default: "https://try.karakeep.app",
-            description: "The address of the Karakeep server",
+            default: "https://try.saiye.app",
+            description: "The address of the Saiye server",
           },
         },
       },
@@ -120,7 +120,7 @@ function getOpenApiDocumentation() {
 function writeDocumentation() {
   const docs = getOpenApiDocumentation();
   const fileContent = JSON.stringify(docs, null, 2);
-  fs.writeFileSync(`./karakeep-openapi-spec.json`, fileContent, {
+  fs.writeFileSync(`./saiye-openapi-spec.json`, fileContent, {
     encoding: "utf-8",
   });
 }
@@ -128,7 +128,7 @@ function writeDocumentation() {
 function checkDocumentation() {
   const docs = getOpenApiDocumentation();
   const fileContent = JSON.stringify(docs, null, 2);
-  const oldContent = fs.readFileSync(`./karakeep-openapi-spec.json`, {
+  const oldContent = fs.readFileSync(`./saiye-openapi-spec.json`, {
     encoding: "utf-8",
   });
   if (oldContent !== fileContent) {

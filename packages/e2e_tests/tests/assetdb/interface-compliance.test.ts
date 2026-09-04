@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { ASSET_TYPES, AssetStore } from "@karakeep/shared/assetdb";
+import { ASSET_TYPES, AssetStore } from "@saiye/shared/assetdb";
 
 import {
   assertAssetExists,

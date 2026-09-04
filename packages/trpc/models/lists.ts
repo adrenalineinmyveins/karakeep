@@ -4,7 +4,7 @@ import { and, count, eq, inArray, or, sql } from "drizzle-orm";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 
-import { KarakeepDBTransaction, SqliteError } from "@karakeep/db";
+import { SaiyeDBTransaction, SqliteError } from "@saiye/db";
 import {
   bookmarkLists,
   bookmarks,
@@ -12,16 +12,16 @@ import {
   listCollaborators,
   ruleEngineRulesTable,
   users,
-} from "@karakeep/db/schema";
-import { parseSearchQuery } from "@karakeep/shared/searchQueryParser";
-import { ZSortOrder } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/db/schema";
+import { parseSearchQuery } from "@saiye/shared/searchQueryParser";
+import { ZSortOrder } from "@saiye/shared/types/bookmarks";
 import {
   ZBookmarkList,
   zEditBookmarkListSchemaWithValidation,
   zNewBookmarkListSchema,
-} from "@karakeep/shared/types/lists";
-import { ZCursor } from "@karakeep/shared/types/pagination";
-import { switchCase } from "@karakeep/shared/utils/switch";
+} from "@saiye/shared/types/lists";
+import { ZCursor } from "@saiye/shared/types/pagination";
+import { switchCase } from "@saiye/shared/utils/switch";
 
 import { AuthedContext, Context } from "..";
 import { buildImpersonatingAuthedContext } from "../lib/impersonate";
@@ -29,7 +29,7 @@ import { RuleEngine } from "../lib/ruleEngine";
 import { getBookmarkIdsFromMatcher } from "../lib/search";
 import { Bookmark } from "./bookmarks";
 import { ListInvitation } from "./listInvitations";
-import { zRuleEngineRuleEventSchema } from "@karakeep/shared/types/rules";
+import { zRuleEngineRuleEventSchema } from "@saiye/shared/types/rules";
 
 interface ListCollaboratorEntry {
   membershipId: string;
@@ -464,7 +464,7 @@ export abstract class List {
     }
   }
 
-  protected async cleanupRulesAfterListDeletion(tx: KarakeepDBTransaction) {
+  protected async cleanupRulesAfterListDeletion(tx: SaiyeDBTransaction) {
     const rules = await tx
       .select({
         id: ruleEngineRulesTable.id,

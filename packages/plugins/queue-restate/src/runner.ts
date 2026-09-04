@@ -1,8 +1,8 @@
 import * as restate from "@restatedev/restate-sdk";
 
-import type { RunnerFuncs, RunnerOptions } from "@karakeep/shared/queueing";
-import { QueueRetryAfterError } from "@karakeep/shared/queueing";
-import { tryCatch } from "@karakeep/shared/tryCatch";
+import type { RunnerFuncs, RunnerOptions } from "@saiye/shared/queueing";
+import { QueueRetryAfterError } from "@saiye/shared/queueing";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
 import type { RunnerJobData, RunnerResult, SerializedError } from "./types";
 

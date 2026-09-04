@@ -3,10 +3,10 @@ import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { assets } from "@karakeep/db/schema";
-import serverConfig from "@karakeep/shared/config";
-import { verifySignedToken } from "@karakeep/shared/signedTokens";
-import { zAssetSignedTokenSchema } from "@karakeep/shared/types/assets";
+import { assets } from "@saiye/db/schema";
+import serverConfig from "@saiye/shared/config";
+import { verifySignedToken } from "@saiye/shared/signedTokens";
+import { zAssetSignedTokenSchema } from "@saiye/shared/types/assets";
 
 import { unauthedMiddleware } from "../../middlewares/auth";
 import { serveAsset } from "../../utils/assets";

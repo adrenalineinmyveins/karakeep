@@ -1,6 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import "@karakeep/tailwind-config/globals.css";
+import "@saiye/tailwind-config/globals.css";
 
 interface Props {
   title?: string;
@@ -8,14 +8,14 @@ interface Props {
   path?: string;
 }
 
-const BASE_URL = "https://karakeep.app";
+const BASE_URL = "https://saiye.app";
 const DEFAULT_TITLE =
-  "Karakeep - The Bookmark Everything App | Save, Organize & Tag with AI";
+  "Saiye - The Bookmark Everything App | Save, Organize & Tag with AI";
 const DEFAULT_DESCRIPTION =
-  "Karakeep is the open-source bookmark manager for links, notes, and images. Automatically organize and tag your bookmarks with AI. Self-hostable, with apps for iOS, Android, Chrome, and Firefox.";
+  "Saiye is the open-source bookmark manager for links, notes, and images. Automatically organize and tag your bookmarks with AI. Self-hostable, with apps for iOS, Android, Chrome, and Firefox.";
 
 const { title, description = DEFAULT_DESCRIPTION, path = "/" } = Astro.props;
-const fullTitle = title ? `${title} | Karakeep` : DEFAULT_TITLE;
+const fullTitle = title ? `${title} | Saiye` : DEFAULT_TITLE;
 const url = `${BASE_URL}${path}`;
 ---
 
@@ -28,24 +28,24 @@ const url = `${BASE_URL}${path}`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="canonical" href={url} />
     <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#7c3aed" />
+    <meta name="theme-color" content="#6366F1" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Karakeep" />
+    <meta property="og:site_name" content="Saiye" />
     <meta property="og:url" content={url} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta
       property="og:image"
-      content="https://karakeep.app/opengraph-image.png"
+      content="https://saiye.app/opengraph-image.png"
     />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="3624" />
     <meta property="og:image:height" content="1956" />
     <meta
       property="og:image:alt"
-      content="Karakeep bookmark manager app screenshot"
+      content="Saiye bookmark manager app screenshot"
     />
 
     <!-- Twitter Card -->
@@ -54,11 +54,11 @@ const url = `${BASE_URL}${path}`;
     <meta name="twitter:description" content={description} />
     <meta
       name="twitter:image"
-      content="https://karakeep.app/twitter-image.png"
+      content="https://saiye.app/twitter-image.png"
     />
     <meta
       name="twitter:image:alt"
-      content="Karakeep bookmark manager app screenshot"
+      content="Saiye bookmark manager app screenshot"
     />
 
     <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16" />

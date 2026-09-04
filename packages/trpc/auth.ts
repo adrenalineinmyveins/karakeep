@@ -2,10 +2,10 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { and, eq } from "drizzle-orm";
 
-import { apiKeys } from "@karakeep/db/schema";
-import type { ZApiKeyScope } from "@karakeep/shared/types/apiKeys";
-import { API_KEY_FULL_ACCESS_SCOPE } from "@karakeep/shared/types/apiKeys";
-import serverConfig from "@karakeep/shared/config";
+import { apiKeys } from "@saiye/db/schema";
+import type { ZApiKeyScope } from "@saiye/shared/types/apiKeys";
+import { API_KEY_FULL_ACCESS_SCOPE } from "@saiye/shared/types/apiKeys";
+import serverConfig from "@saiye/shared/config";
 
 import type { Context } from "./index";
 

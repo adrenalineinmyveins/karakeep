@@ -24,7 +24,7 @@ async function waitForHealthy(port: number): Promise<void> {
       const res = await fetch(`http://localhost:${port}/api/health`);
       return res.status === 200;
     },
-    "Karakeep stack to become healthy",
+    "Saiye stack to become healthy",
     60_000,
     1_000,
   );
@@ -72,7 +72,7 @@ export async function startContainers(): Promise<RunningContainers> {
   execSync(`docker compose up ${buildArg} -d`, {
     cwd: composeDir,
     stdio: "inherit",
-    env: { ...process.env, KARAKEEP_PORT: String(port) },
+    env: { ...process.env, SAIYE_PORT: String(port) },
   });
 
   logInfo("Waiting for services to report healthy...");
@@ -80,7 +80,7 @@ export async function startContainers(): Promise<RunningContainers> {
   await sleep(5_000);
   logSuccess("Containers are ready");
 
-  process.env.KARAKEEP_PORT = String(port);
+  process.env.SAIYE_PORT = String(port);
 
   let stopped = false;
   const stop = async (): Promise<void> => {

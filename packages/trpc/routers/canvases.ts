@@ -2,8 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { db } from "@karakeep/db";
-import { canvases } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { canvases } from "@saiye/db/schema";
 
 import { authedProcedure, router } from "../index";
 

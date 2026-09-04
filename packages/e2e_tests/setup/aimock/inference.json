@@ -400,7 +400,7 @@
         "userMessage": "automatic tagging for a read-it-later/bookmarking app"
       },
       "response": {
-        "content": "{\"tags\":[\"ai-generated\",\"karakeep\",\"worker-test\"]}"
+        "content": "{\"tags\":[\"ai-generated\",\"saiye\",\"worker-test\"]}"
       }
     },
     {
@@ -409,7 +409,7 @@
         "userMessage": "Summarize the following content responding ONLY with the summary."
       },
       "response": {
-        "content": "This page contains a short Hello World test document used to verify Karakeep's inference worker end-to-end."
+        "content": "This page contains a short Hello World test document used to verify Saiye's inference worker end-to-end."
       }
     }
   ]

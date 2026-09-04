@@ -4,12 +4,12 @@ import { HTTPException } from "hono/http-exception";
 import {
   apiKeyScopesGrantScope,
   getApiKeyScope,
-} from "@karakeep/shared/types/apiKeys";
+} from "@saiye/shared/types/apiKeys";
 import type {
   ZApiKeyScopeAccess,
   ZApiKeyScopeResource,
-} from "@karakeep/shared/types/apiKeys";
-import type { AuthedContext } from "@karakeep/trpc";
+} from "@saiye/shared/types/apiKeys";
+import type { AuthedContext } from "@saiye/trpc";
 
 export function apiKeyScopeMiddleware(
   resource: ZApiKeyScopeResource,

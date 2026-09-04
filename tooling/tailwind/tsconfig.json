@@ -1,5 +1,5 @@
 {
-  "extends": "@karakeep/tsconfig/base.json",
+  "extends": "@saiye/tsconfig/base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },

@@ -7,7 +7,7 @@ interface LogCall {
 
 const logCalls: LogCall[] = [];
 
-vi.mock("@karakeep/shared/config", () => ({
+vi.mock("@saiye/shared/config", () => ({
   default: {
     eventLogs: {
       enabled: true,
@@ -18,7 +18,7 @@ vi.mock("@karakeep/shared/config", () => ({
   },
 }));
 
-vi.mock("@karakeep/shared/logger", () => ({
+vi.mock("@saiye/shared/logger", () => ({
   default: {
     info: vi.fn(),
     debug: vi.fn(),

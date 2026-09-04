@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { ZBookmarkReadableContentFormat } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmarkReadableContentFormat } from "@saiye/shared/types/bookmarks";
 
 const zReadableContentCursor = z.object({
   version: z.literal(1),

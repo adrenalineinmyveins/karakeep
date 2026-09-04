@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getInMemoryDB } from "@karakeep/db/drizzle";
+import { getInMemoryDB } from "@saiye/db/drizzle";
 import {
   bookmarkLinks,
   bookmarkLists,
@@ -14,28 +14,28 @@ import {
   ruleEngineRulesTable as rules,
   tagsOnBookmarks,
   users,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   buildCrawlIdempotencyKey,
   LowPriorityCrawlerQueue,
   QueuePriority,
-} from "@karakeep/shared-server";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared-server";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import {
   RuleEngineAction,
   RuleEngineCondition,
   RuleEngineEvent,
   RuleEngineRule,
-} from "@karakeep/shared/types/rules";
+} from "@saiye/shared/types/rules";
 
 import { AuthedContext } from "../..";
 import { TestDB } from "../../testUtils";
 import { RuleEngine } from "../ruleEngine";
 
 // Mock the queue
-vi.mock("@karakeep/shared-server", async (importOriginal) => {
+vi.mock("@saiye/shared-server", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("@karakeep/shared-server")>();
+    await importOriginal<typeof import("@saiye/shared-server")>();
   return {
     ...actual,
     LowPriorityCrawlerQueue: {

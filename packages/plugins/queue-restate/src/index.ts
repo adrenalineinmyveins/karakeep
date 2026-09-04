@@ -3,7 +3,7 @@ import { format } from "node:util";
 import * as restate from "@restatedev/restate-sdk";
 import * as restateClient from "@restatedev/restate-sdk-clients";
 
-import type { PluginProvider } from "@karakeep/shared/plugins";
+import type { PluginProvider } from "@saiye/shared/plugins";
 import type {
   EnqueueOptions,
   Queue,
@@ -12,9 +12,9 @@ import type {
   Runner,
   RunnerFuncs,
   RunnerOptions,
-} from "@karakeep/shared/queueing";
-import logger from "@karakeep/shared/logger";
-import { queueOptionsEqual } from "@karakeep/shared/queueing";
+} from "@saiye/shared/queueing";
+import logger from "@saiye/shared/logger";
+import { queueOptionsEqual } from "@saiye/shared/queueing";
 
 import { envConfig } from "./env";
 import { idProvider } from "./idProvider";

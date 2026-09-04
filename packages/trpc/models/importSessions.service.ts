@@ -1,12 +1,12 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import type { DB } from "@karakeep/db";
-import type { importSessions } from "@karakeep/db/schema";
+import type { DB } from "@saiye/db";
+import type { importSessions } from "@saiye/db/schema";
 import {
   zCreateImportSessionRequestSchema,
   ZImportSessionWithStats,
-} from "@karakeep/shared/types/importSessions";
+} from "@saiye/shared/types/importSessions";
 
 import type { Actor, Authorized } from "../lib/actor";
 import { actorUserId, assertOwnership, authorize } from "../lib/actor";

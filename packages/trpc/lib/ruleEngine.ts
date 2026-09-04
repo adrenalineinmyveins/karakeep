@@ -1,27 +1,27 @@
 import deepEql from "deep-equal";
 import { and, eq } from "drizzle-orm";
 
-import { db as globalDb, DB } from "@karakeep/db";
+import { db as globalDb, DB } from "@saiye/db";
 import {
   bookmarks,
   ruleEngineRulesTable,
   tagsOnBookmarks,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   buildCrawlIdempotencyKey,
   LowPriorityCrawlerQueue,
   QueuePriority,
   RuleEngineQueue,
-} from "@karakeep/shared-server";
-import { EnqueueOptions } from "@karakeep/shared/queueing";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared-server";
+import { EnqueueOptions } from "@saiye/shared/queueing";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import {
   RuleEngineAction,
   RuleEngineCondition,
   RuleEngineEvent,
   RuleEngineRule,
   zRuleEngineRuleEventSchema,
-} from "@karakeep/shared/types/rules";
+} from "@saiye/shared/types/rules";
 
 import { AuthedContext } from "..";
 import { List } from "../models/lists";

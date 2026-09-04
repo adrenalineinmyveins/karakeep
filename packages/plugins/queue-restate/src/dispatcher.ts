@@ -4,8 +4,8 @@ import type {
   Queue,
   QueueOptions,
   RunnerOptions,
-} from "@karakeep/shared/queueing";
-import { tryCatch } from "@karakeep/shared/tryCatch";
+} from "@saiye/shared/queueing";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
 import type { RunnerJobData, RunnerResult, SerializedError } from "./types";
 import { runnerServiceName } from "./runner";

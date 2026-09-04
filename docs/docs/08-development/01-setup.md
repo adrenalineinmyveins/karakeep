@@ -72,7 +72,7 @@ Packages: +3129
 Progress: resolved 0, reused 2699, downloaded 0, added 3129, done
 
 devDependencies:
-+ @karakeep/prettier-config 0.1.0 <- tooling/prettier
++ @saiye/prettier-config 0.1.0 <- tooling/prettier
 
 . prepare$ husky
 └─ Done in 45ms
@@ -141,7 +141,7 @@ If you are returning to mobile development after a significant update to the sou
 ```bash
 pnpm run clean:workspaces
 pnpm install
-pnpm --filter @karakeep/mobile clean:prebuild
+pnpm --filter @saiye/mobile clean:prebuild
 ```
 
 Then continue with the prebuild and run steps below.
@@ -166,8 +166,8 @@ The app has three variants: development, preview, and release.
 | Variant | Description | Expo Dev Tools | Command (iOS) | Command (Android) |
 |---------|-------------|----------------|---------------|--------------------|
 | Development (default) | Requires the expo devserver to be running. Uses a separate bundle ID so it can be installed alongside the production app. | Yes | `pnpm ios` | `pnpm android` |
-| Preview | Standalone app that doesn't require the expo devserver. Uses its own bundle ID. | No | `pnpm --filter @karakeep/mobile ios:preview` | `pnpm --filter @karakeep/mobile android:preview` |
-| Release | Standalone app using the production bundle ID. Closest to a production build. | No | `pnpm --filter @karakeep/mobile ios:release` | `pnpm --filter @karakeep/mobile android:release` |
+| Preview | Standalone app that doesn't require the expo devserver. Uses its own bundle ID. | No | `pnpm --filter @saiye/mobile ios:preview` | `pnpm --filter @saiye/mobile android:preview` |
+| Release | Standalone app using the production bundle ID. Closest to a production build. | No | `pnpm --filter @saiye/mobile ios:release` | `pnpm --filter @saiye/mobile android:release` |
 
 In 90% of the cases, you'll want to use the development variant.
 

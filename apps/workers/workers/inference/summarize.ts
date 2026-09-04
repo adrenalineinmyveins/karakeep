@@ -1,21 +1,21 @@
 import { and, eq } from "drizzle-orm";
 import { getBookmarkDomain } from "network";
 
-import { db } from "@karakeep/db";
-import { bookmarks, customPrompts, users } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { bookmarks, customPrompts, users } from "@saiye/db/schema";
 import {
   addLogFields,
   setSpanAttributes,
   triggerSearchReindex,
   ZOpenAIRequest,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
-import { InferenceClient } from "@karakeep/shared/inference";
-import logger from "@karakeep/shared/logger";
-import { buildSummaryPrompt } from "@karakeep/shared/prompts.server";
-import { DequeuedJob } from "@karakeep/shared/queueing";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
-import { Bookmark } from "@karakeep/trpc/models/bookmarks";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
+import { InferenceClient } from "@saiye/shared/inference";
+import logger from "@saiye/shared/logger";
+import { buildSummaryPrompt } from "@saiye/shared/prompts.server";
+import { DequeuedJob } from "@saiye/shared/queueing";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
+import { Bookmark } from "@saiye/trpc/models/bookmarks";
 
 async function fetchBookmarkDetailsForSummary(bookmarkId: string) {
   const bookmark = await db.query.bookmarks.findFirst({

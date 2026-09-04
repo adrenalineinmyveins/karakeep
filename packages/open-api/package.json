@@ -1,16 +1,16 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@karakeep/open-api",
+  "name": "@saiye/open-api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^8.5.0",
-    "@karakeep/shared": "workspace:^0.1.0",
+    "@saiye/shared": "workspace:^0.1.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "tsx": "^4.8.1"
   },
   "scripts": {

@@ -1,6 +1,6 @@
-import { createCallerFactory } from "@karakeep/trpc";
-import { buildImpersonatingAuthedContext as buildAuthedContext } from "@karakeep/trpc/lib/impersonate";
-import { appRouter } from "@karakeep/trpc/routers/_app";
+import { createCallerFactory } from "@saiye/trpc";
+import { buildImpersonatingAuthedContext as buildAuthedContext } from "@saiye/trpc/lib/impersonate";
+import { appRouter } from "@saiye/trpc/routers/_app";
 
 export const buildImpersonatingAuthedContext = buildAuthedContext;
 

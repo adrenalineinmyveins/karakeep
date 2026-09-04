@@ -1,18 +1,18 @@
 import { assert, beforeEach, describe, expect, inject, it } from "vitest";
 
-import { createKarakeepClient } from "@karakeep/sdk";
+import { createSaiyeClient } from "@saiye/sdk";
 
 import { createTestUser } from "../../utils/api";
 import { waitUntil } from "../../utils/general";
 
 describe("Video Worker Tests", () => {
-  const port = inject("karakeepPort");
+  const port = inject("saiyePort");
 
   if (!port) {
     throw new Error("Missing required environment variables");
   }
 
-  let client: ReturnType<typeof createKarakeepClient>;
+  let client: ReturnType<typeof createSaiyeClient>;
   let apiKey: string;
 
   async function getBookmark(bookmarkId: string) {
@@ -31,7 +31,7 @@ describe("Video Worker Tests", () => {
 
   beforeEach(async () => {
     apiKey = await createTestUser();
-    client = createKarakeepClient({
+    client = createSaiyeClient({
       baseUrl: `http://localhost:${port}/api/v1/`,
       headers: {
         "Content-Type": "application/json",

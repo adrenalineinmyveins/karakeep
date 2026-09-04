@@ -1,4 +1,4 @@
-# Contributing to Karakeep
+# Contributing to Saiye
 
 First off, thank you for considering contributing to our project! This document outlines our contribution process and guidelines to make it easy for you to help improve this project.
 

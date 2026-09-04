@@ -8,16 +8,16 @@ import {
   passwordResetTokens,
   subscriptions,
   users,
-} from "@karakeep/db/schema";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/db/schema";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import type { CustomTestContext } from "../testUtils";
 import * as emailModule from "../email";
 import { defaultBeforeEach, getApiCaller } from "../testUtils";
 
 // Mock server config with email settings
-vi.mock("@karakeep/shared/config", async (original) => {
-  const mod = (await original()) as typeof import("@karakeep/shared/config");
+vi.mock("@saiye/shared/config", async (original) => {
+  const mod = (await original()) as typeof import("@saiye/shared/config");
   return {
     ...mod,
     default: {

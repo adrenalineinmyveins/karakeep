@@ -389,7 +389,7 @@ describe("parseLinkwardenBookmarkFile", () => {
   });
 });
 
-describe("parseKarakeepBookmarkFile", () => {
+describe("parseSaiyeBookmarkFile", () => {
   it("keeps distinct identities for duplicate sibling list names", () => {
     const json = JSON.stringify({
       lists: [
@@ -443,7 +443,7 @@ describe("parseKarakeepBookmarkFile", () => {
       ],
     });
 
-    const result = parseImportFile("karakeep", json);
+    const result = parseImportFile("saiye", json);
 
     expect(result.lists).toEqual([
       {
@@ -512,7 +512,7 @@ describe("parseKarakeepBookmarkFile", () => {
       ],
     });
 
-    const result = parseImportFile("karakeep", json);
+    const result = parseImportFile("saiye", json);
 
     expect(result.lists).toContainEqual({
       externalId: "smart",

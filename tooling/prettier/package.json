@@ -1,5 +1,5 @@
 {
-  "name": "@karakeep/prettier-config",
+  "name": "@saiye/prettier-config",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -17,7 +17,7 @@
     "prettier-plugin-tailwindcss": "^0.5.11"
   },
   "devDependencies": {
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "typescript": "^5.9"
   }
 }

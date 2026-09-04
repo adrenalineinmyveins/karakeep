@@ -1,7 +1,7 @@
-# Karakeep MCP Server
+# Saiye MCP Server
 
-This is the Karakeep MCP server, which is a server that can be used to interact
-with Karakeep from other tools.
+This is the Saiye MCP server, which is a server that can be used to interact
+with Saiye from other tools.
 
 ## Supported Tools
 
@@ -48,15 +48,15 @@ From NPM:
 ```json
 {
   "mcpServers": {
-    "karakeep": {
+    "saiye": {
       "command": "npx",
       "args": [
-        "@karakeep/mcp"
+        "@saiye/mcp"
       ],
       "env": {
-        "KARAKEEP_API_ADDR": "https://<YOUR_SERVER_ADDR>",
-        "KARAKEEP_API_KEY": "<YOUR_TOKEN>",
-        "KARAKEEP_CUSTOM_HEADERS": "{\"CF-Access-Client-Id\": \"...\", \"CF-Access-Client-Secret\": \"...\"}"
+        "SAIYE_API_ADDR": "https://<YOUR_SERVER_ADDR>",
+        "SAIYE_API_KEY": "<YOUR_TOKEN>",
+        "SAIYE_CUSTOM_HEADERS": "{\"CF-Access-Client-Id\": \"...\", \"CF-Access-Client-Secret\": \"...\"}"
       }
     }
   }
@@ -68,17 +68,17 @@ From Docker:
 ```json
 {
   "mcpServers": {
-    "karakeep": {
+    "saiye": {
       "command": "docker",
       "args": [
         "run",
         "-e",
-        "KARAKEEP_API_ADDR=https://<YOUR_SERVER_ADDR>",
+        "SAIYE_API_ADDR=https://<YOUR_SERVER_ADDR>",
         "-e",
-        "KARAKEEP_API_KEY=<YOUR_TOKEN>",
+        "SAIYE_API_KEY=<YOUR_TOKEN>",
         "-e",
-        "KARAKEEP_CUSTOM_HEADERS={\"CF-Access-Client-Id\": \"...\", \"CF-Access-Client-Secret\": \"...\"}",
-        "ghcr.io/karakeep-app/karakeep-mcp:latest"
+        "SAIYE_CUSTOM_HEADERS={\"CF-Access-Client-Id\": \"...\", \"CF-Access-Client-Secret\": \"...\"}",
+        "ghcr.io/adrenalineinmyveins/karakeep-mcp:latest"
       ]
     }
   }

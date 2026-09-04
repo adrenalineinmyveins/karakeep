@@ -2,11 +2,11 @@ import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { db as DONT_USE_DB } from "@karakeep/db";
+import { db as DONT_USE_DB } from "@saiye/db";
 import {
   ruleEngineActionsTable,
   ruleEngineRulesTable,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   RuleEngineRule,
   zNewRuleEngineRuleSchema,
@@ -14,7 +14,7 @@ import {
   zRuleEngineConditionSchema,
   zRuleEngineRuleEventSchema,
   zUpdateRuleEngineRuleSchema,
-} from "@karakeep/shared/types/rules";
+} from "@saiye/shared/types/rules";
 
 import { AuthedContext } from "..";
 

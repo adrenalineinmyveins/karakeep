@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@karakeep/api",
+  "name": "@saiye/api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -17,10 +17,10 @@
     "@hono/prometheus": "^1.0.2",
     "@hono/trpc-server": "^0.4.2",
     "@hono/zod-validator": "^0.7.6",
-    "@karakeep/db": "workspace:*",
-    "@karakeep/shared": "workspace:*",
-    "@karakeep/shared-server": "workspace:*",
-    "@karakeep/trpc": "workspace:*",
+    "@saiye/db": "workspace:*",
+    "@saiye/shared": "workspace:*",
+    "@saiye/shared-server": "workspace:*",
+    "@saiye/trpc": "workspace:*",
     "@trpc/server": "^11.9.0",
     "drizzle-orm": "^0.45.2",
     "file-type": "^21.2.0",
@@ -30,7 +30,7 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@karakeep/tsconfig": "workspace:^0.1.0",
+    "@saiye/tsconfig": "workspace:^0.1.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/deep-equal": "^1.0.4",
     "@types/rss": "^0.0.32",

@@ -1,7 +1,7 @@
 import { vi } from "vitest";
 
-import { getInMemoryDB } from "@karakeep/db/drizzle";
-import { users } from "@karakeep/db/schema";
+import { getInMemoryDB } from "@saiye/db/drizzle";
+import { users } from "@saiye/db/schema";
 
 import type { Context } from "./index";
 import { createCallerFactory } from "./index";
@@ -115,9 +115,9 @@ export async function buildTestContext(
 
 export function defaultBeforeEach(seedDB = true) {
   return async (context: object) => {
-    vi.mock("@karakeep/shared-server", async (original) => {
+    vi.mock("@saiye/shared-server", async (original) => {
       const mod =
-        (await original()) as typeof import("@karakeep/shared-server");
+        (await original()) as typeof import("@saiye/shared-server");
       return {
         ...mod,
         AssetPreprocessingQueue: {

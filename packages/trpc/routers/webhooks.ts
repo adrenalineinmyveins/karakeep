@@ -1,12 +1,12 @@
 import { experimental_trpcMiddleware } from "@trpc/server";
 import { z } from "zod";
 
-import { webhooksTable } from "@karakeep/db/schema";
+import { webhooksTable } from "@saiye/db/schema";
 import {
   zNewWebhookSchema,
   zUpdateWebhookSchema,
   zWebhookSchema,
-} from "@karakeep/shared/types/webhooks";
+} from "@saiye/shared/types/webhooks";
 
 import type { AuthedContext } from "../index";
 import { createScopedAuthedProcedure, router } from "../index";

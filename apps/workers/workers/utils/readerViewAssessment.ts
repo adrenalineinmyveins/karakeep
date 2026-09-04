@@ -3,7 +3,7 @@ import { isProbablyReaderable } from "@mozilla/readability";
 import type {
   ZReaderViewReason,
   ZReaderViewStatus,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 
 export const READER_VIEW_CLASSIFIER_VERSION = 3;
 

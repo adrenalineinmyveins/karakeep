@@ -7,6 +7,8 @@ import openclawIcon from "/openclaw-icon.svg?url";
 import raycastIcon from "/raycast-icon.svg?url";
 import safariIcon from "/safari-icon.svg?url";
 
+import { GITHUB_LINK } from "./constants";
+
 interface Listing {
   name: string;
   description: string;
@@ -18,14 +20,16 @@ interface Listing {
 const mobileApps: Listing[] = [
   {
     name: "iOS App",
-    description: "Save links and notes from your iPhone and iPad.",
-    url: "https://apps.apple.com/us/app/karakeep-app/id6479258022",
+    description:
+      "Save links and notes from your iPhone and iPad. Build from source via the GitHub repo.",
+    url: GITHUB_LINK,
     badge: appleIcon,
   },
   {
     name: "Android App",
-    description: "Capture and organize content on Android devices.",
-    url: "https://play.google.com/store/apps/details?id=app.hoarder.hoardermobile&pcampaignid=web_share",
+    description:
+      "Capture and organize content on Android devices. Build from source via the GitHub repo.",
+    url: GITHUB_LINK,
     badge: googlePlayIcon,
   },
 ];
@@ -33,20 +37,23 @@ const mobileApps: Listing[] = [
 const browserExtensions: Listing[] = [
   {
     name: "Chrome Extension",
-    description: "One-click saving from Chrome.",
-    url: "https://chromewebstore.google.com/detail/karakeep/kgcjekpmcjjogibpjebkhaanilehneje",
+    description:
+      "One-click saving from Chrome. Get it from the GitHub repository.",
+    url: GITHUB_LINK,
     badge: chromeIcon,
   },
   {
     name: "Firefox Add-on",
-    description: "Save pages directly from Firefox.",
-    url: "https://addons.mozilla.org/en-US/firefox/addon/karakeep/",
+    description:
+      "Save pages directly from Firefox. Get it from the GitHub repository.",
+    url: GITHUB_LINK,
     badge: firefoxIcon,
   },
   {
     name: "Safari Extension",
-    description: "Save pages directly from Safari on macOS.",
-    url: "https://apps.apple.com/gb/app/karakeep-app/id6479258022?platform=mac",
+    description:
+      "Save pages directly from Safari on macOS. Get it from the GitHub repository.",
+    url: GITHUB_LINK,
     badge: safariIcon,
   },
 ];
@@ -54,29 +61,33 @@ const browserExtensions: Listing[] = [
 const communityProjects: Listing[] = [
   {
     name: "Raycast Extension",
-    description: "Manage your Karakeep bookmarks directly from Raycast.",
-    url: "https://www.raycast.com/luolei/karakeep",
+    description:
+      "Manage your Saiye bookmarks directly from Raycast. See the GitHub repo for details.",
+    url: GITHUB_LINK,
     badge: raycastIcon,
   },
   {
     name: "Obsidian Plugin",
-    description: "Sync your Karakeep bookmarks to Obsidian as markdown notes.",
-    url: "https://obsidian.md/plugins?id=hoarder-sync",
+    description:
+      "Sync your Saiye bookmarks to Obsidian as markdown notes. See the GitHub repo for details.",
+    url: GITHUB_LINK,
     badge: obsidianIcon,
   },
 ];
 
 const agenticSkills: Listing[] = [
   {
-    name: "ClawHub",
-    description: "Install the Karakeep skill for agentic assistants.",
-    url: "https://clawhub.ai/karakeep/karakeep-app",
+    name: "Agent Skills",
+    description:
+      "Install the Saiye skill for agentic assistants. See the GitHub repo for details.",
+    url: GITHUB_LINK,
     badge: openclawIcon,
   },
   {
     name: "skills.sh",
-    description: "Install with npx skills add karakeep-app/karakeep.",
-    url: "https://skills.sh/karakeep-app/karakeep/karakeep",
+    description:
+      "Install with npx skills add adrenalineinmyveins/karakeep from the GitHub repo.",
+    url: GITHUB_LINK,
     initials: "SH",
   },
 ];
@@ -135,7 +146,9 @@ export default function Apps() {
           Apps & Extensions
         </h1>
         <p className="mt-3 max-w-2xl text-base text-gray-600 sm:text-lg">
-          Use Karakeep anywhere with our mobile apps and browser extensions.
+          Use Saiye anywhere with our mobile apps and browser extensions. This
+          fork is not published on the app stores — everything is available
+          from the GitHub repository.
         </p>
         <div className="mt-10 space-y-6">
           <ListingSection
@@ -150,12 +163,12 @@ export default function Apps() {
           />
           <ListingSection
             title="Community Projects"
-            description="Integrations built by the Karakeep community."
+            description="Integrations built by the Saiye community."
             items={communityProjects}
           />
           <ListingSection
             title="Agentic Skills"
-            description="Connect AI assistants to Karakeep with installable skills."
+            description="Connect AI assistants to Saiye with installable skills."
             items={agenticSkills}
           />
         </div>

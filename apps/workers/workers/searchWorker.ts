@@ -2,23 +2,23 @@ import { eq } from "drizzle-orm";
 import { workerStatsCounter } from "metrics";
 import { withWorkerEventLog, withWorkerTracing } from "workerTracing";
 
-import type { ZSearchIndexingRequest } from "@karakeep/shared-server";
-import { db } from "@karakeep/db";
-import { bookmarks } from "@karakeep/db/schema";
+import type { ZSearchIndexingRequest } from "@saiye/shared-server";
+import { db } from "@saiye/db";
+import { bookmarks } from "@saiye/db/schema";
 import {
   addLogFields,
   SearchIndexingQueue,
   zSearchIndexingRequestSchema,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { DequeuedJob, getQueueClient } from "@karakeep/shared/queueing";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { DequeuedJob, getQueueClient } from "@saiye/shared/queueing";
 import {
   BookmarkSearchDocument,
   getSearchClient,
   SearchIndexClient,
-} from "@karakeep/shared/search";
-import { Bookmark } from "@karakeep/trpc/models/bookmarks";
+} from "@saiye/shared/search";
+import { Bookmark } from "@saiye/trpc/models/bookmarks";
 
 export class SearchIndexingWorker {
   static async build() {

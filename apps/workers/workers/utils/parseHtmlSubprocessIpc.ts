@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   zReaderViewReasonSchema,
   zReaderViewStatusSchema,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 
 export const parseSubprocessInputSchema = z.object({
   htmlContent: z.string(),

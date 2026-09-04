@@ -6,9 +6,9 @@ import {
   zEditBookmarkListSchemaWithValidation,
   zMergeListSchema,
   zNewBookmarkListSchema,
-} from "@karakeep/shared/types/lists";
+} from "@saiye/shared/types/lists";
 
-import { addLogFields, logEvent } from "@karakeep/shared-server";
+import { addLogFields, logEvent } from "@saiye/shared-server";
 
 import type { AuthedContext } from "../index";
 import {

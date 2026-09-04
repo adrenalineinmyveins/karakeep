@@ -13,7 +13,7 @@ export type ImportSource =
   | "pocket"
   | "matter"
   | "omnivore"
-  | "karakeep"
+  | "saiye"
   | "linkwarden"
   | "tab-session-manager"
   | "mymind"
@@ -180,7 +180,7 @@ function parseMatterBookmarkFile(textContent: string): ParsedBookmark[] {
   });
 }
 
-function parseKarakeepBookmarkFile(textContent: string): ParsedImportFile {
+function parseSaiyeBookmarkFile(textContent: string): ParsedImportFile {
   const parsed = zExportSchema.safeParse(JSON.parse(textContent));
   if (!parsed.success) {
     throw new Error(
@@ -478,7 +478,7 @@ function parseInstapaperBookmarkFile(textContent: string): ParsedBookmark[] {
     } else if (record.Folder === "Unread") {
       // This maps to home feed in instapaper, do nothing.
     } else {
-      // Instapaper "Starred" should map to favorites in karakeep, but
+      // Instapaper "Starred" should map to favorites in Saiye, but
       // apparently instapaper export only includes on folder per bookmark
       // so for now, we'll treat the "Starred" as a normal folder.
       paths.push([record.Folder]);
@@ -664,8 +664,8 @@ export function parseImportFile(
   source: ImportSource,
   textContent: string,
 ): ParsedImportFile {
-  if (source === "karakeep") {
-    const parsed = parseKarakeepBookmarkFile(textContent);
+  if (source === "saiye") {
+    const parsed = parseSaiyeBookmarkFile(textContent);
     return {
       bookmarks: deduplicateBookmarks(parsed.bookmarks),
       lists: parsed.lists,

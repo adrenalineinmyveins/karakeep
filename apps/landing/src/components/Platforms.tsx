@@ -1,5 +1,7 @@
 import { Code2, Globe, Terminal, Webhook } from "lucide-react";
 
+import { GITHUB_LINK } from "../constants";
+
 import appStoreBadge from "/app-store-badge.png?url";
 import chromeExtensionBadge from "/chrome-extension-badge.png?url";
 import firefoxAddonBadge from "/firefox-addon.png?url";
@@ -9,27 +11,27 @@ import safariIcon from "/safari-extension.png?url";
 const platforms = [
   {
     name: "iOS",
-    url: "https://apps.apple.com/us/app/karakeep-app/id6479258022",
+    url: GITHUB_LINK,
     badge: appStoreBadge,
   },
   {
     name: "Android",
-    url: "https://play.google.com/store/apps/details?id=app.hoarder.hoardermobile&pcampaignid=web_share",
+    url: GITHUB_LINK,
     badge: playStoreBadge,
   },
   {
     name: "Chrome Extension",
-    url: "https://chromewebstore.google.com/detail/karakeep/kgcjekpmcjjogibpjebkhaanilehneje",
+    url: GITHUB_LINK,
     badge: chromeExtensionBadge,
   },
   {
     name: "Firefox Addon",
-    url: "https://addons.mozilla.org/en-US/firefox/addon/karakeep/",
+    url: GITHUB_LINK,
     badge: firefoxAddonBadge,
   },
   {
     name: "Safari Extension",
-    url: "https://apps.apple.com/gb/app/karakeep-app/id6479258022?platform=mac",
+    url: GITHUB_LINK,
     badge: safariIcon,
   },
 ];
@@ -51,7 +53,7 @@ export default function Platforms() {
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
             Access your bookmarks from anywhere with native apps and browser
-            extensions.
+            extensions. Build them from source via the GitHub repository.
           </p>
         </div>
 

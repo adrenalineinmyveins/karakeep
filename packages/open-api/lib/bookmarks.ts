@@ -14,7 +14,7 @@ import {
   zNewBookmarkRequestSchema,
   zSortOrder,
   zUpdateBookmarksRequestSchema,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 
 import { AssetIdSchema } from "./assets";
 import { BearerAuth } from "./common";

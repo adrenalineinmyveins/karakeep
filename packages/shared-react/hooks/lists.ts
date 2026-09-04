@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { ZBookmarkList } from "@karakeep/shared/types/lists";
+import { ZBookmarkList } from "@saiye/shared/types/lists";
 import {
   listsToTree,
   ZBookmarkListRoot,
-} from "@karakeep/shared/utils/listUtils";
+} from "@saiye/shared/utils/listUtils";
 
 import { useTRPC } from "../trpc";
 import { scheduleInvalidateQueries } from "./query-invalidation";

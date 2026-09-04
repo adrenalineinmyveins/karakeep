@@ -2,18 +2,18 @@ import { eq } from "drizzle-orm";
 import { workerStatsCounter } from "metrics";
 import { withWorkerEventLog, withWorkerTracing } from "workerTracing";
 
-import type { ZOpenAIRequest } from "@karakeep/shared-server";
-import { db } from "@karakeep/db";
-import { bookmarks } from "@karakeep/db/schema";
+import type { ZOpenAIRequest } from "@saiye/shared-server";
+import { db } from "@saiye/db";
+import { bookmarks } from "@saiye/db/schema";
 import {
   addLogFields,
   OpenAIQueue,
   zOpenAIRequestSchema,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
-import { InferenceClientFactory } from "@karakeep/shared/inference";
-import logger from "@karakeep/shared/logger";
-import { DequeuedJob, getQueueClient } from "@karakeep/shared/queueing";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
+import { InferenceClientFactory } from "@saiye/shared/inference";
+import logger from "@saiye/shared/logger";
+import { DequeuedJob, getQueueClient } from "@saiye/shared/queueing";
 
 import { runSummarization } from "./summarize";
 import { runTagging } from "./tagging";

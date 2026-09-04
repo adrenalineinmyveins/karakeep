@@ -4,7 +4,7 @@ import { and, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 
-import { SqliteError } from "@karakeep/db";
+import { SqliteError } from "@saiye/db";
 import {
   assets,
   AssetTypes,
@@ -18,9 +18,9 @@ import {
   tagsOnBookmarks,
   users,
   verificationTokens,
-} from "@karakeep/db/schema";
-import { deleteAsset, deleteUserAssets } from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
+} from "@saiye/db/schema";
+import { deleteAsset, deleteUserAssets } from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
 import {
   zResetPasswordSchema,
   zSignUpSchema,
@@ -29,7 +29,7 @@ import {
   zUserStatsResponseSchema,
   zWhoAmIResponseSchema,
   zWrappedStatsResponseSchema,
-} from "@karakeep/shared/types/users";
+} from "@saiye/shared/types/users";
 
 import { AuthedContext, Context } from "..";
 import { generatePasswordSalt, hashPassword, validatePassword } from "../auth";

@@ -2,7 +2,7 @@ import type {
   ZPreferredLinkPreview,
   ZReaderViewReason,
   ZReaderViewStatus,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 
 interface LinkPreviewSignals {
   readerViewStatus: ZReaderViewStatus | null;

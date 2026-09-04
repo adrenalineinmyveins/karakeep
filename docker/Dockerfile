@@ -61,7 +61,13 @@ COPY ./patches ./patches
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 ENV COREPACK_NPM_REGISTRY=https://registry.npmmirror.com
-RUN printf 'registry=https://registry.npmmirror.com\nfetch-retries=10\nfetch-timeout=300000\nfetch-retry-mintimeout=20000\nfetch-retry-maxtimeout=300000\nnetwork-concurrency=4\n' > /app/.npmrc \
+# 容器内直连 github.com/nodejs.org 均不可达（被墙断连）：
+# better-sqlite3 的 prebuild 下载失败后回退 node-gyp 源码编译，
+# 用 npmmirror 的 node headers 镜像（.npmrc 的 disturl 未必传入子进程 env，此处 ENV 直设保底）
+ENV npm_config_disturl=https://npmmirror.com/mirrors/node/
+# disturl: node-gyp 编译原生模块（如 better-sqlite3 prebuild 下载失败回退源码编译时）
+# 从 npmmirror 拉 node headers，不依赖 nodejs.org
+RUN printf 'registry=https://registry.npmmirror.com\nfetch-retries=10\nfetch-timeout=300000\nfetch-retry-mintimeout=20000\nfetch-retry-maxtimeout=300000\nnetwork-concurrency=4\ndisturl=https://npmmirror.com/mirrors/node/\n' > /app/.npmrc \
     && pnpm install --frozen-lockfile --fetch-retries 10 --fetch-timeout 300000
 
 COPY . .
@@ -74,11 +80,20 @@ RUN cd packages/db && \
 
 
 # Compile the web app
-RUN (cd apps/web && pnpm --config.verify-deps-before-run=false exec next build --experimental-build-mode compile)
+# 代理仅内联在本 RUN 内（宿主 Clash: host.docker.internal:7897），让 next build 拉 Google Fonts 走代理；
+# 不能用 --build-arg 传代理——Docker 预定义代理 build-arg 无需 ARG 声明即注入所有 RUN，
+# 会污染 pnpm install 层（better-sqlite3 prebuild/node-gyp 经代理下载会断连）。
+# NODE_USE_ENV_PROXY=1: Node 24 的 fetch 需显式启用环境变量代理
+RUN (cd apps/web && \
+    HTTP_PROXY=http://host.docker.internal:7897 \
+    HTTPS_PROXY=http://host.docker.internal:7897 \
+    NO_PROXY=localhost,127.0.0.1 \
+    NODE_USE_ENV_PROXY=1 \
+    pnpm --config.verify-deps-before-run=false exec next build --experimental-build-mode compile)
 
 # Build the worker code
 RUN (cd apps/workers && pnpm --config.verify-deps-before-run=false build)
-RUN CI=true pnpm deploy --node-linker=isolated --legacy --filter @karakeep/workers --prod /prod/workers
+RUN CI=true pnpm deploy --node-linker=isolated --legacy --filter @saiye/workers --prod /prod/workers
 
 # Build the cli
 RUN (cd apps/cli && pnpm --config.verify-deps-before-run=false build)
@@ -89,7 +104,7 @@ RUN (cd apps/mcp && pnpm --config.verify-deps-before-run=false build)
 ################# The All-in-one builder ##############
 
 FROM node:24-slim AS aio_builder
-LABEL org.opencontainers.image.source="https://github.com/karakeep-app/karakeep"
+LABEL org.opencontainers.image.source="https://github.com/adrenalineinmyveins/karakeep"
 WORKDIR /app
 
 ARG SERVER_VERSION=nightly
@@ -163,7 +178,7 @@ RUN case ${TARGETARCH} in \
 # Deno is yt-dlp's default but is not present in this image. Node is the
 # base image and is fully supported by yt-dlp (min v20). Point yt-dlp at it
 # via its system config file so every invocation picks it up without
-# changes to the worker. Fixes karakeep-app/karakeep#2758.
+# changes to the worker. Fixes adrenalineinmyveins/karakeep#2758.
 RUN echo "--js-runtimes node" > /etc/yt-dlp.conf
 
 # Copy monolith binary from builder
@@ -236,7 +251,7 @@ ENV USING_LEGACY_SEPARATE_CONTAINERS=true
 ################# The cli ##############
 
 FROM node:24-slim AS cli
-LABEL org.opencontainers.image.source="https://github.com/karakeep-app/karakeep"
+LABEL org.opencontainers.image.source="https://github.com/adrenalineinmyveins/karakeep"
 WORKDIR /app
 
 COPY --from=base /app/apps/cli/dist/index.mjs apps/cli/index.mjs
@@ -251,7 +266,7 @@ ENTRYPOINT ["node", "index.mjs"]
 ################# MCP server ##############
 
 FROM node:24-slim AS mcp
-LABEL org.opencontainers.image.source="https://github.com/karakeep-app/karakeep"
+LABEL org.opencontainers.image.source="https://github.com/adrenalineinmyveins/karakeep"
 WORKDIR /app
 
 COPY --from=base /app/apps/mcp/dist/index.js apps/mcp/index.js

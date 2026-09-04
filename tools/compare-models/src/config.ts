@@ -2,8 +2,8 @@ import { z } from "zod";
 
 // Local config schema for compare-models tool
 const envSchema = z.object({
-    KARAKEEP_API_KEY: z.string().min(1),
-    KARAKEEP_SERVER_ADDR: z.string().url(),
+    SAIYE_API_KEY: z.string().min(1),
+    SAIYE_SERVER_ADDR: z.string().url(),
     MODEL1_NAME: z.string().min(1),
     MODEL2_NAME: z.string().min(1).optional(),
     OPENAI_API_KEY: z.string().min(1),

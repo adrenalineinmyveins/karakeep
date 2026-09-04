@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import { Context } from "@karakeep/trpc";
+import { Context } from "@saiye/trpc";
 
 const health = new Hono<{
   Variables: {

@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   zBookmarkSearchMode,
   zSortOrder,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 
 export const zStringBool = z
   .string()

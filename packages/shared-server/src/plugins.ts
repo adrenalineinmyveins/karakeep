@@ -1,6 +1,6 @@
-import { PluginManager } from "@karakeep/shared/plugins";
+import { PluginManager } from "@saiye/shared/plugins";
 
-const pluginLoaderStateKey = "__karakeep_plugins_loader_state__";
+const pluginLoaderStateKey = "__saiye_plugins_loader_state__";
 
 const globalPluginLoaderState = globalThis as typeof globalThis & {
   [pluginLoaderStateKey]?: {
@@ -24,13 +24,13 @@ export async function loadAllPlugins() {
   pluginLoaderState.loading = (async () => {
     // Load plugins here. Order of plugin loading matter.
     // Queue provider(s)
-    await import("@karakeep/plugins/queue-liteque");
-    await import("@karakeep/plugins/queue-restate");
-    await import("@karakeep/plugins/search-meilisearch");
-    await import("@karakeep/plugins/vectorstore-meilisearch");
+    await import("@saiye/plugins/queue-liteque");
+    await import("@saiye/plugins/queue-restate");
+    await import("@saiye/plugins/search-meilisearch");
+    await import("@saiye/plugins/vectorstore-meilisearch");
     // Rate limiters (order matters - last one wins)
-    await import("@karakeep/plugins/ratelimit-memory");
-    await import("@karakeep/plugins/ratelimit-redis");
+    await import("@saiye/plugins/ratelimit-memory");
+    await import("@saiye/plugins/ratelimit-redis");
     PluginManager.logAllPlugins();
     pluginLoaderState.loaded = true;
   })();

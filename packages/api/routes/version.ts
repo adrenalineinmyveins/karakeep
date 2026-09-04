@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 
-import serverConfig from "@karakeep/shared/config";
-import { Context } from "@karakeep/trpc";
+import serverConfig from "@saiye/shared/config";
+import { Context } from "@saiye/trpc";
 
 const version = new Hono<{
   Variables: {

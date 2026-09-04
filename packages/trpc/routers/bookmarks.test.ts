@@ -7,9 +7,9 @@ import {
   rssFeedImportsTable,
   tagsOnBookmarks,
   users,
-} from "@karakeep/db/schema";
-import * as sharedServer from "@karakeep/shared-server";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/db/schema";
+import * as sharedServer from "@saiye/shared-server";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import { WebhooksService } from "../models/webhooks.service";
 import type { APICallerType, CustomTestContext } from "../testUtils";
@@ -19,8 +19,8 @@ import {
   getTestQueueMocks,
 } from "../testUtils";
 
-vi.mock("@karakeep/shared-server", async (original) => {
-  const mod = (await original()) as typeof import("@karakeep/shared-server");
+vi.mock("@saiye/shared-server", async (original) => {
+  const mod = (await original()) as typeof import("@saiye/shared-server");
   return {
     ...mod,
     LinkCrawlerQueue: {

@@ -10,8 +10,8 @@ import ipaddr from "ipaddr.js";
 import { LRUCache } from "lru-cache";
 import fetch, { Headers } from "node-fetch";
 
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
 
 const DISALLOWED_IP_RANGES = new Set([
   // IPv4 ranges

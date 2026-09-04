@@ -2,10 +2,10 @@ import { TRPCError } from "@trpc/server";
 import { and, desc, eq, lt } from "drizzle-orm";
 import { z } from "zod";
 
-import { assets, backupsTable } from "@karakeep/db/schema";
-import { BackupQueue } from "@karakeep/shared-server";
-import { deleteAsset } from "@karakeep/shared/assetdb";
-import { zBackupSchema } from "@karakeep/shared/types/backups";
+import { assets, backupsTable } from "@saiye/db/schema";
+import { BackupQueue } from "@saiye/shared-server";
+import { deleteAsset } from "@saiye/shared/assetdb";
+import { zBackupSchema } from "@saiye/shared/types/backups";
 
 import { AuthedContext } from "..";
 

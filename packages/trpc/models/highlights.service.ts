@@ -1,13 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import type { DB } from "@karakeep/db";
+import type { DB } from "@saiye/db";
 import {
   zHighlightSchema,
   zNewHighlightSchema,
   zUpdateHighlightSchema,
-} from "@karakeep/shared/types/highlights";
-import { zCursorV2 } from "@karakeep/shared/types/pagination";
+} from "@saiye/shared/types/highlights";
+import { zCursorV2 } from "@saiye/shared/types/pagination";
 
 import type { Actor, Authorized } from "../lib/actor";
 import { actorUserId, assertOwnership, authorize } from "../lib/actor";

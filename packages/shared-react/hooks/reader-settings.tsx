@@ -15,7 +15,7 @@ import {
   READER_DEFAULTS,
   ReaderSettings,
   ReaderSettingsPartial,
-} from "@karakeep/shared/types/readers";
+} from "@saiye/shared/types/readers";
 
 import { useTRPC } from "../trpc";
 

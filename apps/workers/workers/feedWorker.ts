@@ -7,13 +7,13 @@ import { TRPCError } from "@trpc/server";
 import { withWorkerEventLog, withWorkerTracing } from "workerTracing";
 import { ZodError } from "zod";
 
-import type { ZFeedRequestSchema } from "@karakeep/shared-server";
-import { db } from "@karakeep/db";
-import { rssFeedImportsTable, rssFeedsTable } from "@karakeep/db/schema";
-import { addLogFields, FeedQueue, QuotaService } from "@karakeep/shared-server";
-import logger from "@karakeep/shared/logger";
-import { DequeuedJob, getQueueClient } from "@karakeep/shared/queueing";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import type { ZFeedRequestSchema } from "@saiye/shared-server";
+import { db } from "@saiye/db";
+import { rssFeedImportsTable, rssFeedsTable } from "@saiye/db/schema";
+import { addLogFields, FeedQueue, QuotaService } from "@saiye/shared-server";
+import logger from "@saiye/shared/logger";
+import { DequeuedJob, getQueueClient } from "@saiye/shared/queueing";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import { parseFeedItems } from "./utils/feedParser";
 

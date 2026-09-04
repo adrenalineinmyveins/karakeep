@@ -1,9 +1,9 @@
 import { trpcServer } from "@hono/trpc-server";
 import { Hono } from "hono";
 
-import logger from "@karakeep/shared/logger";
-import { Context } from "@karakeep/trpc";
-import { appRouter } from "@karakeep/trpc/routers/_app";
+import logger from "@saiye/shared/logger";
+import { Context } from "@saiye/trpc";
+import { appRouter } from "@saiye/trpc/routers/_app";
 
 const trpc = new Hono<{
   Variables: {

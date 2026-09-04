@@ -1,6 +1,6 @@
 import { assert, beforeEach, describe, expect, inject, it } from "vitest";
 
-import { createKarakeepClient } from "@karakeep/sdk";
+import { createSaiyeClient } from "@saiye/sdk";
 
 import { createTestUser } from "../../utils/api";
 import { waitUntil } from "../../utils/general";
@@ -11,20 +11,20 @@ interface MeiliVectorDocument {
 }
 
 describe("Embeddings Worker Tests", () => {
-  const karakeepPort = inject("karakeepPort");
+  const saiyePort = inject("saiyePort");
   const meiliPort = inject("meiliPort");
 
-  if (!karakeepPort || !meiliPort) {
+  if (!saiyePort || !meiliPort) {
     throw new Error("Missing required environment variables");
   }
 
-  let client: ReturnType<typeof createKarakeepClient>;
+  let client: ReturnType<typeof createSaiyeClient>;
   let apiKey: string;
 
   beforeEach(async () => {
     apiKey = await createTestUser();
-    client = createKarakeepClient({
-      baseUrl: `http://localhost:${karakeepPort}/api/v1/`,
+    client = createSaiyeClient({
+      baseUrl: `http://localhost:${saiyePort}/api/v1/`,
       headers: {
         "Content-Type": "application/json",
         authorization: `Bearer ${apiKey}`,
@@ -37,7 +37,7 @@ describe("Embeddings Worker Tests", () => {
       body: {
         type: "text",
         title: "Embedding worker text bookmark",
-        text: "Karakeep should generate and index an embedding for this bookmark.",
+        text: "Saiye should generate and index an embedding for this bookmark.",
       },
     });
 

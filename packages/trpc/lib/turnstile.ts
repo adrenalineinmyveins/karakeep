@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
 
 const TurnstileVerifyResponseSchema = z.object({
   success: z.boolean(),

@@ -9,8 +9,8 @@
 
 import { and, desc, eq, inArray } from "drizzle-orm";
 
-import { db } from "@karakeep/db";
-import { chatMessages, chatSessions } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { chatMessages, chatSessions } from "@saiye/db/schema";
 
 import type { AgentEvent, AgentInterface, ToolDefinition } from "./sdkAdapter";
 import { createAgent } from "./sdkAdapter";
@@ -32,7 +32,7 @@ const TOTAL_MESSAGE_TIMEOUT_MS = 120_000;
 const TIMEOUT_USER_MESSAGE =
   "回复超时：模型上游长时间无响应，请稍后重试";
 
-const SYSTEM_PROMPT = `你是 Karakeep 的 AI 助手，帮助用户管理他们的书签知识库。
+const SYSTEM_PROMPT = `你是 Saiye 的 AI 助手，帮助用户管理他们的书签知识库。
 
 你的能力：
 1. 搜索与检索：用户问"我保存过关于 X 的文章吗？"时，使用 search_bookmarks 工具搜索

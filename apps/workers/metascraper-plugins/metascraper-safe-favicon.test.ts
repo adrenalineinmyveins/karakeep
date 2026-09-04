@@ -5,7 +5,7 @@ vi.mock("network", () => ({
   getRandomProxy: vi.fn((proxies: string[]) => proxies[0]),
 }));
 
-vi.mock("@karakeep/shared/config", () => ({
+vi.mock("@saiye/shared/config", () => ({
   default: {
     proxy: {},
   },

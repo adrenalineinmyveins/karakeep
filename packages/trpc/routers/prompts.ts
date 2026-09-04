@@ -2,12 +2,12 @@ import { experimental_trpcMiddleware, TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { customPrompts } from "@karakeep/db/schema";
+import { customPrompts } from "@saiye/db/schema";
 import {
   zNewPromptSchema,
   zPromptSchema,
   zUpdatePromptSchema,
-} from "@karakeep/shared/types/prompts";
+} from "@saiye/shared/types/prompts";
 
 import { Context, createScopedAuthedProcedure, router } from "../index";
 

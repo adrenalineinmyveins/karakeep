@@ -15,7 +15,7 @@ Those features are important for leveraging Karakeep's full potential, but if yo
 ```yaml
 services:
   web:
-    image: ghcr.io/karakeep-app/karakeep:release
+    image: ghcr.io/adrenalineinmyveins/karakeep:release
     restart: unless-stopped
     volumes:
       - data:/data
@@ -37,7 +37,7 @@ docker run -d \
   -p 3000:3000 \
   -e DATA_DIR=/data \
   -e NEXTAUTH_SECRET=super_random_string \
-  ghcr.io/karakeep-app/karakeep:release
+  ghcr.io/adrenalineinmyveins/karakeep:release
 ```
 
 :::warning

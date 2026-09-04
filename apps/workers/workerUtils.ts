@@ -1,13 +1,13 @@
 import { eq } from "drizzle-orm";
 
-import { db, KarakeepDBTransaction } from "@karakeep/db";
-import { assets, AssetTypes, bookmarks } from "@karakeep/db/schema";
+import { db, SaiyeDBTransaction } from "@saiye/db";
+import { assets, AssetTypes, bookmarks } from "@saiye/db/schema";
 
 type DBAssetType = typeof assets.$inferInsert;
 export async function updateAsset(
   oldAssetId: string | undefined,
   newAsset: DBAssetType,
-  txn: KarakeepDBTransaction,
+  txn: SaiyeDBTransaction,
 ) {
   if (oldAssetId) {
     await txn.delete(assets).where(eq(assets.id, oldAssetId));

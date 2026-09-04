@@ -13,7 +13,7 @@ import { getBorderCharacters, table } from "table";
 import {
   listNameFromPath,
   listsToTree,
-} from "@karakeep/shared/utils/listUtils";
+} from "@saiye/shared/utils/listUtils";
 
 export const listsCmd = new Command()
   .name("lists")

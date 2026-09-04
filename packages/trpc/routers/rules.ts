@@ -2,13 +2,13 @@ import { experimental_trpcMiddleware, TRPCError } from "@trpc/server";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
-import { bookmarkTags } from "@karakeep/db/schema";
+import { bookmarkTags } from "@saiye/db/schema";
 import {
   RuleEngineRule,
   zNewRuleEngineRuleSchema,
   zRuleEngineRuleSchema,
   zUpdateRuleEngineRuleSchema,
-} from "@karakeep/shared/types/rules";
+} from "@saiye/shared/types/rules";
 
 import { AuthedContext, createScopedAuthedProcedure, router } from "../index";
 import { List } from "../models/lists";

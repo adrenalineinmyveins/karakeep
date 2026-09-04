@@ -2,8 +2,8 @@ import type {
   RateLimitClient,
   RateLimitConfig,
   RateLimitResult,
-} from "@karakeep/shared/ratelimiting";
-import { PluginProvider } from "@karakeep/shared/plugins";
+} from "@saiye/shared/ratelimiting";
+import { PluginProvider } from "@saiye/shared/plugins";
 
 interface RateLimitEntry {
   count: number;

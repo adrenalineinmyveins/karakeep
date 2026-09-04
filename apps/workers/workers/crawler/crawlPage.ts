@@ -20,16 +20,16 @@ import {
 } from "playwright";
 import { abortRace, abortRaceResolve, raceWith, timeoutRace } from "utils";
 
-import { db } from "@karakeep/db";
-import { users } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { users } from "@saiye/db/schema";
 import {
   getTracer,
   setSpanAttributes,
   withSpan,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { tryCatch } from "@karakeep/shared/tryCatch";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
 import type { AutoconsentHandle } from "./autoconsent";
 import {
@@ -49,7 +49,7 @@ import {
 } from "./browser";
 import { truncateUrl } from "./utils";
 
-const tracer = getTracer("@karakeep/workers");
+const tracer = getTracer("@saiye/workers");
 
 export interface CrawlPageResult {
   htmlContent: string;

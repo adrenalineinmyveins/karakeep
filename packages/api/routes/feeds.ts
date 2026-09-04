@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import {
   zNewFeedSchema,
   zUpdateFeedSchema,
-} from "@karakeep/shared/types/feeds";
+} from "@saiye/shared/types/feeds";
 
 import { authMiddleware } from "../middlewares/auth";
 

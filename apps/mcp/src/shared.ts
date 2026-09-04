@@ -1,25 +1,25 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import TurndownService from "turndown";
 
-import { createKarakeepClient } from "@karakeep/sdk";
+import { createSaiyeClient } from "@saiye/sdk";
 
 import packageJson from "../package.json";
 
-const addr = process.env.KARAKEEP_API_ADDR;
-const apiKey = process.env.KARAKEEP_API_KEY;
+const addr = process.env.SAIYE_API_ADDR;
+const apiKey = process.env.SAIYE_API_KEY;
 
 const getCustomHeaders = () => {
   try {
-    return process.env.KARAKEEP_CUSTOM_HEADERS
-      ? JSON.parse(process.env.KARAKEEP_CUSTOM_HEADERS)
+    return process.env.SAIYE_CUSTOM_HEADERS
+      ? JSON.parse(process.env.SAIYE_CUSTOM_HEADERS)
       : {};
   } catch (e) {
-    console.error("Failed to parse KARAKEEP_CUSTOM_HEADERS", e);
+    console.error("Failed to parse SAIYE_CUSTOM_HEADERS", e);
     return {};
   }
 };
 
-export const karakeepClient = createKarakeepClient({
+export const saiyeClient = createSaiyeClient({
   baseUrl: `${addr}/api/v1`,
   headers: {
     ...getCustomHeaders(),
@@ -29,7 +29,7 @@ export const karakeepClient = createKarakeepClient({
 });
 
 export const mcpServer = new McpServer({
-  name: "Karakeep",
+  name: "Saiye",
   version: packageJson.version,
 });
 

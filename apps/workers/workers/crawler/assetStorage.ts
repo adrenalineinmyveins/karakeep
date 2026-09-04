@@ -14,8 +14,8 @@ import { execa } from "execa";
 import { fetchWithProxy, getBookmarkDomain } from "network";
 import type { RunProxyConfig } from "network";
 
-import { db } from "@karakeep/db";
-import { getTracer, QuotaService, withSpan } from "@karakeep/shared-server";
+import { db } from "@saiye/db";
+import { getTracer, QuotaService, withSpan } from "@saiye/shared-server";
 import {
   ASSET_TYPES,
   getAssetSize,
@@ -23,14 +23,14 @@ import {
   newAssetId,
   saveAsset,
   saveAssetFromFile,
-} from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { tryCatch } from "@karakeep/shared/tryCatch";
+} from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
 import { normalizeContentType, truncateUrl } from "./utils";
 
-const tracer = getTracer("@karakeep/workers");
+const tracer = getTracer("@saiye/workers");
 
 export async function storeScreenshot(
   screenshot: Buffer | undefined,

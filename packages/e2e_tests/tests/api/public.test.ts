@@ -1,9 +1,9 @@
 import { assert, beforeEach, describe, expect, inject, it } from "vitest";
 import { z } from "zod";
 
-import { createSignedToken } from "@karakeep/shared/signedTokens";
-import { zAssetSignedTokenSchema } from "@karakeep/shared/types/assets";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { createSignedToken } from "@saiye/shared/signedTokens";
+import { zAssetSignedTokenSchema } from "@saiye/shared/types/assets";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import { createTestUser, uploadTestAsset } from "../../utils/api";
 import { createTestPdfFile } from "../../utils/assets";
@@ -13,7 +13,7 @@ import { getTrpcClient } from "../../utils/trpc";
 const SINGING_SECRET = "secret";
 
 describe("Public API", () => {
-  const port = inject("karakeepPort");
+  const port = inject("saiyePort");
 
   if (!port) {
     throw new Error("Missing required environment variables");

@@ -1,10 +1,10 @@
-# Karakeep Project Overview
+# Saiye Project Overview
 
-This document provides context about the Karakeep project for the different agents.
+This document provides context about the Saiye project (based on Karakeep) for the different agents.
 
 ## Project Overview
 
-Karakeep is a monorepo project managed with Turborepo. It is a "read-it-later" bookmarking application with a focus on collecting and organizing information. The project is built with a modern tech stack, including:
+Saiye (based on Karakeep) is a monorepo project managed with Turborepo. It is a "read-it-later" bookmarking application with a focus on collecting and organizing information. The project is built with a modern tech stack, including:
 
 - **Frontend:** Next.js, React, TypeScript, Tailwind CSS
 - **Backend:** Hono (a lightweight web framework), tRPC
@@ -18,11 +18,11 @@ The project is organized into `apps` and `packages`:
 ### Applications (`apps/`)
 
 - **`web`:** The main web application, built with Next.js.
-- **`browser-extension`:** A browser extension, likely for saving content to karakeep.
+- **`browser-extension`:** A browser extension, likely for saving content to Saiye.
 - **`cli`:** A command-line interface for interacting with the service.
 - **`landing`:** A landing page for the project.
 - **`mobile`:** A mobile application (details unknown).
-- **`mcp`:** The Model Context Protocol (MCP) server to communicate with Karakeep.
+- **`mcp`:** The Model Context Protocol (MCP) server to communicate with Saiye.
 - **`workers`:** Background workers for processing tasks.
 
 ### Packages (`packages/`)

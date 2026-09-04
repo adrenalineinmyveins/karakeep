@@ -1,19 +1,19 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import type { DB } from "@karakeep/db";
-import type { webhooksTable } from "@karakeep/db/schema";
-import serverConfig from "@karakeep/shared/config";
+import type { DB } from "@saiye/db";
+import type { webhooksTable } from "@saiye/db/schema";
+import serverConfig from "@saiye/shared/config";
 import {
   zNewWebhookSchema,
   zUpdateWebhookSchema,
-} from "@karakeep/shared/types/webhooks";
+} from "@saiye/shared/types/webhooks";
 
 import type { Actor, Authorized } from "../lib/actor";
 import { actorUserId, assertOwnership, authorize } from "../lib/actor";
 import { WebhooksRepo } from "./webhooks.repo";
-import { WebhookQueue, ZWebhookRequest } from "@karakeep/shared-server";
-import { EnqueueOptions } from "@karakeep/shared/queueing";
+import { WebhookQueue, ZWebhookRequest } from "@saiye/shared-server";
+import { EnqueueOptions } from "@saiye/shared/queueing";
 
 type Webhook = typeof webhooksTable.$inferSelect;
 

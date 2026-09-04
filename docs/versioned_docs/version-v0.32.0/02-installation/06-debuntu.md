@@ -13,10 +13,10 @@ The script will download and install all dependencies (except for Ollama), insta
 
 The script functions as an update script in addition to an installer. See **[Updating](#updating)**.
 
-### 1. Download the script from the [Karakeep repository](https://github.com/karakeep-app/karakeep/blob/main/karakeep-linux.sh)
+### 1. Download the script from the [Karakeep repository](https://github.com/adrenalineinmyveins/karakeep/blob/main/karakeep-linux.sh)
 
 ```
-wget https://raw.githubusercontent.com/karakeep-app/karakeep/main/karakeep-linux.sh
+wget https://raw.githubusercontent.com/adrenalineinmyveins/karakeep/main/karakeep-linux.sh
 ```
 
 ### 2. Run the script

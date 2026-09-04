@@ -1,12 +1,12 @@
 import RSS from "rss";
 
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 import {
   BookmarkTypes,
   ZPublicBookmark,
-} from "@karakeep/shared/types/bookmarks";
-import { getAssetUrl } from "@karakeep/shared/utils/assetUtils";
-import { isAllowedBookmarkUrl } from "@karakeep/shared/utils/url";
+} from "@saiye/shared/types/bookmarks";
+import { getAssetUrl } from "@saiye/shared/utils/assetUtils";
+import { isAllowedBookmarkUrl } from "@saiye/shared/utils/url";
 
 export function toRSS(
   params: {
@@ -22,7 +22,7 @@ export function toRSS(
     feed_url: params.feedUrl,
     site_url: params.siteUrl,
     description: params.description,
-    generator: "Karakeep",
+    generator: "Saiye",
   });
 
   bookmarks

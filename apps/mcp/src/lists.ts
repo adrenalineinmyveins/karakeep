@@ -4,9 +4,9 @@ import { z } from "zod";
 import {
   zEditBookmarkListSchema,
   zEditBookmarkListSchemaWithValidation,
-} from "@karakeep/shared/types/lists";
+} from "@saiye/shared/types/lists";
 
-import { karakeepClient, mcpServer } from "./shared";
+import { saiyeClient, mcpServer } from "./shared";
 import {
   compactBookmark,
   compactList,
@@ -18,7 +18,7 @@ mcpServer.tool(
   "get-lists",
   `Retrieves a list of lists.`,
   async (): Promise<CallToolResult> => {
-    const res = await karakeepClient.GET("/lists", {
+    const res = await saiyeClient.GET("/lists", {
       params: {},
     });
     if (!res.data) {
@@ -44,7 +44,7 @@ export async function getListHandler({
 }: {
   listId: string;
 }): Promise<CallToolResult> {
-  const res = await karakeepClient.GET("/lists/{listId}", {
+  const res = await saiyeClient.GET("/lists/{listId}", {
     params: { path: { listId } },
   });
   if (!res.data) {
@@ -116,7 +116,7 @@ export async function updateListHandler(
     );
   }
 
-  const res = await karakeepClient.PATCH("/lists/{listId}", {
+  const res = await saiyeClient.PATCH("/lists/{listId}", {
     params: { path: { listId } },
     body,
   });
@@ -151,7 +151,7 @@ export async function deleteListHandler({
 }: {
   listId: string;
 }): Promise<CallToolResult> {
-  const getRes = await karakeepClient.GET("/lists/{listId}", {
+  const getRes = await saiyeClient.GET("/lists/{listId}", {
     params: { path: { listId } },
   });
   if (!getRes.data) {
@@ -159,7 +159,7 @@ export async function deleteListHandler({
   }
   const { id, name } = getRes.data;
 
-  const delRes = await karakeepClient.DELETE("/lists/{listId}", {
+  const delRes = await saiyeClient.DELETE("/lists/{listId}", {
     params: { path: { listId: id } },
   });
   if (delRes.error) {
@@ -190,7 +190,7 @@ mcpServer.tool(
     bookmarkId: z.string().describe(`The bookmarkId to add.`),
   },
   async ({ listId, bookmarkId }): Promise<CallToolResult> => {
-    const res = await karakeepClient.PUT(
+    const res = await saiyeClient.PUT(
       `/lists/{listId}/bookmarks/{bookmarkId}`,
       {
         params: {
@@ -223,7 +223,7 @@ mcpServer.tool(
     bookmarkId: z.string().describe(`The bookmarkId to remove.`),
   },
   async ({ listId, bookmarkId }): Promise<CallToolResult> => {
-    const res = await karakeepClient.DELETE(
+    const res = await saiyeClient.DELETE(
       `/lists/{listId}/bookmarks/{bookmarkId}`,
       {
         params: {
@@ -282,7 +282,7 @@ export async function getListBookmarksHandler(
   input: GetListBookmarksInput,
 ): Promise<CallToolResult> {
   const { listId, includeContent, ...query } = input;
-  const res = await karakeepClient.GET("/lists/{listId}/bookmarks", {
+  const res = await saiyeClient.GET("/lists/{listId}/bookmarks", {
     params: {
       path: { listId },
       query: pickDefined({ ...query, includeContent }),
@@ -325,7 +325,7 @@ mcpServer.tool(
       .describe(`The parent list id of this list.`),
   },
   async ({ name, icon, parentId }): Promise<CallToolResult> => {
-    const res = await karakeepClient.POST("/lists", {
+    const res = await saiyeClient.POST("/lists", {
       body: {
         name,
         icon,

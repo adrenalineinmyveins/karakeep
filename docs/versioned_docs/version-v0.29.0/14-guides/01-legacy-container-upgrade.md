@@ -16,8 +16,8 @@ index cdfc908..6297563 100644
  version: "3.8"
  services:
    web:
--    image: ghcr.io/hoarder-app/hoarder-web:${KARAKEEP_VERSION:-release}
-+    image: ghcr.io/karakeep-app/karakeep:${KARAKEEP_VERSION:-release}
+-    image: ghcr.io/hoarder-app/hoarder-web:${SAIYE_VERSION:-release}
++    image: ghcr.io/adrenalineinmyveins/karakeep:${SAIYE_VERSION:-release}
      restart: unless-stopped
      volumes:
        - data:/data
@@ -43,7 +43,7 @@ index cdfc908..6297563 100644
      volumes:
        - meilisearch:/meili_data
 -  workers:
--    image: ghcr.io/hoarder-app/hoarder-workers:${KARAKEEP_VERSION:-release}
+-    image: ghcr.io/hoarder-app/hoarder-workers:${SAIYE_VERSION:-release}
 -    restart: unless-stopped
 -    volumes:
 -      - data:/data

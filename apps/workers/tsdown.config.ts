@@ -17,6 +17,6 @@ export default defineConfig({
   ],
   noExternal: [
     // Bundle workspace packages (since they're not published to npm)
-    /^@karakeep\//,
+    /^@saiye\//,
   ],
 });

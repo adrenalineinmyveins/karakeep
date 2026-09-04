@@ -3,7 +3,7 @@ import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import {
   zUserStatsResponseSchema,
   zWhoAmIResponseSchema,
-} from "@karakeep/shared/types/users";
+} from "@saiye/shared/types/users";
 
 import { BearerAuth } from "./common";
 import { UnauthorizedResponse } from "./errors";

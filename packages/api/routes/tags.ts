@@ -7,7 +7,7 @@ import {
   zTagListApiResultSchema,
   zTagListQueryParamsSchema,
   zUpdateTagRequestSchema,
-} from "@karakeep/shared/types/tags";
+} from "@saiye/shared/types/tags";
 
 import { authMiddleware } from "../middlewares/auth";
 import { adaptPagination, zPagination } from "../utils/pagination";

@@ -1,6 +1,6 @@
 import { Rocket } from "lucide-react";
 
-import { CLOUD_SIGNUP_LINK } from "../constants";
+import { GITHUB_LINK } from "../constants";
 
 export default function Banner() {
   return (
@@ -9,16 +9,16 @@ export default function Banner() {
         <div className="flex flex-wrap items-center justify-center gap-1 px-2 py-0.5 sm:px-3 sm:py-1">
           <Rocket className="size-4 text-amber-600 sm:size-5" />
           <span className="font-semibold text-slate-800">
-            Karakeep Cloud Public Beta is Now Live
+            Saiye is free, open source, and self-hostable
           </span>
         </div>
         <a
-          href={CLOUD_SIGNUP_LINK}
+          href={GITHUB_LINK}
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center justify-center gap-1 text-xs font-semibold text-amber-700 underline decoration-amber-400 underline-offset-2 transition-all hover:text-amber-800 sm:rounded-full sm:border sm:border-amber-300 sm:bg-amber-500 sm:px-3 sm:py-1 sm:text-sm sm:text-white sm:no-underline sm:shadow-sm sm:hover:border-amber-400 sm:hover:bg-amber-600"
         >
-          Join Now <span className="hidden sm:inline">&rarr;</span>
+          View on GitHub <span className="hidden sm:inline">&rarr;</span>
         </a>
       </div>
     </div>

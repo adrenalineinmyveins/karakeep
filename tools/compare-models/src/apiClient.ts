@@ -1,17 +1,17 @@
-import { createKarakeepClient } from "@karakeep/sdk";
+import { createSaiyeClient } from "@saiye/sdk";
 
 import type { Bookmark } from "./types";
 import { config } from "./config";
 
-export class KarakeepAPIClient {
-  private readonly client: ReturnType<typeof createKarakeepClient>;
+export class SaiyeAPIClient {
+  private readonly client: ReturnType<typeof createSaiyeClient>;
 
   constructor() {
-    this.client = createKarakeepClient({
-      baseUrl: `${config.KARAKEEP_SERVER_ADDR}/api/v1/`,
+    this.client = createSaiyeClient({
+      baseUrl: `${config.SAIYE_SERVER_ADDR}/api/v1/`,
       headers: {
         "Content-Type": "application/json",
-        authorization: `Bearer ${config.KARAKEEP_API_KEY}`,
+        authorization: `Bearer ${config.SAIYE_API_KEY}`,
       },
     });
   }

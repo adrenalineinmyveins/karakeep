@@ -1,22 +1,22 @@
-# Karakeep SDK
+# Saiye SDK
 
-This package contains the official typescript SDK for the karakeep API.
+This package contains the official typescript SDK for the saiye API.
 
 ## Installation
 
 ```
-npm install @karakeep/sdk
+npm install @saiye/sdk
 ```
 
 ## Usage
 
 ```typescript
-import { createKarakeepClient } from "@karakeep/sdk";
+import { createSaiyeClient } from "@saiye/sdk";
 
 // Create a client
 const apiKey = "my-super-secret-key";
-const addr = `https://karakeep.mydomain.com`;
-const client = createKarakeepClient({
+const addr = `https://saiye.mydomain.com`;
+const client = createSaiyeClient({
   baseUrl: `${addr}/api/v1/`,
   headers: {
     "Content-Type": "application/json",
@@ -60,5 +60,5 @@ API docs can be found [here](https://docs.karakeep.app/api).
 
 ## Versioning
 
-- This package follows the minor version of the karakeep server. So new APIs introduced in Karakeep version `0.21.0` will be available in this package starting from version `0.21.0`.
-- Karakeep strives to maintain backward compatibility in its APIs, so older versions of this package should continue working with newer karakeep server versions.
+- This package follows the minor version of the saiye server. So new APIs introduced in Saiye version `0.21.0` will be available in this package starting from version `0.21.0`.
+- Saiye strives to maintain backward compatibility in its APIs, so older versions of this package should continue working with newer saiye server versions.

@@ -2,8 +2,8 @@ import { count, eq, isNotNull, or, sql, sum } from "drizzle-orm";
 import { Counter, Gauge, Histogram, register } from "prom-client";
 import type { Metric } from "prom-client";
 
-import { db } from "@karakeep/db";
-import { assets, bookmarks, subscriptions, users } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { assets, bookmarks, subscriptions, users } from "@saiye/db/schema";
 import {
   AdminMaintenanceQueue,
   AssetPreprocessingQueue,
@@ -17,8 +17,8 @@ import {
   SearchIndexingQueue,
   VideoWorkerQueue,
   WebhookQueue,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
 
 function getOrCreateMetric<T extends Metric>(
   name: string,
@@ -29,10 +29,10 @@ function getOrCreateMetric<T extends Metric>(
 
 // Queue metrics
 const queuePendingJobsGauge = getOrCreateMetric(
-  "karakeep_queue_jobs",
+  "saiye_queue_jobs",
   () =>
     new Gauge({
-      name: "karakeep_queue_jobs",
+      name: "saiye_queue_jobs",
       help: "Number of jobs in each background queue",
       labelNames: ["queue_name", "status"],
       async collect() {
@@ -86,10 +86,10 @@ const queuePendingJobsGauge = getOrCreateMetric(
 
 // User metrics
 const totalUsersGauge = getOrCreateMetric(
-  "karakeep_total_users",
+  "saiye_total_users",
   () =>
     new Gauge({
-      name: "karakeep_total_users",
+      name: "saiye_total_users",
       help: "Total number of users in the system",
       async collect() {
         try {
@@ -112,10 +112,10 @@ if (serverConfig.stripe.isConfigured) {
     end
   `;
   getOrCreateMetric(
-    "karakeep_subscription_status",
+    "saiye_subscription_status",
     () =>
       new Gauge({
-        name: "karakeep_subscription_status",
+        name: "saiye_subscription_status",
         help: "Total number of users per subscription status and tier",
         labelNames: ["status", "tier"],
         async collect() {
@@ -155,10 +155,10 @@ if (serverConfig.stripe.isConfigured) {
 
 // Asset metrics
 const totalAssetSizeGauge = getOrCreateMetric(
-  "karakeep_total_asset_size_bytes",
+  "saiye_total_asset_size_bytes",
   () =>
     new Gauge({
-      name: "karakeep_total_asset_size_bytes",
+      name: "saiye_total_asset_size_bytes",
       help: "Total size of all assets in bytes",
       async collect() {
         try {
@@ -176,10 +176,10 @@ const totalAssetSizeGauge = getOrCreateMetric(
 
 // Bookmark metrics
 const totalBookmarksGauge = getOrCreateMetric(
-  "karakeep_total_bookmarks",
+  "saiye_total_bookmarks",
   () =>
     new Gauge({
-      name: "karakeep_total_bookmarks",
+      name: "saiye_total_bookmarks",
       help: "Total number of bookmarks in the system",
       async collect() {
         try {
@@ -195,10 +195,10 @@ const totalBookmarksGauge = getOrCreateMetric(
 
 // Bookmark creation metrics
 const bookmarkCreationCounter = getOrCreateMetric(
-  "karakeep_bookmark_creations_total",
+  "saiye_bookmark_creations_total",
   () =>
     new Counter({
-      name: "karakeep_bookmark_creations_total",
+      name: "saiye_bookmark_creations_total",
       help: "Total number of bookmarks created",
       labelNames: ["source"],
     }),
@@ -206,30 +206,30 @@ const bookmarkCreationCounter = getOrCreateMetric(
 
 // Api metrics
 const apiRequestsTotalCounter = getOrCreateMetric(
-  "karakeep_trpc_requests_total",
+  "saiye_trpc_requests_total",
   () =>
     new Counter({
-      name: "karakeep_trpc_requests_total",
+      name: "saiye_trpc_requests_total",
       help: "Total number of API requests",
       labelNames: ["type", "path", "is_error"],
     }),
 );
 
 const apiErrorsTotalCounter = getOrCreateMetric(
-  "karakeep_trpc_errors_total",
+  "saiye_trpc_errors_total",
   () =>
     new Counter({
-      name: "karakeep_trpc_errors_total",
+      name: "saiye_trpc_errors_total",
       help: "Total number of API requests",
       labelNames: ["type", "path", "code"],
     }),
 );
 
 const apiRequestDurationSummary = getOrCreateMetric(
-  "karakeep_trpc_request_duration_seconds",
+  "saiye_trpc_request_duration_seconds",
   () =>
     new Histogram({
-      name: "karakeep_trpc_request_duration_seconds",
+      name: "saiye_trpc_request_duration_seconds",
       help: "Duration of tRPC requests in seconds",
       labelNames: ["type", "path"],
       buckets: [

@@ -5,9 +5,9 @@ import { count, eq, sum } from "drizzle-orm";
 import Stripe from "stripe";
 import { z } from "zod";
 
-import { assets, bookmarks, subscriptions, users } from "@karakeep/db/schema";
-import { addLogFields, withEventLog } from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
+import { assets, bookmarks, subscriptions, users } from "@saiye/db/schema";
+import { addLogFields, withEventLog } from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
 
 import {
   Context,

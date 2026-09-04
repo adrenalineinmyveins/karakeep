@@ -7,7 +7,7 @@ import {
   ObjectContext,
   ObjectSharedContext,
 } from "@restatedev/restate-sdk";
-import { tryCatch } from "@karakeep/shared/tryCatch";
+import { tryCatch } from "@saiye/shared/tryCatch";
 
 // --- Types ---
 

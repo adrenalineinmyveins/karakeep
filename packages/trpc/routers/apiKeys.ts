@@ -2,13 +2,13 @@ import { TRPCError } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { apiKeys } from "@karakeep/db/schema";
-import { addLogFields, logEvent } from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
+import { apiKeys } from "@saiye/db/schema";
+import { addLogFields, logEvent } from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
 import {
   API_KEY_FULL_ACCESS_SCOPE,
   zApiKeyScopesSchema,
-} from "@karakeep/shared/types/apiKeys";
+} from "@saiye/shared/types/apiKeys";
 
 import {
   authenticateApiKey,

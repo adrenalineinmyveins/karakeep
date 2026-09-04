@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { getInMemoryDB } from "@karakeep/db/drizzle";
+import { getInMemoryDB } from "@saiye/db/drizzle";
 import {
   bookmarkAssets,
   bookmarkLinks,
@@ -13,9 +13,9 @@ import {
   rssFeedsTable,
   tagsOnBookmarks,
   users,
-} from "@karakeep/db/schema";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
-import { Matcher } from "@karakeep/shared/types/search";
+} from "@saiye/db/schema";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
+import { Matcher } from "@saiye/shared/types/search";
 
 import { AuthedContext } from "../..";
 import { getBookmarkIdsFromMatcher } from "../search";

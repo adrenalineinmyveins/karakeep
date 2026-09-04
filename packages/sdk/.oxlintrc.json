@@ -12,6 +12,6 @@
     "**/*.config.cjs",
     "**/.eslintrc.cjs",
     "dist",
-    "src/karakeep-api.d.ts"
+    "src/saiye-api.d.ts"
   ]
 }

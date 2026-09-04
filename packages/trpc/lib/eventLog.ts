@@ -1,9 +1,9 @@
-import type { EventLogType } from "@karakeep/shared-server";
+import type { EventLogType } from "@saiye/shared-server";
 import {
   addLogFields,
   recordEventLogFailure,
   withEventLog,
-} from "@karakeep/shared-server";
+} from "@saiye/shared-server";
 
 type TrpcResult<T> = { ok: true; data: T } | { ok: false; error: unknown };
 

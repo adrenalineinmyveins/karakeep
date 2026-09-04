@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-import web from "@karakeep/tailwind-config/web";
+import web from "@saiye/tailwind-config/web";
 
 const config = {
   content: [...(web.content as string[]), "src/**/*.astro"],

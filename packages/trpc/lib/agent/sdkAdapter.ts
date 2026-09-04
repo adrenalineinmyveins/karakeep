@@ -30,8 +30,8 @@ import { OPENAI_MODELS } from "@earendil-works/pi-ai/providers/openai.models";
 import type { TSchema } from "typebox";
 import { z } from "zod";
 
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
 
 // ── 对外接口抽象 ──────────────────────────────────────
 

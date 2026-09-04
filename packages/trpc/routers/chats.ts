@@ -2,10 +2,10 @@ import { TRPCError } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { db } from "@karakeep/db";
-import { chatMessages, chatSessions } from "@karakeep/db/schema";
-import { InferenceClientFactory } from "@karakeep/shared/inference";
-import logger from "@karakeep/shared/logger";
+import { db } from "@saiye/db";
+import { chatMessages, chatSessions } from "@saiye/db/schema";
+import { InferenceClientFactory } from "@saiye/shared/inference";
+import logger from "@saiye/shared/logger";
 
 import { authedProcedure, router } from "../index";
 import { AgentOrchestrator } from "../lib/agent/orchestrator";

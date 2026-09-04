@@ -6,10 +6,10 @@ import { fileURLToPath } from "node:url";
 
 import { execa } from "execa";
 
-import { getTracer, withSpan } from "@karakeep/shared-server";
+import { getTracer, withSpan } from "@saiye/shared-server";
 import { getBookmarkDomain } from "network";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
 
 import type {
   ParseSubprocessError,
@@ -21,7 +21,7 @@ import {
 } from "../utils/parseHtmlSubprocessIpc";
 import { truncateUrl } from "./utils";
 
-const tracer = getTracer("@karakeep/workers");
+const tracer = getTracer("@saiye/workers");
 
 const EMBEDDED_MEDIA_DATA_URI_PATTERN = /data:(?:audio|video)\/[^"'\s<>)]*/gi;
 

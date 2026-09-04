@@ -15,7 +15,7 @@ import {
   AssetStore,
   LocalFileSystemAssetStore,
   S3AssetStore,
-} from "@karakeep/shared/assetdb";
+} from "@saiye/shared/assetdb";
 
 export interface TestAssetData {
   userId: string;

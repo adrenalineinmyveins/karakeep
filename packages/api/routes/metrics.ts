@@ -1,23 +1,23 @@
 // Import stats to register Prometheus metrics
-import "@karakeep/trpc/stats";
+import "@saiye/trpc/stats";
 
 import { prometheus } from "@hono/prometheus";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 import { register } from "prom-client";
 
-import serverConfig from "@karakeep/shared/config";
+import serverConfig from "@saiye/shared/config";
 
 type PrometheusHandlers = ReturnType<typeof prometheus>;
 
 const globalForPrometheus = globalThis as typeof globalThis & {
-  __karakeepApiPrometheus?: PrometheusHandlers;
+  __saiyeApiPrometheus?: PrometheusHandlers;
 };
 
-const prometheusHandlers = (globalForPrometheus.__karakeepApiPrometheus ??=
+const prometheusHandlers = (globalForPrometheus.__saiyeApiPrometheus ??=
   prometheus({
     registry: register,
-    prefix: "karakeep_",
+    prefix: "saiye_",
     collectDefaultMetrics: true,
   }));
 

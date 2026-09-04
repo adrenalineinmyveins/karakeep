@@ -13,13 +13,13 @@ import { getAPIClient } from "@/lib/trpc";
 import { Command } from "@commander-js/extra-typings";
 import chalk from "chalk";
 
-import type { ZBookmark } from "@karakeep/shared/types/bookmarks";
+import type { ZBookmark } from "@saiye/shared/types/bookmarks";
 import {
   BookmarkTypes,
   MAX_READABLE_CONTENT_MAX_CHARS,
   MAX_NUM_BOOKMARKS_PER_PAGE,
-} from "@karakeep/shared/types/bookmarks";
-import type { ZBookmarkReadableContentFormat } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
+import type { ZBookmarkReadableContentFormat } from "@saiye/shared/types/bookmarks";
 
 export const bookmarkCmd = new Command()
   .name("bookmarks")

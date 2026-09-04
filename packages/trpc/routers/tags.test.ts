@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { bookmarkTags, tagsOnBookmarks } from "@karakeep/db/schema";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { bookmarkTags, tagsOnBookmarks } from "@saiye/db/schema";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import type { CustomTestContext } from "../testUtils";
 import { defaultBeforeEach } from "../testUtils";

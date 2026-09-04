@@ -1,4 +1,4 @@
-import logger from "@karakeep/shared/logger";
+import logger from "@saiye/shared/logger";
 
 export const exitAbortController = new AbortController();
 

@@ -4,12 +4,12 @@ import {
   getTracer,
   setSpanAttributes,
   withSpan,
-} from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
+} from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
 
 import type { Context } from "../index";
 
-const tracer = getTracer("@karakeep/trpc");
+const tracer = getTracer("@saiye/trpc");
 
 /**
  * tRPC middleware that creates a span for each procedure call.

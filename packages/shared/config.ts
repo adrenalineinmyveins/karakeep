@@ -63,8 +63,8 @@ const allEnv = z.object({
   DISABLE_SIGNUPS: stringBool("false"),
   DISABLE_PASSWORD_AUTH: stringBool("false"),
   // 桌面本地模式：web 端免登录（见 apps/web/server/auth.ts 的收口旁路）。
-  // 用 KARAKEEP_ 前缀避免裸 LOCAL_MODE 与其他软件的全局环境变量冲突。
-  KARAKEEP_LOCAL_MODE: stringBool("false"),
+  // 用 SAIYE_ 前缀避免裸 LOCAL_MODE 与其他软件的全局环境变量冲突。
+  SAIYE_LOCAL_MODE: stringBool("false"),
   OAUTH_AUTO_REDIRECT: stringBool("false"),
   OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING: stringBool("false"),
   OAUTH_WELLKNOWN_URL: z.string().url().optional(),
@@ -74,6 +74,12 @@ const allEnv = z.object({
   OAUTH_TIMEOUT: z.coerce.number().optional().default(3500),
   OAUTH_SCOPE: z.string().default("openid email profile"),
   OAUTH_PROVIDER_NAME: z.string().default("Custom Provider"),
+  // 微信扫码登录（微信开放平台「网站应用」，需企业资质审核）。
+  // 仅当 APP_ID 与 APP_SECRET 同时配置时启用；REDIRECT_URI 用于
+  // 桌面/内网场景：经公网中转服务回跳本机（见 apps/desktop/relay）。
+  WECHAT_APP_ID: z.string().optional(),
+  WECHAT_APP_SECRET: z.string().optional(),
+  WECHAT_REDIRECT_URI: z.string().url().optional(),
   TURNSTILE_SITE_KEY: z.string().optional(),
   TURNSTILE_SECRET_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),
@@ -279,7 +285,7 @@ const allEnv = z.object({
   // OpenTelemetry tracing configuration
   OTEL_TRACING_ENABLED: stringBool("false"),
   OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: z.string().url().optional(),
-  OTEL_SERVICE_NAME: z.string().default("karakeep"),
+  OTEL_SERVICE_NAME: z.string().default("saiye"),
   OTEL_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(1.0),
 
   // Event logging configuration
@@ -309,7 +315,7 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
     auth: {
       disableSignups: val.DISABLE_SIGNUPS,
       disablePasswordAuth: val.DISABLE_PASSWORD_AUTH,
-      localMode: val.KARAKEEP_LOCAL_MODE,
+      localMode: val.SAIYE_LOCAL_MODE,
       emailVerificationRequired: val.EMAIL_VERIFICATION_REQUIRED,
       oauth: {
         autoRedirect: val.OAUTH_AUTO_REDIRECT,
@@ -322,6 +328,11 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
         scope: val.OAUTH_SCOPE,
         name: val.OAUTH_PROVIDER_NAME,
         timeout: val.OAUTH_TIMEOUT,
+      },
+      wechat: {
+        appId: val.WECHAT_APP_ID,
+        appSecret: val.WECHAT_APP_SECRET,
+        redirectUri: val.WECHAT_REDIRECT_URI,
       },
       turnstile: {
         enabled: val.TURNSTILE_SITE_KEY !== undefined,

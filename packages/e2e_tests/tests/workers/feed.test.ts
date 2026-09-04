@@ -5,7 +5,7 @@ import { waitUntil } from "../../utils/general";
 import { getTrpcClient } from "../../utils/trpc";
 
 describe("Feed Worker Tests", () => {
-  const port = inject("karakeepPort");
+  const port = inject("saiyePort");
 
   if (!port) {
     throw new Error("Missing required environment variables");

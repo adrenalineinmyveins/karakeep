@@ -1,8 +1,8 @@
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 
-import { AuthedContext, Context, createCallerFactory } from "@karakeep/trpc";
-import { appRouter } from "@karakeep/trpc/routers/_app";
+import { AuthedContext, Context, createCallerFactory } from "@saiye/trpc";
+import { appRouter } from "@saiye/trpc/routers/_app";
 
 const createCaller = createCallerFactory(appRouter);
 

@@ -45,21 +45,21 @@ async function waitForAimockHealthy(
 
 export default async function ({ provide }: GlobalSetupContext) {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const karakeepPort = await getRandomPort();
+  const saiyePort = await getRandomPort();
   const aimockPort = await getRandomPort();
   const meiliPort = await getRandomPort();
 
   const buildArg = process.env.E2E_TEST_NO_BUILD ? "" : "--build";
 
   console.log(
-    `Starting docker compose on ports karakeep=${karakeepPort} aimock=${aimockPort} meili=${meiliPort}...`,
+    `Starting docker compose on ports saiye=${saiyePort} aimock=${aimockPort} meili=${meiliPort}...`,
   );
   execSync(`docker compose up ${buildArg} -d`, {
     cwd: __dirname,
     stdio: "inherit",
     env: {
       ...process.env,
-      KARAKEEP_PORT: karakeepPort.toString(),
+      SAIYE_PORT: saiyePort.toString(),
       AIMOCK_PORT: aimockPort.toString(),
       MEILI_PORT: meiliPort.toString(),
     },
@@ -67,18 +67,18 @@ export default async function ({ provide }: GlobalSetupContext) {
 
   console.log("Waiting for services to become healthy...");
   await Promise.all([
-    waitForHealthy(karakeepPort),
+    waitForHealthy(saiyePort),
     waitForAimockHealthy(aimockPort),
   ]);
 
   // Wait 5 seconds for the worker to start
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
-  provide("karakeepPort", karakeepPort);
+  provide("saiyePort", saiyePort);
   provide("aimockPort", aimockPort);
   provide("meiliPort", meiliPort);
 
-  process.env.KARAKEEP_PORT = karakeepPort.toString();
+  process.env.SAIYE_PORT = saiyePort.toString();
   process.env.AIMOCK_PORT = aimockPort.toString();
   process.env.MEILI_PORT = meiliPort.toString();
 
@@ -124,7 +124,7 @@ export default async function ({ provide }: GlobalSetupContext) {
 
 declare module "vitest" {
   export interface ProvidedContext {
-    karakeepPort: number;
+    saiyePort: number;
     aimockPort: number;
     meiliPort: number;
   }

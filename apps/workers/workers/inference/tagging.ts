@@ -2,36 +2,36 @@ import { and, eq, inArray } from "drizzle-orm";
 import { getBookmarkDomain } from "network";
 import { buildImpersonatingTRPCClient } from "trpc";
 import { z } from "zod";
-import { getVectorStoreClient } from "@karakeep/shared/vectorStore";
+import { getVectorStoreClient } from "@saiye/shared/vectorStore";
 
-import type { ZOpenAIRequest } from "@karakeep/shared-server";
+import type { ZOpenAIRequest } from "@saiye/shared-server";
 import type {
   InferenceClient,
   InferenceResponse,
-} from "@karakeep/shared/inference";
-import type { ZTagStyle } from "@karakeep/shared/types/users";
-import { db } from "@karakeep/db";
+} from "@saiye/shared/inference";
+import type { ZTagStyle } from "@saiye/shared/types/users";
+import { db } from "@saiye/db";
 import {
   bookmarks,
   bookmarkTags,
   customPrompts,
   tagsOnBookmarks,
   users,
-} from "@karakeep/db/schema";
+} from "@saiye/db/schema";
 import {
   addLogFields,
   setSpanAttributes,
   triggerSearchReindex,
-} from "@karakeep/shared-server";
-import { ASSET_TYPES, readAsset } from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
-import logger from "@karakeep/shared/logger";
-import { buildImagePrompt } from "@karakeep/shared/prompts";
-import { buildTextPrompt } from "@karakeep/shared/prompts.server";
-import { DequeuedJob, EnqueueOptions } from "@karakeep/shared/queueing";
-import { RuleEngine } from "@karakeep/trpc/lib/ruleEngine";
-import { Bookmark } from "@karakeep/trpc/models/bookmarks";
-import { WebhooksService } from "@karakeep/trpc/models/webhooks.service";
+} from "@saiye/shared-server";
+import { ASSET_TYPES, readAsset } from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
+import logger from "@saiye/shared/logger";
+import { buildImagePrompt } from "@saiye/shared/prompts";
+import { buildTextPrompt } from "@saiye/shared/prompts.server";
+import { DequeuedJob, EnqueueOptions } from "@saiye/shared/queueing";
+import { RuleEngine } from "@saiye/trpc/lib/ruleEngine";
+import { Bookmark } from "@saiye/trpc/models/bookmarks";
+import { WebhooksService } from "@saiye/trpc/models/webhooks.service";
 
 /**
  * The maximum length of the relevant tag names to avoid bloating the inference context.

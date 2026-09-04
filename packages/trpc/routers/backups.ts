@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { zBackupSchema } from "@karakeep/shared/types/backups";
+import { zBackupSchema } from "@saiye/shared/types/backups";
 
 import {
   createRateLimitMiddleware,

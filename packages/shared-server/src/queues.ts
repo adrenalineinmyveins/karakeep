@@ -6,8 +6,8 @@ import {
   Queue,
   QueueClient,
   QueueOptions,
-} from "@karakeep/shared/queueing";
-import { zRuleEngineEventSchema } from "@karakeep/shared/types/rules";
+} from "@saiye/shared/queueing";
+import { zRuleEngineEventSchema } from "@saiye/shared/types/rules";
 
 import { loadAllPlugins } from "./plugins";
 

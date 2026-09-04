@@ -2,8 +2,8 @@ import { getGlobalOptions } from "@/lib/globals";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
 
-import type { AppRouter } from "@karakeep/trpc/routers/_app";
-import { TRPC_MAX_URL_LENGTH_INTERNAL } from "@karakeep/shared/trpc";
+import type { AppRouter } from "@saiye/trpc/routers/_app";
+import { TRPC_MAX_URL_LENGTH_INTERNAL } from "@saiye/shared/trpc";
 
 export function getAPIClient() {
   const globals = getGlobalOptions();

@@ -1,13 +1,13 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import * as z from "zod";
 
-import { zSortOrder } from "@karakeep/shared/types/bookmarks";
+import { zSortOrder } from "@saiye/shared/types/bookmarks";
 import {
   zCreateTagRequestSchema,
   zTagBasicSchema,
   zTagListQueryParamsSchema,
   zUpdateTagRequestSchema,
-} from "@karakeep/shared/types/tags";
+} from "@saiye/shared/types/tags";
 
 import { BearerAuth } from "./common";
 import { ErrorSchema, UnauthorizedResponse } from "./errors";

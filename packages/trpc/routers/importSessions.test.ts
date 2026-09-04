@@ -9,14 +9,14 @@ import {
   importSessionBookmarks,
   importSessions,
   importStagingBookmarks,
-} from "@karakeep/db/schema";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+} from "@saiye/db/schema";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import {
   zCreateImportSessionRequestSchema,
   zDeleteImportSessionRequestSchema,
   zGetImportSessionStatsRequestSchema,
-} from "@karakeep/shared/types/importSessions";
-import { zNewBookmarkListSchema } from "@karakeep/shared/types/lists";
+} from "@saiye/shared/types/importSessions";
+import { zNewBookmarkListSchema } from "@saiye/shared/types/lists";
 
 import { ImportSessionsService } from "../models/importSessions.service";
 import type { APICallerType, CustomTestContext } from "../testUtils";

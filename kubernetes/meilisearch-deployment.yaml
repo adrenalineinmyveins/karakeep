@@ -23,9 +23,9 @@ spec:
               name: meilisearch
           envFrom:
             - secretRef:
-                name: karakeep-secrets
+                name: saiye-secrets
             - configMapRef:
-                name: karakeep-configuration
+                name: saiye-configuration
       volumes:
         - name: meilisearch
           persistentVolumeClaim:

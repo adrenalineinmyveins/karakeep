@@ -5,15 +5,15 @@ import { Readable } from "stream";
 import { pipeline } from "stream/promises";
 import { fileTypeFromBlob, supportedMimeTypes } from "file-type";
 
-import { assets, AssetTypes } from "@karakeep/db/schema";
-import { QuotaService, StorageQuotaError } from "@karakeep/shared-server";
+import { assets, AssetTypes } from "@saiye/db/schema";
+import { QuotaService, StorageQuotaError } from "@saiye/shared-server";
 import {
   newAssetId,
   saveAssetFromFile,
   SUPPORTED_UPLOAD_ASSET_TYPES,
-} from "@karakeep/shared/assetdb";
-import serverConfig from "@karakeep/shared/config";
-import { AuthedContext } from "@karakeep/trpc";
+} from "@saiye/shared/assetdb";
+import serverConfig from "@saiye/shared/config";
+import { AuthedContext } from "@saiye/trpc";
 
 const MAX_UPLOAD_SIZE_BYTES = serverConfig.maxAssetSizeMb * 1024 * 1024;
 
@@ -105,7 +105,7 @@ export async function uploadAsset(
   let tempFilePath: string | undefined;
 
   try {
-    tempFilePath = path.join(os.tmpdir(), `karakeep-upload-${Date.now()}`);
+    tempFilePath = path.join(os.tmpdir(), `saiye-upload-${Date.now()}`);
     await pipeline(
       webStreamToNode(data.stream()),
       fs.createWriteStream(tempFilePath),

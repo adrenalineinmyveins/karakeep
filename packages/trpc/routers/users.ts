@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { addLogFields } from "@karakeep/shared-server";
-import serverConfig from "@karakeep/shared/config";
+import { addLogFields } from "@saiye/shared-server";
+import serverConfig from "@saiye/shared/config";
 import {
   zResetPasswordSchema,
   zSignUpSchema,
@@ -11,8 +11,8 @@ import {
   zUserStatsResponseSchema,
   zWhoAmIResponseSchema,
   zWrappedStatsResponseSchema,
-} from "@karakeep/shared/types/users";
-import { validateRedirectUrl } from "@karakeep/shared/utils/redirectUrl";
+} from "@saiye/shared/types/users";
+import { validateRedirectUrl } from "@saiye/shared/utils/redirectUrl";
 
 import {
   createAdminScopedProcedure,

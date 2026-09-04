@@ -13,10 +13,10 @@ import {
   unique,
 } from "drizzle-orm/sqlite-core";
 
-import type { ZApiKeyScope } from "@karakeep/shared/types/apiKeys";
-import { API_KEY_FULL_ACCESS_SCOPE } from "@karakeep/shared/types/apiKeys";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
-import type { ZReaderViewReason } from "@karakeep/shared/types/bookmarks";
+import type { ZApiKeyScope } from "@saiye/shared/types/apiKeys";
+import { API_KEY_FULL_ACCESS_SCOPE } from "@saiye/shared/types/apiKeys";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
+import type { ZReaderViewReason } from "@saiye/shared/types/bookmarks";
 
 function createdAtField(colName = "createdAt") {
   return integer(colName, { mode: "timestamp" })

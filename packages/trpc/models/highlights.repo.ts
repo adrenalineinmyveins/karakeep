@@ -1,14 +1,14 @@
 import { and, desc, eq, like, lt, lte, or } from "drizzle-orm";
 import { z } from "zod";
 
-import type { DB } from "@karakeep/db";
-import { highlights } from "@karakeep/db/schema";
+import type { DB } from "@saiye/db";
+import { highlights } from "@saiye/db/schema";
 import {
   zHighlightSchema,
   zNewHighlightSchema,
   zUpdateHighlightSchema,
-} from "@karakeep/shared/types/highlights";
-import { zCursorV2 } from "@karakeep/shared/types/pagination";
+} from "@saiye/shared/types/highlights";
+import { zCursorV2 } from "@saiye/shared/types/pagination";
 
 type Highlight = z.infer<typeof zHighlightSchema>;
 

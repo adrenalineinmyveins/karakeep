@@ -1,7 +1,7 @@
 import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
 
-import serverConfig from "@karakeep/shared/config";
-import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import serverConfig from "@saiye/shared/config";
+import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 
 import type { CustomTestContext } from "../testUtils";
 import { defaultBeforeEach } from "../testUtils";
@@ -19,24 +19,24 @@ const originalSemanticSearchFeature =
   serverConfig.experimentalFeatures.semanticSearch;
 const originalEmbeddingAutoIndexing = serverConfig.embedding.enableAutoIndexing;
 
-vi.mock("@karakeep/shared/inference", () => ({
+vi.mock("@saiye/shared/inference", () => ({
   EmbeddingClientFactory: {
     build: searchMocks.buildEmbeddingClient,
   },
 }));
 
-vi.mock("@karakeep/shared/search", async (original) => ({
-  ...(await original<typeof import("@karakeep/shared/search")>()),
+vi.mock("@saiye/shared/search", async (original) => ({
+  ...(await original<typeof import("@saiye/shared/search")>()),
   getSearchClient: vi.fn(async () => ({ search: searchMocks.search })),
 }));
 
-vi.mock("@karakeep/shared/vectorStore", async (original) => ({
-  ...(await original<typeof import("@karakeep/shared/vectorStore")>()),
+vi.mock("@saiye/shared/vectorStore", async (original) => ({
+  ...(await original<typeof import("@saiye/shared/vectorStore")>()),
   getVectorStoreClient: searchMocks.getVectorStoreClient,
 }));
 
-vi.mock("@karakeep/shared/ratelimiting", async (original) => ({
-  ...(await original<typeof import("@karakeep/shared/ratelimiting")>()),
+vi.mock("@saiye/shared/ratelimiting", async (original) => ({
+  ...(await original<typeof import("@saiye/shared/ratelimiting")>()),
   getRateLimitClient: searchMocks.getRateLimitClient,
 }));
 

@@ -4,7 +4,7 @@ import * as z from "zod";
 import {
   zNewHighlightSchema,
   zUpdateHighlightSchema,
-} from "@karakeep/shared/types/highlights";
+} from "@saiye/shared/types/highlights";
 
 import { BearerAuth } from "./common";
 import { ErrorSchema, UnauthorizedResponse } from "./errors";

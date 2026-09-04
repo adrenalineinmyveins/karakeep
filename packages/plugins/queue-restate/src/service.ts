@@ -3,7 +3,7 @@ import type {
   QueueOptions,
   RunnerFuncs,
   RunnerOptions,
-} from "@karakeep/shared/queueing";
+} from "@saiye/shared/queueing";
 
 import { buildDispatcherService } from "./dispatcher";
 import { buildRunnerService } from "./runner";

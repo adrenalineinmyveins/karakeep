@@ -28,7 +28,7 @@ Available options:
 
 This script WILL NOT update or migrate a $(app)/Hoarder install that was installed in any other way.
 Please back up your existing installation before running this script!
-If you encounter any errors please create a GitHub issue (https://github.com/karakeep-app/karakeep/issues) and tag vhsdream
+If you encounter any errors please create a GitHub issue (https://github.com/adrenalineinmyveins/karakeep/issues) and tag vhsdream
 
 Usage: bash $(basename "${BASH_SOURCE[0]}") [-h] [-v] [install|update|migrate]
 
@@ -88,7 +88,7 @@ setup_colours
 
 # Flash and bling
 app() {
-  echo -e "${CLR}${PURPLE}Karakeep${CLR}"
+  echo -e "${CLR}${PURPLE}Saiye${CLR}"
 }
 
 spinner() {
@@ -165,14 +165,14 @@ parse_params() {
 parse_params "$@"
 
 OS="$(awk -F'=' '/^VERSION_CODENAME=/{ print $NF }' /etc/os-release)"
-INSTALL_DIR=/opt/karakeep
+INSTALL_DIR=/opt/saiye
 APP_DIR="$INSTALL_DIR"/apps
-export DATA_DIR=/var/lib/karakeep
-CONFIG_DIR=/etc/karakeep
-LOG_DIR=/var/log/karakeep
-ENV_FILE=${CONFIG_DIR}/karakeep.env
+export DATA_DIR=/var/lib/saiye
+CONFIG_DIR=/etc/saiye
+LOG_DIR=/var/log/saiye
+ENV_FILE=${CONFIG_DIR}/saiye.env
 
-install_karakeep() {
+install_saiye() {
   header
   msg_info "$(app) installation for Debian 12/Ubuntu 24.04" && sleep 3
   echo -e "\n"
@@ -208,7 +208,7 @@ install_karakeep() {
   echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_24.x nodistro main" >/etc/apt/sources.list.d/nodesource.list
   $shh apt-get update
   $shh apt-get install -y nodejs
-  # https://github.com/karakeep-app/karakeep/issues/967
+  # https://github.com/adrenalineinmyveins/karakeep/issues/967
   $shh npm install -g corepack@latest
   msg_done "Installed Node.js"
 
@@ -216,9 +216,9 @@ install_karakeep() {
   mkdir -p {"$DATA_DIR","$CONFIG_DIR","$LOG_DIR"}
   M_DATA_DIR=/var/lib/meilisearch
   M_CONFIG_FILE=/etc/meilisearch.toml
-  RELEASE="$(curl -s https://api.github.com/repos/karakeep-app/karakeep/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4) }')"
+  RELEASE="$(curl -s https://api.github.com/repos/adrenalineinmyveins/karakeep/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4) }')"
   cd /tmp
-  curl -fsSLO "https://github.com/karakeep-app/karakeep/archive/refs/tags/v${RELEASE}.zip"
+  curl -fsSLO "https://github.com/adrenalineinmyveins/karakeep/archive/refs/tags/v${RELEASE}.zip"
   unzip -q v"$RELEASE".zip
   mv karakeep-"$RELEASE" "$INSTALL_DIR" && cd "$APP_DIR"/web
   corepack enable
@@ -250,11 +250,11 @@ no_analytics = true
 EOF
   chmod 600 "$M_CONFIG_FILE"
 
-  karakeep_SECRET="$(openssl rand -base64 36 | cut -c1-24)"
+  saiye_SECRET="$(openssl rand -base64 36 | cut -c1-24)"
   cat <<EOF >"$ENV_FILE"
 NODE_ENV=production
 SERVER_VERSION=${RELEASE}
-NEXTAUTH_SECRET="${karakeep_SECRET}"
+NEXTAUTH_SECRET="${saiye_SECRET}"
 NEXTAUTH_URL="http://localhost:3000"
 DATA_DIR=${DATA_DIR}
 MEILI_ADDR="http://127.0.0.1:7700"
@@ -275,12 +275,12 @@ EOF
   if ! id -u meilisearch >/dev/null 2>&1; then
     useradd -U -s /usr/sbin/nologin -r -m -d "$M_DATA_DIR" meilisearch
   fi
-  if ! id -u karakeep >/dev/null 2>&1; then
-    useradd -U -s /usr/sbin/nologin -r -M -d "$INSTALL_DIR" karakeep
+  if ! id -u saiye >/dev/null 2>&1; then
+    useradd -U -s /usr/sbin/nologin -r -M -d "$INSTALL_DIR" saiye
   fi
   chown meilisearch:meilisearch "$M_CONFIG_FILE"
-  touch "$LOG_DIR"/{karakeep-workers.log,karakeep-web.log}
-  chown -R karakeep:karakeep "$INSTALL_DIR" "$CONFIG_DIR" "$DATA_DIR" "$LOG_DIR"
+  touch "$LOG_DIR"/{saiye-workers.log,saiye-web.log}
+  chown -R saiye:saiye "$INSTALL_DIR" "$CONFIG_DIR" "$DATA_DIR" "$LOG_DIR"
   msg_done "Users created, permissions modified"
 
   msg_start "Creating service files and configuring log rotation..."
@@ -319,9 +319,9 @@ RemoveIPC=true
 WantedBy=multi-user.target
 EOF
 
-  cat <<EOF >/etc/systemd/system/karakeep-browser.service
+  cat <<EOF >/etc/systemd/system/saiye-browser.service
 [Unit]
-Description=Karakeep headless browser
+Description=Saiye headless browser
 After=network.target
 
 [Service]
@@ -329,70 +329,70 @@ User=root
 Restart=on-failure
 ExecStart=/usr/bin/chromium --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 --hide-scrollbars
 TimeoutStopSec=5
-SyslogIdentifier=karakeep-browser
+SyslogIdentifier=saiye-browser
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-  cat <<EOF >/etc/systemd/system/karakeep-workers.service
+  cat <<EOF >/etc/systemd/system/saiye-workers.service
 [Unit]
-Description=Karakeep workers
-Wants=network.target karakeep-browser.service meilisearch.service
-After=network.target karakeep-browser.service meilisearch.service
+Description=Saiye workers
+Wants=network.target saiye-browser.service meilisearch.service
+After=network.target saiye-browser.service meilisearch.service
 
 [Service]
-User=karakeep
-Group=karakeep
+User=saiye
+Group=saiye
 Restart=always
 EnvironmentFile=${ENV_FILE}
 WorkingDirectory=${APP_DIR}/workers
 ExecStart=/usr/bin/node dist/index.js
-StandardOutput=append:${LOG_DIR}/karakeep-workers.log
-StandardError=append:${LOG_DIR}/karakeep-workers.log
+StandardOutput=append:${LOG_DIR}/saiye-workers.log
+StandardError=append:${LOG_DIR}/saiye-workers.log
 TimeoutStopSec=5
-SyslogIdentifier=karakeep-workers
+SyslogIdentifier=saiye-workers
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-  cat <<EOF >/etc/systemd/system/karakeep-web.service
+  cat <<EOF >/etc/systemd/system/saiye-web.service
 [Unit]
-Description=Karakeep web
-Wants=network.target karakeep-workers.service
-After=network.target karakeep-workers.service
+Description=Saiye web
+Wants=network.target saiye-workers.service
+After=network.target saiye-workers.service
 
 [Service]
-User=karakeep
-Group=karakeep
+User=saiye
+Group=saiye
 Restart=on-failure
 EnvironmentFile=${ENV_FILE}
 WorkingDirectory=${APP_DIR}/web
 ExecStart=/usr/bin/pnpm start
-StandardOutput=append:${LOG_DIR}/karakeep-web.log
-StandardError=append:${LOG_DIR}/karakeep-web.log
+StandardOutput=append:${LOG_DIR}/saiye-web.log
+StandardError=append:${LOG_DIR}/saiye-web.log
 TimeoutStopSec=5
-SyslogIdentifier=karakeep-web
+SyslogIdentifier=saiye-web
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-  cat <<EOF >/etc/systemd/system/karakeep.target
+  cat <<EOF >/etc/systemd/system/saiye.target
 [Unit]
-Description=Karakeep Services
+Description=Saiye Services
 After=network-online.target
-Wants=meilisearch.service karakeep-browser.service karakeep-workers.service karakeep-web.service
+Wants=meilisearch.service saiye-browser.service saiye-workers.service saiye-web.service
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-  cat <<EOF >/etc/logrotate.d/karakeep
-/var/log/karakeep/*.log
+  cat <<EOF >/etc/logrotate.d/saiye
+/var/log/saiye/*.log
 {
-  su karakeep karakeep
+  su saiye saiye
   weekly
   missingok
   rotate 4
@@ -404,22 +404,22 @@ EOF
   msg_done "Service files created, log rotation configured"
 
   msg_start "Enabling and starting services, please wait..." && sleep 3
-  systemctl enable -q --now meilisearch.service karakeep.target
+  systemctl enable -q --now meilisearch.service saiye.target
   service_check install
   exit 0
 }
 
-update_karakeep() {
+update_saiye() {
   msg_info "${YELLOW}Checking for an update...${CLR}" && sleep 1
   if [[ ! -d ${INSTALL_DIR} ]]; then
-    die "Is Karakeep even installed?"
+    die "Is Saiye even installed?"
   fi
-  RELEASE="$(curl -s https://api.github.com/repos/karakeep-app/karakeep/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4) }')"
+  RELEASE="$(curl -s https://api.github.com/repos/adrenalineinmyveins/karakeep/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4) }')"
   PREV_RELEASE="$(cat "$INSTALL_DIR"/version.txt)"
   if [[ "$RELEASE" != "$PREV_RELEASE" ]]; then
-    if [[ "$(systemctl is-active karakeep-web)" == "active" ]]; then
+    if [[ "$(systemctl is-active saiye-web)" == "active" ]]; then
       msg_start "Stopping affected services..."
-      systemctl stop karakeep-web karakeep-workers
+      systemctl stop saiye-web saiye-workers
       msg_done "Stopped services"
     fi
     if [[ "$OS" == "bookworm" ]]; then
@@ -429,10 +429,10 @@ update_karakeep() {
     sed -i "s|SERVER_VERSION=${PREV_RELEASE}|SERVER_VERSION=${RELEASE}|" "$ENV_FILE"
     rm -R "$INSTALL_DIR"
     cd /tmp
-    curl -fsSLO "https://github.com/karakeep-app/karakeep/archive/refs/tags/v${RELEASE}.zip"
+    curl -fsSLO "https://github.com/adrenalineinmyveins/karakeep/archive/refs/tags/v${RELEASE}.zip"
     unzip -q v"$RELEASE".zip
     mv karakeep-"$RELEASE" "$INSTALL_DIR"
-    # https://github.com/karakeep-app/karakeep/issues/967
+    # https://github.com/adrenalineinmyveins/karakeep/issues/967
     if [[ "$(corepack -v)" < "0.31.0" ]]; then
       $shh npm install -g corepack@0.31.0
     fi
@@ -448,20 +448,20 @@ update_karakeep() {
     $shh pnpm build
     cd "$INSTALL_DIR"/packages/db && $shh pnpm migrate
     echo "$RELEASE" >"$INSTALL_DIR"/version.txt
-    chown -R karakeep:karakeep "$INSTALL_DIR" "$DATA_DIR"
+    chown -R saiye:saiye "$INSTALL_DIR" "$DATA_DIR"
     msg_done "Updated $(app) ${CYAN}to v${RELEASE}${CLR}"
     msg_start "Restarting services and cleaning up..."
     rm /tmp/v"$RELEASE".zip
 
     # Migrations
     # 0.27 changed the worker compiled file from .mjs to .js
-    if grep -q '^ExecStart=/usr/bin/node\s\+dist/index\.mjs$' /etc/systemd/system/karakeep-workers.service; then
-      sed -i -E 's#^(ExecStart=/usr/bin/node\s+dist/)index\.mjs$#\1index.js#' /etc/systemd/system/karakeep-workers.service
+    if grep -q '^ExecStart=/usr/bin/node\s\+dist/index\.mjs$' /etc/systemd/system/saiye-workers.service; then
+      sed -i -E 's#^(ExecStart=/usr/bin/node\s+dist/)index\.mjs$#\1index.js#' /etc/systemd/system/saiye-workers.service
       systemctl daemon-reload
     fi
     # End migrations
 
-    systemctl restart karakeep.target
+    systemctl restart saiye.target
     service_check update
   else
     msg_info "${YELLOW}No update required.${CLR}"
@@ -469,29 +469,29 @@ update_karakeep() {
   exit 0
 }
 
-migrate_karakeep() {
-  if [[ ! -d /opt/karakeep ]]; then
+migrate_saiye() {
+  if [[ ! -d /opt/saiye ]]; then
     msg_start "Migrating your Hoarder installation to $(app), ${CYAN}then checking for an update...${CLR}"
     systemctl stop hoarder-browser hoarder-workers hoarder-web
-    sed -i -e "s|hoarder|karakeep|g" /etc/hoarder/hoarder.env /etc/systemd/system/hoarder-{browser,web,workers}.service /etc/systemd/system/hoarder.target \
-      -e "s|Hoarder|Karakeep|g" /etc/systemd/system/hoarder-{browser,web,workers}.service /etc/systemd/system/hoarder.target
+    sed -i -e "s|hoarder|saiye|g" /etc/hoarder/hoarder.env /etc/systemd/system/hoarder-{browser,web,workers}.service /etc/systemd/system/hoarder.target \
+      -e "s|Hoarder|Saiye|g" /etc/systemd/system/hoarder-{browser,web,workers}.service /etc/systemd/system/hoarder.target
     for path in /etc/systemd/system/hoarder*.service; do
-      new_path="${path//hoarder/karakeep}"
+      new_path="${path//hoarder/saiye}"
       mv "$path" "$new_path"
     done
-    mv /etc/systemd/system/hoarder.target /etc/systemd/system/karakeep.target
+    mv /etc/systemd/system/hoarder.target /etc/systemd/system/saiye.target
     mv /opt/hoarder "$INSTALL_DIR"
     mv /var/lib/hoarder "$DATA_DIR"
     mv /etc/hoarder "$CONFIG_DIR"
     mv /var/log/hoarder "$LOG_DIR"
     mv "$CONFIG_DIR"/hoarder.env "$ENV_FILE"
-    mv "$LOG_DIR"/hoarder-web.log "$LOG_DIR"/karakeep-web.log
-    mv "$LOG_DIR"/hoarder-workers.log "$LOG_DIR"/karakeep-workers.log
-    usermod -l karakeep hoarder -d "$INSTALL_DIR"
-    groupmod -n karakeep hoarder
-    chown -R karakeep:karakeep "$INSTALL_DIR" "$CONFIG_DIR" "$DATA_DIR" "$LOG_DIR"
+    mv "$LOG_DIR"/hoarder-web.log "$LOG_DIR"/saiye-web.log
+    mv "$LOG_DIR"/hoarder-workers.log "$LOG_DIR"/saiye-workers.log
+    usermod -l saiye hoarder -d "$INSTALL_DIR"
+    groupmod -n saiye hoarder
+    chown -R saiye:saiye "$INSTALL_DIR" "$CONFIG_DIR" "$DATA_DIR" "$LOG_DIR"
     systemctl daemon-reload
-    systemctl -q enable --now karakeep.target
+    systemctl -q enable --now saiye.target
     service_check migrate
   else
     msg_info "${YELLOW}There is no need for a migration: $(app) ${YELLOW}is already installed.${CLR}"
@@ -499,7 +499,7 @@ migrate_karakeep() {
 }
 
 service_check() {
-  local services=("karakeep-browser" "karakeep-workers" "karakeep-web" "meilisearch")
+  local services=("saiye-browser" "saiye-workers" "saiye-web" "meilisearch")
   readarray -t status < <(for service in "${services[@]}"; do
     systemctl is-active "$service" | grep "^active" -
   done)
@@ -509,7 +509,7 @@ service_check() {
       sleep 1
       LOCAL_IP="$(hostname -I | awk '{print $1}')"
       msg_info "Go to ${YELLOW}http://$LOCAL_IP:3000 ${CLR}to create your account"
-      msg_info "Change settings at ${YELLOW}'/etc/karakeep/karakeep.env'${CLR}"
+      msg_info "Change settings at ${YELLOW}'/etc/saiye/saiye.env'${CLR}"
       exit 0
     elif [[ "$1" == "update" ]]; then
       msg_done "$(app) ${CYAN}is updated and running!${CLR}"
@@ -529,13 +529,13 @@ service_check() {
 
 case "${args[0]}" in
 install)
-  install_karakeep
+  install_saiye
   ;;
 update)
-  update_karakeep
+  update_saiye
   ;;
 migrate)
-  migrate_karakeep && update_karakeep
+  migrate_saiye && update_saiye
   ;;
 *)
   die "Unknown command. Choose 'install', 'update' or 'migrate.'"

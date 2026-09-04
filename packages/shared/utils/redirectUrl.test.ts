@@ -28,16 +28,16 @@ describe("validateRedirectUrl", () => {
     expect(validateRedirectUrl("//evil.com/path")).toBe(undefined);
   });
 
-  it("should allow karakeep:// scheme for mobile app", () => {
-    expect(validateRedirectUrl("karakeep://")).toBe("karakeep://");
-    expect(validateRedirectUrl("karakeep://callback")).toBe(
-      "karakeep://callback",
+  it("should allow saiye:// scheme for mobile app", () => {
+    expect(validateRedirectUrl("saiye://")).toBe("saiye://");
+    expect(validateRedirectUrl("saiye://callback")).toBe(
+      "saiye://callback",
     );
-    expect(validateRedirectUrl("karakeep://callback/path")).toBe(
-      "karakeep://callback/path",
+    expect(validateRedirectUrl("saiye://callback/path")).toBe(
+      "saiye://callback/path",
     );
-    expect(validateRedirectUrl("karakeep://callback?param=value")).toBe(
-      "karakeep://callback?param=value",
+    expect(validateRedirectUrl("saiye://callback?param=value")).toBe(
+      "saiye://callback?param=value",
     );
   });
 
@@ -74,10 +74,10 @@ describe("validateRedirectUrl", () => {
 });
 
 describe("isMobileAppRedirect", () => {
-  it("should return true for karakeep:// URLs", () => {
-    expect(isMobileAppRedirect("karakeep://")).toBe(true);
-    expect(isMobileAppRedirect("karakeep://callback")).toBe(true);
-    expect(isMobileAppRedirect("karakeep://callback/path")).toBe(true);
+  it("should return true for saiye:// URLs", () => {
+    expect(isMobileAppRedirect("saiye://")).toBe(true);
+    expect(isMobileAppRedirect("saiye://callback")).toBe(true);
+    expect(isMobileAppRedirect("saiye://callback/path")).toBe(true);
   });
 
   it("should return false for other URLs", () => {

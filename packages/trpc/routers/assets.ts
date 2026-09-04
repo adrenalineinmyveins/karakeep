@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   zAssetSchema,
   zAssetTypesSchema,
-} from "@karakeep/shared/types/bookmarks";
+} from "@saiye/shared/types/bookmarks";
 
 import { createScopedAuthedProcedure, router } from "../index";
 import { Asset } from "../models/assets";

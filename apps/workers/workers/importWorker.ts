@@ -13,58 +13,58 @@ import {
 import { Counter, Gauge, Histogram } from "prom-client";
 import { buildImpersonatingTRPCClient } from "trpc";
 
-import { db } from "@karakeep/db";
+import { db } from "@saiye/db";
 import {
   bookmarkLinks,
   bookmarks,
   importSessions,
   importStagingBookmarks,
-} from "@karakeep/db/schema";
-import { addLogFields, withEventLog } from "@karakeep/shared-server";
-import logger, { throttledLogger } from "@karakeep/shared/logger";
+} from "@saiye/db/schema";
+import { addLogFields, withEventLog } from "@saiye/shared-server";
+import logger, { throttledLogger } from "@saiye/shared/logger";
 import {
   BookmarkTypes,
   MAX_BOOKMARK_TITLE_LENGTH,
-} from "@karakeep/shared/types/bookmarks";
-import { ImportSessionsService } from "@karakeep/trpc/models/importSessions.service";
+} from "@saiye/shared/types/bookmarks";
+import { ImportSessionsService } from "@saiye/trpc/models/importSessions.service";
 
 import { registry } from "../metrics";
 
 // Prometheus metrics
 const importStagingProcessedCounter = new Counter({
-  name: "karakeep_import_staging_processed_total",
+  name: "saiye_import_staging_processed_total",
   help: "Total number of staged items processed",
   labelNames: ["result"],
   registers: [registry],
 });
 
 const importStagingStaleResetCounter = new Counter({
-  name: "karakeep_import_staging_stale_reset_total",
+  name: "saiye_import_staging_stale_reset_total",
   help: "Total number of stale processing items reset to pending",
   registers: [registry],
 });
 
 const importStagingInFlightGauge = new Gauge({
-  name: "karakeep_import_staging_in_flight",
+  name: "saiye_import_staging_in_flight",
   help: "Current number of in-flight items (processing + recently completed)",
   registers: [registry],
 });
 
 const importSessionsGauge = new Gauge({
-  name: "karakeep_import_sessions_active",
+  name: "saiye_import_sessions_active",
   help: "Number of active import sessions by status",
   labelNames: ["status"],
   registers: [registry],
 });
 
 const importStagingPendingGauge = new Gauge({
-  name: "karakeep_import_staging_pending_total",
+  name: "saiye_import_staging_pending_total",
   help: "Total number of pending items in staging table",
   registers: [registry],
 });
 
 const importBatchDurationHistogram = new Histogram({
-  name: "karakeep_import_batch_duration_seconds",
+  name: "saiye_import_batch_duration_seconds",
   help: "Time taken to process a batch of staged items",
   buckets: [0.1, 0.5, 1, 2, 5, 10, 30],
   registers: [registry],

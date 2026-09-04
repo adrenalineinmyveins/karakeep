@@ -1,15 +1,15 @@
 import { eq } from "drizzle-orm";
 
-import { db } from "@karakeep/db";
-import { assets } from "@karakeep/db/schema";
+import { db } from "@saiye/db";
+import { assets } from "@saiye/db/schema";
 import {
   ZAdminMaintenanceTidyAssetsTask,
   ZTidyAssetsRequest,
   zTidyAssetsRequestSchema,
-} from "@karakeep/shared-server";
-import { deleteAsset, getAllAssets } from "@karakeep/shared/assetdb";
-import logger from "@karakeep/shared/logger";
-import { DequeuedJob } from "@karakeep/shared/queueing";
+} from "@saiye/shared-server";
+import { deleteAsset, getAllAssets } from "@saiye/shared/assetdb";
+import logger from "@saiye/shared/logger";
+import { DequeuedJob } from "@saiye/shared/queueing";
 
 async function handleAsset(
   asset: {

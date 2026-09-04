@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import type { ReadingPosition } from "@karakeep/shared/utils/reading-progress-dom";
+import type { ReadingPosition } from "@saiye/shared/utils/reading-progress-dom";
 
 import { useTRPC } from "../trpc";
 

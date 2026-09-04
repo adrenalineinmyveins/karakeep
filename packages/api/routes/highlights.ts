@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import {
   zNewHighlightSchema,
   zUpdateHighlightSchema,
-} from "@karakeep/shared/types/highlights";
+} from "@saiye/shared/types/highlights";
 
 import { authMiddleware } from "../middlewares/auth";
 import { adaptPagination, zPagination } from "../utils/pagination";

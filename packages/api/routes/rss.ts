@@ -2,9 +2,9 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import serverConfig from "@karakeep/shared/config";
-import { MAX_NUM_BOOKMARKS_PER_PAGE } from "@karakeep/shared/types/bookmarks";
-import { List } from "@karakeep/trpc/models/lists";
+import serverConfig from "@saiye/shared/config";
+import { MAX_NUM_BOOKMARKS_PER_PAGE } from "@saiye/shared/types/bookmarks";
+import { List } from "@saiye/trpc/models/lists";
 
 import { unauthedMiddleware } from "../middlewares/auth";
 import { toRSS } from "../utils/rss";

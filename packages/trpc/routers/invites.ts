@@ -3,8 +3,8 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { invites, users } from "@karakeep/db/schema";
-import { zUserNameSchema } from "@karakeep/shared/types/users";
+import { invites, users } from "@saiye/db/schema";
+import { zUserNameSchema } from "@saiye/shared/types/users";
 
 import { generatePasswordSalt, hashPassword } from "../auth";
 import { sendInviteEmail } from "../email";
@@ -64,7 +64,7 @@ export const invitesAppRouter = router({
         await sendInviteEmail(
           input.email,
           token,
-          ctx.user.name || "A Karakeep admin",
+          ctx.user.name || "A Saiye admin",
         );
       } catch (error) {
         console.error("Failed to send invite email:", error);
@@ -264,7 +264,7 @@ export const invitesAppRouter = router({
         await sendInviteEmail(
           invite.email,
           newToken,
-          ctx.user.name || "A Karakeep admin",
+          ctx.user.name || "A Saiye admin",
         );
       } catch (error) {
         console.error("Failed to send invite email:", error);

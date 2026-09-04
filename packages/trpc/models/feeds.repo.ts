@@ -1,12 +1,12 @@
 import { count, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import type { DB } from "@karakeep/db";
-import { rssFeedsTable } from "@karakeep/db/schema";
+import type { DB } from "@saiye/db";
+import { rssFeedsTable } from "@saiye/db/schema";
 import {
   zNewFeedSchema,
   zUpdateFeedSchema,
-} from "@karakeep/shared/types/feeds";
+} from "@saiye/shared/types/feeds";
 
 type Feed = typeof rssFeedsTable.$inferSelect;
 

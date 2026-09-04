@@ -1,5 +1,5 @@
 // Auto-register the MeiliSearch Vector provider when this package is imported
-import { PluginManager, PluginType } from "@karakeep/shared/plugins";
+import { PluginManager, PluginType } from "@saiye/shared/plugins";
 
 import { MeiliSearchVectorProvider } from "./src";
 

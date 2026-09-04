@@ -8,9 +8,9 @@ import {
   zTagListResponseSchema,
   zTagListValidatedRequestSchema,
   zUpdateTagRequestSchema,
-} from "@karakeep/shared/types/tags";
+} from "@saiye/shared/types/tags";
 
-import { addLogFields } from "@karakeep/shared-server";
+import { addLogFields } from "@saiye/shared-server";
 
 import type { AuthedContext } from "../index";
 import {
