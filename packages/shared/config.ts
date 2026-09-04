@@ -62,6 +62,9 @@ const allEnv = z.object({
   NEXTAUTH_SECRET: z.string().optional(),
   DISABLE_SIGNUPS: stringBool("false"),
   DISABLE_PASSWORD_AUTH: stringBool("false"),
+  // 桌面本地模式：web 端免登录（见 apps/web/server/auth.ts 的收口旁路）。
+  // 用 KARAKEEP_ 前缀避免裸 LOCAL_MODE 与其他软件的全局环境变量冲突。
+  KARAKEEP_LOCAL_MODE: stringBool("false"),
   OAUTH_AUTO_REDIRECT: stringBool("false"),
   OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING: stringBool("false"),
   OAUTH_WELLKNOWN_URL: z.string().url().optional(),
@@ -306,6 +309,7 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
     auth: {
       disableSignups: val.DISABLE_SIGNUPS,
       disablePasswordAuth: val.DISABLE_PASSWORD_AUTH,
+      localMode: val.KARAKEEP_LOCAL_MODE,
       emailVerificationRequired: val.EMAIL_VERIFICATION_REQUIRED,
       oauth: {
         autoRedirect: val.OAUTH_AUTO_REDIRECT,

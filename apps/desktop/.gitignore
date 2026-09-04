@@ -1,0 +1,12 @@
+# 依赖与下载缓存
+node_modules/
+bin-cache/
+
+# Rust/Tauri 构建产物
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# 打包调试日志
+*.txt
+
+*.log

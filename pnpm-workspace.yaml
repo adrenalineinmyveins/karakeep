@@ -36,7 +36,7 @@ patchedDependencies:
   react-native@0.85.3: patches/react-native@0.85.3.patch
   '@drawnix/drawnix': patches/@drawnix__drawnix.patch
 
-# Docker builds can prune packages that use one of the root patches.
+  # Docker builds can prune packages that use one of the root patches.
 allowUnusedPatches: true
 
 minimumReleaseAgeExclude:

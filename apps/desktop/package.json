@@ -1,0 +1,16 @@
+{
+  "name": "@karakeep/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "tauri": "tauri",
+    "shell:dev": "tauri dev",
+    "shell:build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

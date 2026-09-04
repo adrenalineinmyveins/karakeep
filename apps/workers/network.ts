@@ -68,6 +68,18 @@ async function resolveHostAddresses(hostname: string): Promise<string[]> {
     return addresses;
   }
 
+  // 回退：部分 Windows 环境的系统 DNS 指向本机未启动的服务（如代理工具残留），
+  // c-ares 直连该地址会 ECONNREFUSED，而系统解析器（getaddrinfo）可正常回退。
+  // 解析结果同样会经过 SSRF 地址校验，安全性不受影响。
+  try {
+    const lookupResult = await dns.lookup(hostname, { all: true });
+    if (lookupResult.length > 0) {
+      return lookupResult.map((r) => r.address);
+    }
+  } catch {
+    // 回退也失败则沿用原报错
+  }
+
   const errorMessage =
     errors.length > 0
       ? errors.join("; ")

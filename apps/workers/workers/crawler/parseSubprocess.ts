@@ -1,6 +1,9 @@
 // Runs the HTML parsing (metadata extraction + readability) in a separate
 // node process with a bounded heap, so a pathological page can't OOM the
 // worker itself.
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+
 import { execa } from "execa";
 
 import { getTracer, withSpan } from "@karakeep/shared-server";
@@ -58,10 +61,15 @@ function getSubprocessScriptPath(): string {
   const currentUrl = import.meta.url;
   if (currentUrl.includes("/dist/")) {
     // Production: running from built output
-    return new URL("./scripts/parseHtmlSubprocess.js", currentUrl).pathname;
+    return fileURLToPath(
+      new URL("./scripts/parseHtmlSubprocess.js", currentUrl),
+    );
   }
   // Dev mode: running via tsx
-  return new URL("../../scripts/parseHtmlSubprocess.ts", currentUrl).pathname;
+  // 注意：必须用 fileURLToPath，Windows 下 URL.pathname 是 "/F:/..."，非法路径
+  return fileURLToPath(
+    new URL("../../scripts/parseHtmlSubprocess.ts", currentUrl),
+  );
 }
 
 function getSubprocessCommand(): { cmd: string; args: string[] } {
@@ -70,9 +78,15 @@ function getSubprocessCommand(): { cmd: string; args: string[] } {
 
   if (scriptPath.endsWith(".ts")) {
     // Dev mode: use tsx to run TypeScript directly
+    // Windows 下裸 "tsx"（实际是 tsx.cmd）无法被直接 spawn，改用 node + tsx cli
+    const require = createRequire(import.meta.url);
     return {
-      cmd: "tsx",
-      args: [`--max-old-space-size=${maxOldSpaceSize}`, scriptPath],
+      cmd: process.execPath,
+      args: [
+        `--max-old-space-size=${maxOldSpaceSize}`,
+        require.resolve("tsx/cli"),
+        scriptPath,
+      ],
     };
   }
 

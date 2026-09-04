@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { Adapter, AdapterUser } from "@auth/core/adapters";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { count, eq } from "drizzle-orm";
@@ -5,6 +6,7 @@ import NextAuth, {
   DefaultSession,
   getServerSession,
   NextAuthOptions,
+  type Session,
 } from "next-auth";
 import { Adapter as NextAuthAdapater } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -25,7 +27,11 @@ import {
   normalizeUserNameInput,
 } from "@karakeep/shared/utils/userName";
 import { logEvent } from "@karakeep/shared-server";
-import { validatePassword } from "@karakeep/trpc/auth";
+import {
+  generatePasswordSalt,
+  hashPassword,
+  validatePassword,
+} from "@karakeep/trpc/auth";
 import { User } from "@karakeep/trpc/models/users";
 
 type UserRole = "admin" | "user";
@@ -299,4 +305,42 @@ export const authOptions: NextAuthOptions = {
 
 export const authHandler = NextAuth(authOptions);
 
-export const getServerAuthSession = () => getServerSession(authOptions);
+// ─── 桌面本地模式（KARAKEEP_LOCAL_MODE=true）──────────────────
+// 单机桌面部署信任 loopback：会话解析收口于此，本地模式直接返回
+// 合成 session（JWT 策略下无法向外部浏览器注入 cookie，故走旁路）。
+// 首个请求懒创建本地 admin 用户；服务端默认行为不受影响。
+const LOCAL_USER_EMAIL = "local@desktop.karakeep.local";
+
+async function getLocalModeSession() {
+  let user = await db.query.users.findFirst({
+    where: eq(users.email, LOCAL_USER_EMAIL),
+  });
+  if (!user) {
+    user = await User.createRaw(db, {
+      name: "Local User",
+      email: LOCAL_USER_EMAIL,
+      // 随机不可用密码：本地用户不走凭据登录
+      password: await hashPassword(
+        randomBytes(32).toString("hex"),
+        generatePasswordSalt(),
+      ),
+      emailVerified: new Date(),
+    });
+  }
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role ?? "user",
+    },
+    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+  };
+}
+
+export const getServerAuthSession = async (): Promise<Session | null> => {
+  if (serverConfig.auth.localMode) {
+    return await getLocalModeSession();
+  }
+  return await getServerSession(authOptions);
+};

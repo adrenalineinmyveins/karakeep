@@ -45,6 +45,9 @@ yarn-error.log*
 **/*.db
 data
 
+# Desktop M0.1 prototype workspace
+.desktop-m01/
+
 # PWA Files
 **/public/sw.js
 **/public/workbox-*.js
@@ -73,3 +76,6 @@ auth_failures.log
 .codex
 .claude/worktrees
 jean.json
+
+# Tauri installer build artifact
+apps/desktop/src-tauri/payload.tar.gz

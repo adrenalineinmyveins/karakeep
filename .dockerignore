@@ -8,8 +8,9 @@ README.md
 **/.env*
 .turbo
 .git
-./data
+data
 .pnpm-store
+.recover
 
 # Files that don't need to be included in the Docker image
 docs
@@ -18,6 +19,11 @@ charts
 apps/mobile
 apps/landing
 apps/browser-extension
+# 桌面客户端产物/缓存不入服务端镜像（保留 package.json 供 pnpm workspace 解析）
+apps/desktop/dist
+apps/desktop/bin-cache
+apps/desktop/src-tauri
+apps/desktop/*.txt
 packages/e2e_tests
 packages/benchmarks
 tools/seed-snapshot
