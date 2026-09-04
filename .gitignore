@@ -93,3 +93,9 @@ apps/mobile/tsc-code.txt
 # Docker image build downloads
 docker/downloads/
 docker/s6-overlay/
+
+# Rebrand working files (keep scripts + SVG masters only)
+.rebrand/profile*
+.rebrand/*.log
+.rebrand/*.txt
+.rebrand/*.png

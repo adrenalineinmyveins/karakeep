@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 598 166">
+  <!-- saive mark (monochrome, inherits fill) -->
+  <rect x="62" y="14" width="88" height="106" rx="14"/>
+  <path fill-rule="evenodd" d="M44 40 h74 a14 14 0 0 1 14 14 v84 a14 14 0 0 1 -14 14 H44 a14 14 0 0 1 -14 -14 V54 a14 14 0 0 1 14 -14 z M44 54 v84 h74 V54 z"/>
+  <path d="M69 72 h26 v58 l-13 -14 l-13 14 z"/>
+  <!-- wordmark -->
+  <text x="186" y="122" font-family="system-ui, 'Segoe UI', 'PingFang SC', sans-serif" font-size="96" font-weight="700" letter-spacing="2">saiye</text>
+</svg>
