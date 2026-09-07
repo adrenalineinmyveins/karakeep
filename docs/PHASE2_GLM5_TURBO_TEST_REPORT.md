@@ -3,7 +3,7 @@
 > 生成时间：2026-08-06
 > 模型：`glm-5-turbo`（智谱 BigModel）
 > 测试脚本：`packages/trpc/scripts/test-tools.ts`
-> 环境：Karakeep 本地开发环境（SQLite + OpenAI-compatible API）
+> 环境：Saiye 本地开发环境（SQLite + OpenAI-compatible API）
 
 ---
 
@@ -223,7 +223,7 @@ SELECT id, name FROM bookmarkTags WHERE userId = 'test-user';
 
 ## 6. 结论
 
-GLM-5-Turbo 在 Karakeep 工具集成场景中表现优秀：
+GLM-5-Turbo 在 Saiye 工具集成场景中表现优秀：
 
 1. **工具选择 100% 准确** — 5 个不同场景（查询/创建），每次都精确选择正确工具
 2. **参数传递精确** — 自动推断参数类型，无多余参数

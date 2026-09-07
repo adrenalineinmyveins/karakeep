@@ -5,9 +5,12 @@
 /intro                                          /getting-started/intro   301
 /screenshots                                    /getting-started/screenshots   301
 /configuration                                  /configuration/environment-variables   301
-/quick-sharing                                  /using-karakeep/quick-sharing   301
-/import                                         /using-karakeep/import   301
-/guides/search-query-language                   /using-karakeep/search-query-language   301
+/quick-sharing                                  /using-saiye/quick-sharing   301
+/import                                         /using-saiye/import   301
+/guides/search-query-language                   /using-saiye/search-query-language   301
+/using-karakeep/quick-sharing                   /using-saiye/quick-sharing   301
+/using-karakeep/import                          /using-saiye/import   301
+/using-karakeep/search-query-language           /using-saiye/search-query-language   301
 /openai                                         /administration/openai   301
 /command-line                                   /integrations/command-line   301
 /mcp                                            /integrations/mcp   301

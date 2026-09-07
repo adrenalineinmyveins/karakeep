@@ -9,14 +9,14 @@ This script is a stripped-down version of those found in the [Proxmox Community 
 - **Debian 12** (Buster) or
 - **Ubuntu 24.04** (Noble Numbat)
 
-The script will download and install all dependencies (except for Ollama), install Karakeep, do a basic configuration of Karakeep and Meilisearch (the search app used by Karakeep), and create and enable the systemd service files needed to run Karakeep on startup. Karakeep and Meilisearch are run in the context of their low-privilege user environments for more security.
+The script will download and install all dependencies (except for Ollama), install Saiye, do a basic configuration of Saiye and Meilisearch (the search app used by Saiye), and create and enable the systemd service files needed to run Saiye on startup. Saiye and Meilisearch are run in the context of their low-privilege user environments for more security.
 
 The script functions as an update script in addition to an installer. See **[Updating](#updating)**.
 
-### 1. Download the script from the [Karakeep repository](https://github.com/adrenalineinmyveins/karakeep/blob/main/karakeep-linux.sh)
+### 1. Download the script from the [Saiye repository](https://github.com/adrenalineinmyveins/karakeep/blob/main/saije-linux.sh)
 
 ```
-wget https://raw.githubusercontent.com/adrenalineinmyveins/karakeep/main/karakeep-linux.sh
+wget https://raw.githubusercontent.com/adrenalineinmyveins/karakeep/main/saije-linux.sh
 ```
 
 ### 2. Run the script
@@ -26,7 +26,7 @@ wget https://raw.githubusercontent.com/adrenalineinmyveins/karakeep/main/karakee
     If this is a fresh install, then run the installer by using the following command:
 
     ```shell
-    bash karakeep-linux.sh install
+    bash saije-linux.sh install
     ```
 
 ### 3. Create an account/sign in
@@ -37,38 +37,38 @@ wget https://raw.githubusercontent.com/adrenalineinmyveins/karakeep/main/karakee
 
 > This script must be run as `root`, or as a user with `sudo` privileges.
 
-    If Karakeep has previously been installed using this script, then run the updater like so:
+    If Saiye has previously been installed using this script, then run the updater like so:
 
     ```shell
-     bash karakeep-linux.sh update
+     bash saije-linux.sh update
     ```
 
 ## Services and Ports
 
-`karakeep.target` includes 4 services: `meilisearch.service`, `karakeep-web.service`, `karakeep-workers.service`, `karakeep-browser.service`.
+`saiye.target` includes 4 services: `meilisearch.service`, `saiye-web.service`, `saiye-workers.service`, `saiye-browser.service`.
 
-- `meilisearch.service`: Provides full-text search, Karakeep Workers service connects to it, uses port `7700` by default.
+- `meilisearch.service`: Provides full-text search, Saiye Workers service connects to it, uses port `7700` by default.
 
-- `karakeep-web.service`: Provides the karakeep web service, uses `3000` port by default.
+- `saiye-web.service`: Provides the saiye web service, uses `3000` port by default.
 
-- `karakeep-workers.service`: Provides the karakeep workers service, no port.
+- `saiye-workers.service`: Provides the saiye workers service, no port.
 
-- `karakeep-browser.service`: Provides the headless browser service, uses `9222` port by default.
+- `saiye-browser.service`: Provides the headless browser service, uses `9222` port by default.
 
 ## Configuration, ENV file, database locations
 
-During installation, the script created a configuration file for `meilisearch`, an `ENV` file for Karakeep, and located config paths and database paths separate from the installation path of Karakeep, so as to allow for easier updating. Their names/locations are as follows:
+During installation, the script created a configuration file for `meilisearch`, an `ENV` file for Saiye, and located config paths and database paths separate from the installation path of Saiye, so as to allow for easier updating. Their names/locations are as follows:
 
 - `/etc/meilisearch.toml` - a basic configuration for meilisearch, that contains configs for the database location, disabling analytics, and using a master key, which prevents unauthorized connections.
 - `/var/lib/meilisearch` - Meilisearch DB location.
-- `/etc/karakeep/karakeep.env` - The Karakeep `ENV` file. Edit this file to configure Karakeep beyond the default. The web service and the workers service need to be restarted after editing this file:
+- `/etc/saiye/saiye.env` - The Saiye `ENV` file. Edit this file to configure Saiye beyond the default. The web service and the workers service need to be restarted after editing this file:
 
     ```shell
-    sudo systemctl restart karakeep-workers karakeep-web
+    sudo systemctl restart saiye-workers saiye-web
     ```
 
-- `/var/lib/karakeep` - The Karakeep database location. If you delete the contents of this folder you will lose all your data.
+- `/var/lib/saiye` - The Saiye database location. If you delete the contents of this folder you will lose all your data.
 
 ## Still Running Hoarder?
 
-There is a way to upgrade. Please see [Hoarder to Karakeep Migration](../06-administration/08-hoarder-to-karakeep-migration.md)
+There is a way to upgrade. Please see [Hoarder to Saiye Migration](../06-administration/08-hoarder-to-karakeep-migration.md)

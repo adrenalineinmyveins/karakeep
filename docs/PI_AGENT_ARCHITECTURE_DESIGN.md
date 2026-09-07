@@ -1,4 +1,4 @@
-# Karakeep × PI Agent 架构设计文档
+# Saiye × PI Agent 架构设计文档
 
 > 版本：v2.0
 > 日期：2026-08-07
@@ -19,7 +19,7 @@
 
 ## 1. 设计目标
 
-引入 PI Agent 框架后，Karakeep 将从"书签管理工具"升级为"AI 驱动的个人知识操作系统"。
+引入 PI Agent 框架后，Saiye 将从"书签管理工具"升级为"AI 驱动的个人知识操作系统"。
 
 本版聚焦：
 
@@ -696,7 +696,7 @@ export function buildAgentTools(ctx: Context): ToolDefinition[] {
  * 定义 Agent 的角色、能力边界和行为规范。
  */
 export function buildSystemPrompt(userId: string): string {
-  return `你是 Karakeep 的 AI 助手，帮助用户管理他们的书签知识库。
+  return `你是 Saiye 的 AI 助手，帮助用户管理他们的书签知识库。
 
 你的能力：
 1. **搜索与检索**：用户问"我保存过关于 X 的文章吗？"时，使用 search_bookmarks 工具搜索
@@ -986,7 +986,7 @@ export const appRouter = router({
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   Karakeep AI 调用层                      │
+│                   Saiye AI 调用层                      │
 │                                                         │
 │  ┌───────────────────────────────────────────────────┐  │
 │  │  场景 A：自动 AI 处理（保留 InferenceClient）      │  │

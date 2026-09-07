@@ -1,4 +1,4 @@
-# Karakeep 架构文档
+# Saiye 架构文档
 
 > 目录范围：/  （全项目架构总览）
 >
@@ -9,7 +9,7 @@
 
 ## 1. 项目概述
 
-**Karakeep 是一个以"稍后阅读 / 书签收藏"为核心、面向 AI 增强的个人信息管理系统（"read-it-later" bookmarking app）。**
+**Saiye 是一个以"稍后阅读 / 书签收藏"为核心、面向 AI 增强的个人信息管理系统（"read-it-later" bookmarking app）。**
 
 用户可以通过 Web、移动端（Expo）、浏览器扩展、CLI 或 MCP 把链接 / 文本 / 文件保存为书签，系统会自动完成：
 
@@ -24,7 +24,7 @@
 
 ## 2. 系统架构总览
 
-Karakeep 是一个典型的**分层 + 异步任务**架构：同步请求走"客户端 → API 网关 → tRPC 业务逻辑 → 数据库"，耗时/可重试工作通过队列分发给独立 Workers 处理。
+Saiye 是一个典型的**分层 + 异步任务**架构：同步请求走"客户端 → API 网关 → tRPC 业务逻辑 → 数据库"，耗时/可重试工作通过队列分发给独立 Workers 处理。
 
 ```mermaid
 flowchart TB
@@ -131,7 +131,7 @@ flowchart TB
 | `apps/mobile` | `@saiye/mobile` | Expo 移动端，复用 `@saiye/shared-react` hooks |
 | `apps/browser-extension` | — | 浏览器扩展，支持 SingleFile 完整页面捕获 |
 | `apps/cli` | `@saiye/cli` | 命令行（书签/标签/清单/资产/管理员/导入等命令） |
-| `apps/mcp` | `@saiye/mcp` | Model Context Protocol 服务器，向 LLM 暴露 Karakeep 工具 |
+| `apps/mcp` | `@saiye/mcp` | Model Context Protocol 服务器，向 LLM 暴露 Saiye 工具 |
 | `apps/landing` | — | Astro 落地页 |
 
 ### 4.2 包 (`packages/`)
@@ -384,7 +384,7 @@ flowchart LR
 
 ### 9.1 混合搜索架构
 
-Karakeep 提供 **FTS（全文）/ 语义（向量）/ 混合** 三种搜索模式（`packages/trpc/routers/bookmarks.ts` 的 `searchBookmarks`）。
+Saiye 提供 **FTS（全文）/ 语义（向量）/ 混合** 三种搜索模式（`packages/trpc/routers/bookmarks.ts` 的 `searchBookmarks`）。
 
 ```mermaid
 flowchart LR
@@ -436,7 +436,7 @@ flowchart TB
 ```mermaid
 flowchart TB
     subgraph Host["宿主机"]
-        subgraph KarakeepContainer["karakeep 容器 (s6-overlay)"]
+        subgraph SaiyeContainer["saiye 容器 (s6-overlay)"]
             INIT["init-db-migration\n(运行 Drizzle 迁移)"]
             WEB_SVC["svc-web\n(Next.js + Hono, :3000)"]
             WKR_SVC["svc-workers\n(后台任务进程)"]
@@ -452,7 +452,7 @@ flowchart TB
     WKR_SVC -.-> CHROME
     WEB_SVC --> MEILI
     WKR_SVC --> MEILI
-    KarakeepContainer --- VOL_DATA
+    SaiyeContainer --- VOL_DATA
     MEILI --- VOL_MEILI
 ```
 
@@ -496,7 +496,7 @@ flowchart TB
 
 - **Web**：服务端用 `apps/web/server/api/trpc.ts` 的 `serverTrpc`（`@trpc/tanstack-react-query` proxy，RSC 内调用）；客户端用 `@saiye/shared-react/providers/trpc-provider`。
 - **Mobile**：复用 `shared-react` 的 hooks（`useBookmarks` / `useLists` / `useTags` 等）与高亮组件，配置自建服务器地址（`server-address.tsx`）。
-- **浏览器扩展**：通过 `utils/trpc.ts` 连接 Karakeep 实例，支持 SingleFile 完整页面归档并上传为 `precrawledArchiveId`。
+- **浏览器扩展**：通过 `utils/trpc.ts` 连接 Saiye 实例，支持 SingleFile 完整页面归档并上传为 `precrawledArchiveId`。
 - **CLI / MCP**：不直接连 tRPC，而通过 `packages/sdk` 调用 REST `/api/v1`（Bearer API Key 认证），保证跨网络可用。
 - **类型单一来源**：`AppRouter = typeof appRouter`（`packages/trpc/routers/_app.ts`）作为唯一类型定义，被各端导入。
 

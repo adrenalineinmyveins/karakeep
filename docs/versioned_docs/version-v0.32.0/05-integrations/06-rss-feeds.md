@@ -1,6 +1,6 @@
 # RSS Feeds
 
-Karakeep offers RSS feed integration, allowing you to both consume RSS feeds from external sources and publish your lists as RSS feeds for others to subscribe to.
+Saiye offers RSS feed integration, allowing you to both consume RSS feeds from external sources and publish your lists as RSS feeds for others to subscribe to.
 
 ## Publishing RSS Feeds
 
@@ -31,7 +31,7 @@ Note: Text notes are not included in RSS feeds as they don't have an associated 
 
 ## Consuming RSS Feeds
 
-Karakeep can automatically monitor RSS feeds and create bookmarks from new entries, making it perfect for staying up to date with blogs, news sites, and other content sources.
+Saiye can automatically monitor RSS feeds and create bookmarks from new entries, making it perfect for staying up to date with blogs, news sites, and other content sources.
 
 ### Adding an RSS Feed
 
@@ -45,6 +45,6 @@ Karakeep can automatically monitor RSS feeds and create bookmarks from new entri
 
 ### How It Works
 
-- Karakeep checks enabled RSS feeds **every hour**
+- Saiye checks enabled RSS feeds **every hour**
 - New entries are automatically created as bookmarks
 - Duplicate entries are automatically detected and skipped

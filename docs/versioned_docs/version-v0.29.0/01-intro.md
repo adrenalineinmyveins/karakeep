@@ -4,7 +4,7 @@ slug: /
 
 # Introduction
 
-Karakeep (previously Hoarder) is an open source "Bookmark Everything" app that uses AI for automatically tagging the content you throw at it. The app is built with self-hosting as a first class citizen.
+Saiye (previously Hoarder) is an open source "Bookmark Everything" app that uses AI for automatically tagging the content you throw at it. The app is built with self-hosting as a first class citizen.
 
 ![Screenshot](https://raw.githubusercontent.com/adrenalineinmyveins/karakeep/main/screenshots/homepage.png)
 
@@ -18,7 +18,7 @@ Karakeep (previously Hoarder) is an open source "Bookmark Everything" app that u
 - ✨ AI-based (aka chatgpt) automatic tagging and summarization. With supports for local models using ollama!
 - 🤖 Rule-based engine for customized management.
 - 🎆 OCR for extracting text from images.
-- 🔖 [Chrome plugin](https://chromewebstore.google.com/detail/karakeep/kgcjekpmcjjogibpjebkhaanilehneje) and [Firefox addon](https://addons.mozilla.org/en-US/firefox/addon/karakeep/) for quick bookmarking.
+- 🔖 [Chrome plugin](https://chromewebstore.google.com/detail/saiye/kgcjekpmcjjogibpjebkhaanilehneje) and [Firefox addon](https://addons.mozilla.org/en-US/firefox/addon/karakeep/) for quick bookmarking.
 - 📱 An [iOS app](https://apps.apple.com/us/app/karakeep-app/id6479258022), and an [Android app](https://play.google.com/store/apps/details?id=app.hoarder.hoardermobile&pcampaignid=web_share).
 - 📰 Auto hoarding from RSS feeds.
 - 🔌 REST API and multiple clients.
@@ -50,4 +50,4 @@ The demo is seeded with some content, but it's in read-only mode to prevent abus
 
 ## About the name
 
-The name Karakeep is inspired by the Arabic word "كراكيب" (karakeeb), a colloquial term commonly used to refer to miscellaneous clutter, odds and ends, or items that may seem disorganized but often hold personal value or hidden usefulness. It evokes the image of a messy drawer or forgotten box, full of stuff you can't quite throw away—because somehow, it matters (or more likely, because you're a hoarder!).
+The name Saiye is inspired by the Arabic word "كراكيب" (karakeeb), a colloquial term commonly used to refer to miscellaneous clutter, odds and ends, or items that may seem disorganized but often hold personal value or hidden usefulness. It evokes the image of a messy drawer or forgotten box, full of stuff you can't quite throw away—because somehow, it matters (or more likely, because you're a hoarder!).

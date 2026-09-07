@@ -28,7 +28,7 @@ Press Ctrl+C to stop all services and clean up Docker containers.
 
 ## Manual Setup
 
-Karakeep uses `node` version 22. To install it, you can use `nvm` [^1]
+Saiye uses `node` version 22. To install it, you can use `nvm` [^1]
 
 ```
 $ nvm install  22
@@ -40,7 +40,7 @@ $ node --version
 v22.14.0
 ```
 
-Karakeep also makes use of `corepack`[^2]. If you have `node` installed, then `corepack` should already be
+Saiye also makes use of `corepack`[^2]. If you have `node` installed, then `corepack` should already be
 installed on your machine, and you don't need to do anything. To verify the `corepack` is installed run:
 
 ```

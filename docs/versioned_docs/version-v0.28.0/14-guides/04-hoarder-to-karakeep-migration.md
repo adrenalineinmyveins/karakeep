@@ -1,6 +1,6 @@
-# Hoarder to Karakeep Migration
+# Hoarder to Saiye Migration
 
-Hoarder is rebranding to Karakeep. Due to github limitations, the old docker image might not be getting new updates after the rebranding. You might need to update your docker image to point to the new karakeep image instead by applying the following change in the docker compose file.
+Hoarder is rebranding to Saiye. Due to github limitations, the old docker image might not be getting new updates after the rebranding. You might need to update your docker image to point to the new saiye image instead by applying the following change in the docker compose file.
 
 ```diff
 diff --git a/docker/docker-compose.yml b/docker/docker-compose.yml
@@ -19,10 +19,10 @@ You can also change the `HOARDER_VERSION` environment variable but if you do so 
 
 ## Migrating a Baremetal Installation
 
-If you previously used the [Debian/Ubuntu install script](https://docs.karakeep.app/Installation/debuntu) to install Hoarder, there is an option to migrate your installation to Karakeep.
+If you previously used the [Debian/Ubuntu install script](https://docs.saiye.app/Installation/debuntu) to install Hoarder, there is an option to migrate your installation to Saiye.
 
 ```bash
-bash karakeep-linux.sh migrate
+bash saije-linux.sh migrate
 ```
 
 This will migrate your installation with no user input required. After the migration, the script will also check for an update.

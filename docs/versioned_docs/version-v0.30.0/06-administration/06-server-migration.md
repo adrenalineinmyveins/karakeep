@@ -1,6 +1,6 @@
 # Migrating Between Servers
 
-This guide explains how to migrate all of your data from one Karakeep server to another using the official CLI.
+This guide explains how to migrate all of your data from one Saiye server to another using the official CLI.
 
 ## What the command does
 
@@ -33,7 +33,7 @@ Notes:
 ## Quick start
 
 ```
-karakeep --server-addr https://src.example.com --api-key <SOURCE_API_KEY> migrate \
+saiye --server-addr https://src.example.com --api-key <SOURCE_API_KEY> migrate \
   --dest-server https://dest.example.com \
   --dest-api-key <DEST_API_KEY>
 ```

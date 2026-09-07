@@ -1,6 +1,6 @@
 # Configuring different AI Providers
 
-Karakeep uses LLM providers for AI tagging and summarization. It also uses embedding models for stuff like semantic search. We support OpenAI-compatible providers and ollama. This guide will show you how to configure different providers.
+Saiye uses LLM providers for AI tagging and summarization. It also uses embedding models for stuff like semantic search. We support OpenAI-compatible providers and ollama. This guide will show you how to configure different providers.
 
 ## Tagging and Summarization Models
 
@@ -22,7 +22,7 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ### Ollama
 
-Ollama is a local LLM provider that you can use to run your own LLM server. You'll need to pass ollama's address to karakeep and you need to ensure that it's accessible from within the karakeep container (e.g. no localhost addresses).
+Ollama is a local LLM provider that you can use to run your own LLM server. You'll need to pass ollama's address to saiye and you need to ensure that it's accessible from within the saiye container (e.g. no localhost addresses).
 
 Ollama provides two API endpoints:
 
@@ -149,7 +149,7 @@ INFERENCE_OUTPUT_SCHEMA=json
 
 ## Embedding Models
 
-Karakeep uses embedding models for stuff like semantic search and refining tag suggestions. Typically, when you configure an embedding model, you'll want to configure its default num dimensions and context length. Those are done via:
+Saiye uses embedding models for stuff like semantic search and refining tag suggestions. Typically, when you configure an embedding model, you'll want to configure its default num dimensions and context length. Those are done via:
 
 ```
 EMBEDDING_TEXT_MODEL=
@@ -165,7 +165,7 @@ EMBEDDING_OPENAI_API_KEY=embedding-provider-api-key
 EMBEDDING_OPENAI_BASE_URL=https://embedding-provider.example.com/v1
 ```
 
-For embedding models that support multiple output sizes, set `EMBEDDING_TEXT_MODEL_DIMENSION_OVERRIDE` to pass the requested dimensions to the provider. Its value must match `EMBEDDING_DIMENSIONS`, which configures the vector store, or Karakeep will fail to start:
+For embedding models that support multiple output sizes, set `EMBEDDING_TEXT_MODEL_DIMENSION_OVERRIDE` to pass the requested dimensions to the provider. Its value must match `EMBEDDING_DIMENSIONS`, which configures the vector store, or Saiye will fail to start:
 
 ```
 EMBEDDING_TEXT_MODEL_DIMENSION_OVERRIDE=768

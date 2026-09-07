@@ -4,19 +4,19 @@ import type * as OpenApiPlugin from "docusaurus-plugin-openapi-docs";
 import { themes as prismThemes } from "prism-react-renderer";
 
 const config: Config = {
-  title: "Karakeep Docs",
+  title: "Saiye Docs",
   tagline: "Dinosaurs are cool",
   favicon: "img/favicon.ico",
 
   // Set the production url of your site here
-  url: "https://docs.karakeep.app",
+  url: "https://docs.saiye.app",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "karakeep-app", // Usually your GitHub org/user name.
+  organizationName: "adrenalineinmyveins", // Usually your GitHub org/user name.
   projectName: "karakeep", // Usually your repo name.
 
   onBrokenLinks: "warn",
@@ -67,7 +67,7 @@ const config: Config = {
         id: "api",
         docsPluginId: "classic",
         config: {
-          karakeep: {
+          saiye: {
             specPath: "../packages/open-api/saiye-openapi-spec.json",
             outputDir: "docs/api",
             sidebarOptions: {
@@ -85,7 +85,7 @@ const config: Config = {
     navbar: {
       title: "",
       logo: {
-        alt: "Karakeep Logo",
+        alt: "Saiye Logo",
         src: "img/logo-full.svg",
         srcDark: "img/logo-full-white.svg",
         width: "120px",
@@ -96,7 +96,7 @@ const config: Config = {
           position: "right",
         },
         {
-          href: "https://karakeep.app",
+          href: "https://saiye.app",
           label: "Homepage",
           position: "right",
         },
@@ -117,7 +117,7 @@ const config: Config = {
       appId: "V93C1M14G6",
       // Public API key: it is safe to commit it
       apiKey: "0eb8853d9740822fb9d21620d5515f35",
-      indexName: "karakeep",
+      indexName: "saiye",
       contextualSearch: true,
       insights: true,
     },

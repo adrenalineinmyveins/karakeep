@@ -1,6 +1,6 @@
 # Legacy Container Upgrade
 
-Karakeep's 0.16 release consolidated the web and worker containers into a single container and also dropped the need for the redis container. The legacy containers will stop being supported soon, to upgrade to the new container do the following:
+Saiye's 0.16 release consolidated the web and worker containers into a single container and also dropped the need for the redis container. The legacy containers will stop being supported soon, to upgrade to the new container do the following:
 
 1. Remove the redis container and its volume if it had one.
 2. Move the environment variables that you've set exclusively to the `workers` container to the `web` container.

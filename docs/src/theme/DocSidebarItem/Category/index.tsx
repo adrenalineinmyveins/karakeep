@@ -40,7 +40,7 @@ const categoryIcons: Record<string, LucideIcon> = {
   'Getting Started': Rocket,
   'Installation': Package,
   'Configuration': Settings,
-  'Using Karakeep': BookOpen,
+  'Using Saiye': BookOpen,
   'Integrations': Plug,
   'Administration': Wrench,
   'Community': Users,

@@ -1,6 +1,6 @@
 # Quick Sharing Extensions
 
-The whole point of Karakeep is making it easy to hoard the content. That's why there are a couple of 
+The whole point of Saiye is making it easy to hoard the content. That's why there are a couple of 
 
 ## Mobile Apps
 
@@ -14,8 +14,8 @@ The whole point of Karakeep is making it easy to hoard the content. That's why t
 
 <img src="/img/quick-sharing/extension.png" alt="mobile screenshot" width="300"/>
 
-- **Chrome extension**: [here](https://chromewebstore.google.com/detail/karakeep/kgcjekpmcjjogibpjebkhaanilehneje).
+- **Chrome extension**: [here](https://chromewebstore.google.com/detail/saiye/kgcjekpmcjjogibpjebkhaanilehneje).
 - **Firefox addon**: [here](https://addons.mozilla.org/en-US/firefox/addon/karakeep/).
 
 - ## Community Extensions
-- **Safari extension**: [App Store Link](https://apps.apple.com/us/app/karakeeper-bookmarker/id6746722790).  For macOS and iOS to allow a simple way to add your bookmarks to your self hosted karakeep instance.
+- **Safari extension**: [App Store Link](https://apps.apple.com/us/app/saiyeer-bookmarker/id6746722790).  For macOS and iOS to allow a simple way to add your bookmarks to your self hosted saiye instance.

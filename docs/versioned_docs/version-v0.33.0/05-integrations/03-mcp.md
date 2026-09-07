@@ -1,6 +1,6 @@
 # Model Context Protocol Server (MCP)
 
-Karakeep comes with a Model Context Protocol server that can be used to interact with it through LLMs.
+Saiye comes with a Model Context Protocol server that can be used to interact with it through LLMs.
 
 ## Supported Tools
 
@@ -35,7 +35,7 @@ From NPM:
 ```json
 {
   "mcpServers": {
-    "karakeep": {
+    "saiye": {
       "command": "npx",
       "args": [
         "@saiye/mcp"
@@ -54,7 +54,7 @@ From Docker:
 ```json
 {
   "mcpServers": {
-    "karakeep": {
+    "saiye": {
       "command": "docker",
       "args": [
         "run",

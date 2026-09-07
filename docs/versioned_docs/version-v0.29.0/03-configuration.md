@@ -9,7 +9,7 @@ The app is mainly configured by environment variables. All the used environment 
 | WORKERS_HOST                           | No                                    | 127.0.0.1       | Host to listen to for requests to WORKERS_PORT. You will need to set this if running in a container, since localhost will not be reachable from outside                                                                                                                                                                 |
 | WORKERS_ENABLED_WORKERS                | No                                    | Not set         | Comma separated list of worker names to enable. If set, only these workers will run. Valid values: crawler,inference,search,adminMaintenance,video,feed,assetPreprocessing,webhook,ruleEngine.                                                                                                                          |
 | WORKERS_DISABLED_WORKERS               | No                                    | Not set         | Comma separated list of worker names to disable. Takes precedence over `WORKERS_ENABLED_WORKERS`.                                                                                                                                                                                                                       |
-| LOG_LEVEL                              | No                                    | debug            | The application log level as defined in the [winston documentation](https://github.com/winstonjs/winston?tab=readme-ov-file#logging-levels). You may want to set this to `notice` or `warning` when running Karakeep in a production environment.                                                            |
+| LOG_LEVEL                              | No                                    | debug            | The application log level as defined in the [winston documentation](https://github.com/winstonjs/winston?tab=readme-ov-file#logging-levels). You may want to set this to `notice` or `warning` when running Saiye in a production environment.                                                            |
 | DATA_DIR                               | Yes                                   | Not set         | The path for the persistent data directory. This is where the db lives. Assets are stored here by default unless `ASSETS_DIR` is set.                                                                                                                                                                                   |
 | ASSETS_DIR                             | No                                    | Not set         | The path where crawled assets will be stored. If not set, defaults to `${DATA_DIR}/assets`.                                                                                                                                                                                                                             |
 | NEXTAUTH_URL                           | Yes                                   | Not set         | Should point to the address of your server. The app will function without it, but will redirect you to wrong addresses on signout for example.                                                                                                                                                                          |
@@ -31,7 +31,7 @@ The app is mainly configured by environment variables. All the used environment 
 
 ## Asset Storage
 
-Karakeep supports two storage backends for assets: local filesystem (default) and S3-compatible object storage. S3 storage is automatically detected when an S3 endpoint is passed.
+Saiye supports two storage backends for assets: local filesystem (default) and S3-compatible object storage. S3 storage is automatically detected when an S3 endpoint is passed.
 
 | Name                             | Required          | Default | Description                                                                                               |
 | -------------------------------- | ----------------- | ------- | --------------------------------------------------------------------------------------------------------- |
@@ -52,7 +52,7 @@ Switching between storage backends after data has been stored will require manua
 
 ## Authentication / Signup
 
-By default, Karakeep uses the database to store users, but it is possible to also use OAuth.
+By default, Saiye uses the database to store users, but it is possible to also use OAuth.
 The flags need to be provided to the `web` container.
 
 :::info
@@ -73,7 +73,7 @@ When setting up OAuth, the allowed redirect URLs configured at the provider shou
 | OAUTH_CLIENT_ID                             | No       | Not set                | The "Client ID" as provided by the OAuth provider                                                                                                                                                     |
 | OAUTH_SCOPE                                 | No       | "openid email profile" | "Full list of scopes to request (space delimited)"                                                                                                                                                    |
 | OAUTH_PROVIDER_NAME                         | No       | "Custom Provider"      | The name of your provider. Will be shown on the signup page as "Sign in with `<name>`"                                                                                                                |
-| OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING | No       | false                  | Whether existing accounts in karakeep stored in the database should automatically be linked with your OAuth account. Only enable it if you trust the OAuth provider!                                  |
+| OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING | No       | false                  | Whether existing accounts in saiye stored in the database should automatically be linked with your OAuth account. Only enable it if you trust the OAuth provider!                                  |
 | OAUTH_TIMEOUT                               | No       | 3500                   | The wait time in milliseconds for the OAuth provider response. Increase this if you are having `outgoing request timed out` errors                                                                    |
 
 For more information on `OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING`, check the [next-auth.js documentation](https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option).
@@ -112,7 +112,7 @@ Either `OPENAI_API_KEY` or `OLLAMA_BASE_URL` need to be set for automatic taggin
 :::info
 
 - You can append additional instructions to the prompt used for automatic tagging, in the `AI Settings` (in the `User Settings` screen)
-- You can use the placeholders `$tags`, `$aiTags`, `$userTags` in the prompt. These placeholders will be replaced with all tags, ai generated tags or human created tags when automatic tagging is performed (e.g. `[karakeep, computer, ai]`)
+- You can use the placeholders `$tags`, `$aiTags`, `$userTags` in the prompt. These placeholders will be replaced with all tags, ai generated tags or human created tags when automatic tagging is performed (e.g. `[saiye, computer, ai]`)
   :::
 
 ## Crawler Configs
@@ -171,7 +171,7 @@ Example JSON file:
 
 ## OCR Configs
 
-Karakeep uses [tesseract.js](https://github.com/naptha/tesseract.js) to extract text from images.
+Saiye uses [tesseract.js](https://github.com/naptha/tesseract.js) to extract text from images.
 
 | Name                     | Required | Default   | Description                                                                                                                                                                                                                               |
 | ------------------------ | -------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -211,7 +211,7 @@ You can use webhooks to trigger actions when bookmarks are created, changed or c
 
 ## SMTP Configuration
 
-Karakeep can send emails for various purposes such as email verification during signup. Configure these settings to enable email functionality.
+Saiye can send emails for various purposes such as email verification during signup. Configure these settings to enable email functionality.
 
 | Name          | Required | Default | Description                                                                                     |
 | ------------- | -------- | ------- | ----------------------------------------------------------------------------------------------- |
@@ -224,14 +224,14 @@ Karakeep can send emails for various purposes such as email verification during 
 
 ## Proxy Configuration
 
-If your Karakeep instance needs to connect through a proxy server, you can configure the following settings:
+If your Saiye instance needs to connect through a proxy server, you can configure the following settings:
 
 | Name                               | Required | Default | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ---------------------------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | CRAWLER_HTTP_PROXY                 | No       | Not set | HTTP proxy server URL for outgoing HTTP requests (e.g., `http://proxy.example.com:8080`). You can pass multiple comma separated proxies and the used one will be chosen at random. The proxy is used for crawling, RSS feed fetches and webhooks.                                                                                                                                                                                                                                                                           |
 | CRAWLER_HTTPS_PROXY                | No       | Not set | HTTPS proxy server URL for outgoing HTTPS requests (e.g., `http://proxy.example.com:8080`). You can pass multiple comma separated proxies and the used one will be chosen at random. The proxy is used for crawling, RSS feed fetches and webhooks.                                                                                                                                                                                                                                                                         |
 | CRAWLER_NO_PROXY                   | No       | Not set | Comma-separated list of hostnames/IPs that should bypass the proxy (e.g., `localhost,127.0.0.1,.local`)                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| CRAWLER_ALLOWED_INTERNAL_HOSTNAMES | No       | Not set | By default, Karakeep blocks worker-initiated requests whose DNS resolves to private, loopback, or link-local IP addresses. Use this to allowlist specific hostnames for internal access (e.g., `internal.company.com,.local`). Supports domain wildcards by prefixing with a dot (e.g., `.internal.company.com`). Passing `.` allowlists all domains. Note: Internal IP validation is bypassed when a proxy is configured for the URL as the local DNS resolver won't necessarily be the same as the one used by the proxy. |
+| CRAWLER_ALLOWED_INTERNAL_HOSTNAMES | No       | Not set | By default, Saiye blocks worker-initiated requests whose DNS resolves to private, loopback, or link-local IP addresses. Use this to allowlist specific hostnames for internal access (e.g., `internal.company.com,.local`). Supports domain wildcards by prefixing with a dot (e.g., `.internal.company.com`). Passing `.` allowlists all domains. Note: Internal IP validation is bypassed when a proxy is configured for the URL as the local DNS resolver won't necessarily be the same as the one used by the proxy. |
 
 :::info
 These proxy settings will be used by the crawler and other components that make outgoing HTTP requests.

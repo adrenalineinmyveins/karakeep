@@ -36,7 +36,7 @@
 |---|---|---|
 | 资产类型白名单 [assetdb.ts](../packages/shared/assetdb.ts) | 上传允许图片/视频/PDF/HTML；**书签级资产仅 image/pdf** | 无任何 `audio/*` |
 | 推理客户端 [inference.ts](../packages/shared/inference.ts) | 仅 `inferFromText` / `inferFromImage`；工厂支持 OpenAI（含 baseURL/proxy）→ Ollama | 缺转录方法 |
-| Workers | 图片 OCR、PDF 解析、视频下载、摘要/打标/嵌入 | 无音频转录 job（上游 Karakeep 有 `videoWorker` 式的转录设计，本 fork 未包含） |
+| Workers | 图片 OCR、PDF 解析、视频下载、摘要/打标/嵌入 | 无音频转录 job（上游 Saiye 有 `videoWorker` 式的转录设计，本 fork 未包含） |
 | Chat 数据模型 [schema.ts](../packages/db/schema.ts) | `chatMessages`：`role` + `content` 纯文本，**已有 `metadata` JSON 列** | 附件挂载的天然扩展点 |
 | 资产上传/鉴权 | `POST /api/assets`（30 req/min 限频 + 存储配额）；读取走 `ensureCanView` + 1h 签名 URL | 可直接复用，无需新建 |
 
@@ -319,7 +319,7 @@ idle → uploading（上传二进制）→ processing（转录/抓取中，禁�
 | ASR 成本与滥用（无限制上传） | 高 | §4.5：限频 + 配额 + 单文件时长上限 + 日转录分钟数上限 |
 | 转录时延 × 120s 消息超时 | 高 | 严格异步预转录，对话只读结果（§5.1 原则 4） |
 | OpenAI 兼容端点行为差异（错误码/字段） | 中 | 只用最小公共子集；错误按"供应商错误"统一透传 |
-| 与上游 Karakeep 漂移加大 | 中 | worker 设计参照上游模式（audio worker + transcript asset），保持同构 |
+| 与上游 Saiye 漂移加大 | 中 | worker 设计参照上游模式（audio worker + transcript asset），保持同构 |
 | 长转录撑大消息/上下文 | 中 | transcript 存资产不存消息行；注入预算截断（§5.4） |
 | 双端实现不一致 | 中 | 转录/抓取全在服务端，前端只做录音与上传 |
 | 无 AI 配置 | 低 | 配置探测隐藏入口；音频文件仍可收藏播放 |

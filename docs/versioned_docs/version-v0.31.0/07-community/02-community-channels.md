@@ -1,6 +1,6 @@
 # Community Channels
 
-Stay connected with the Karakeep team and community for updates, support, and feature discussions.
+Stay connected with the Saiye team and community for updates, support, and feature discussions.
 
 ## Discord
 
@@ -9,5 +9,5 @@ Stay connected with the Karakeep team and community for updates, support, and fe
 
 ## Twitter / X
 
-- Follow [@karakeep_app](https://twitter.com/karakeep_app) for release announcements, tips, and product news.
+- Follow [@saiye_app](https://twitter.com/saiye_app) for release announcements, tips, and product news.
 - DM or tag us with feedback or things you'd like to see next.

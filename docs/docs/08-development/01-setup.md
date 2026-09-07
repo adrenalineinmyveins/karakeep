@@ -30,7 +30,7 @@ Alternatively, you can use Docker Compose to run the full stack in containers â€
 
 ## Manual Setup
 
-Karakeep uses `node` version 24. To install it, you can use `nvm` [^1]
+Saiye uses `node` version 24. To install it, you can use `nvm` [^1]
 
 ```
 $ nvm install 24
@@ -42,7 +42,7 @@ $ node --version
 v24.0.0
 ```
 
-Karakeep also makes use of `corepack`[^2]. If you have `node` installed, then `corepack` should already be
+Saiye also makes use of `corepack`[^2]. If you have `node` installed, then `corepack` should already be
 installed on your machine, and you don't need to do anything. To verify the `corepack` is installed run:
 
 ```

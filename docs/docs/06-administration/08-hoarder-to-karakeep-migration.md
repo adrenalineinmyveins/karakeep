@@ -22,7 +22,7 @@ You can also change the `HOARDER_VERSION` environment variable but if you do so 
 If you previously used the [Debian/Ubuntu install script](../02-installation/06-debuntu.md) to install Hoarder, there is an option to migrate your installation to Karakeep.
 
 ```bash
-bash karakeep-linux.sh migrate
+bash saije-linux.sh migrate
 ```
 
 This will migrate your installation with no user input required. After the migration, the script will also check for an update.

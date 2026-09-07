@@ -65,17 +65,17 @@ After that you have to configure the web service to the type ClusterIP so it is 
 
 If you have already deployed the service you can patch the web service to the type ClusterIP with the following command:
 
-` kubectl -n karakeep patch service web -p '{"spec":{"type":"ClusterIP"}}' `
+` kubectl -n saiye patch service web -p '{"spec":{"type":"ClusterIP"}}' `
 
 Afterwards you can apply the ingress and access the service via your chosen URL.
 
 #### Setting up HTTPS access to the Service
 
-To access karakeep securely you can configure the ingress to use a preconfigured TLS certificate. This requires that you already have the needed files, namely your .crt and .key file, on hand.
+To access saiye securely you can configure the ingress to use a preconfigured TLS certificate. This requires that you already have the needed files, namely your .crt and .key file, on hand.
 
-After you have deployed the karakeep manifests you can deploy your certificate for karakeep in the `karakeep` namespace with this example command. You can name the secret however you want. But be aware that the secret name in the ingress definition has to match the secret name.
+After you have deployed the saiye manifests you can deploy your certificate for saiye in the `saiye` namespace with this example command. You can name the secret however you want. But be aware that the secret name in the ingress definition has to match the secret name.
 
-` $ kubectl --namespace karakeep create secret tls karakeep-web-tls --cert=/path/to/crt --key=/path/to/key `
+` $ kubectl --namespace saiye create secret tls saiye-web-tls --cert=/path/to/crt --key=/path/to/key `
 
 If the secret is successfully created you can now configure the Ingress to use TLS via this changes to the spec:
 
@@ -83,15 +83,15 @@ If the secret is successfully created you can now configure the Ingress to use T
  spec:
   tls:
   - hosts:
-      - karakeep.example.com
-    secretName: karakeep-web-tls
+      - saiye.example.com
+    secretName: saiye-web-tls
 ````
 
 > Note: Be aware that the hosts have to match between the tls spec and the HTTP spec.
 
 ### [Optional] 6. Setup quick sharing extensions
 
-Go to the [quick sharing page](../04-using-karakeep/quick-sharing.md) to install the mobile apps and the browser extensions. Those will help you hoard things faster!
+Go to the [quick sharing page](../04-using-saiye/quick-sharing.md) to install the mobile apps and the browser extensions. Those will help you hoard things faster!
 
 ## Updating
 

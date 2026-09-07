@@ -1,6 +1,6 @@
 # Configuring different AI Providers
 
-Karakeep uses LLM providers for AI tagging and summarization. We support OpenAI-compatible providers and ollama. This guide will show you how to configure different providers.
+Saiye uses LLM providers for AI tagging and summarization. We support OpenAI-compatible providers and ollama. This guide will show you how to configure different providers.
 
 ## OpenAI
 
@@ -16,7 +16,7 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ## Ollama
 
-Ollama is a local LLM provider that you can use to run your own LLM server. You'll need to pass ollama's address to karakeep and you need to ensure that it's accessible from within the karakeep container (e.g. no localhost addresses).
+Ollama is a local LLM provider that you can use to run your own LLM server. You'll need to pass ollama's address to saiye and you need to ensure that it's accessible from within the saiye container (e.g. no localhost addresses).
 
 ```
 # MAKE SURE YOU DON'T HAVE OPENAI_API_KEY set, otherwise it takes precedence.

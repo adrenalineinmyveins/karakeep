@@ -1,6 +1,6 @@
 # Command Line Tool (CLI)
 
-Karakeep comes with a simple CLI for those users who want to do more advanced manipulation.
+Saiye comes with a simple CLI for those users who want to do more advanced manipulation.
 
 ## Features
 
@@ -23,13 +23,13 @@ docker run --rm ghcr.io/adrenalineinmyveins/karakeep-cli:release --help
 ## Usage
 
 ```
-karakeep
+saiye
 ```
 
 ```
-Usage: karakeep [options] [command]
+Usage: saiye [options] [command]
 
-A CLI interface to interact with the karakeep api
+A CLI interface to interact with the saiye api
 
 Options:
   --api-key <key>       the API key to interact with the API (env: SAIYE_API_KEY)
@@ -50,11 +50,11 @@ Commands:
 And some of the subcommands:
 
 ```
-karakeep bookmarks
+saiye bookmarks
 ```
 
 ```
-Usage: karakeep bookmarks [options] [command]
+Usage: saiye bookmarks [options] [command]
 
 Manipulating bookmarks
 
@@ -72,11 +72,11 @@ Commands:
 ```
 
 ```
-karakeep lists
+saiye lists
 ```
 
 ```
-Usage: karakeep lists [options] [command]
+Usage: saiye lists [options] [command]
 
 Manipulating lists
 
@@ -93,16 +93,16 @@ Commands:
 
 ## Obtaining an API Key
 
-To use the CLI, you'll need to get an API key from your karakeep settings. You can validate that it's working by running:
+To use the CLI, you'll need to get an API key from your saiye settings. You can validate that it's working by running:
 
 ```
-karakeep --api-key <key> --server-addr <addr> whoami
+saiye --api-key <key> --server-addr <addr> whoami
 ```
 
 For example:
 
 ```
-karakeep --api-key mysupersecretkey --server-addr https://try.karakeep.app whoami
+saiye --api-key mysupersecretkey --server-addr https://try.karakeep.app whoami
 {
   id: 'j29gnbzxxd01q74j2lu88tnb',
   name: 'Test User',
@@ -111,8 +111,8 @@ karakeep --api-key mysupersecretkey --server-addr https://try.karakeep.app whoam
 ```
 
 You can also store the server address and API key in
-`$XDG_CONFIG_HOME/karakeep/config.json`. If `XDG_CONFIG_HOME` is not set, the
-CLI reads `~/.config/karakeep/config.json`.
+`$XDG_CONFIG_HOME/saiye/config.json`. If `XDG_CONFIG_HOME` is not set, the
+CLI reads `~/.config/saiye/config.json`.
 
 ```json
 {
@@ -129,10 +129,10 @@ If no server address is provided, the CLI defaults to
 To create or update this file interactively, run:
 
 ```bash
-karakeep auth init
+saiye auth init
 ```
 
 
 ## Other clients
 
-There also exists a **non-official**, community-maintained, python package called [karakeep-python-api](https://github.com/thiswillbeyourgithub/karakeep_python_api) that can be accessed from the CLI, but is **not** official.
+There also exists a **non-official**, community-maintained, python package called [saiye-python-api](https://github.com/thiswillbeyourgithub/saiye_python_api) that can be accessed from the CLI, but is **not** official.

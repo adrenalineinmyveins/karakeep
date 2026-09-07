@@ -4,7 +4,7 @@ const sidebar: SidebarsConfig = {
   apisidebar: [
     {
       type: "doc",
-      id: "api/karakeep-api",
+      id: "api/saiye-api",
     },
     {
       type: "category",

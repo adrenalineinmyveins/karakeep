@@ -1,4 +1,4 @@
-# Karakeep 桌面版 Phase 0 详细设计
+# Saiye 桌面版 Phase 0 详细设计
 
 > 版本：v1.0
 > 日期：2026-09-02
@@ -55,7 +55,7 @@ flowchart TB
 ### 2.2 用户数据目录（与安装目录分离，升级不丢数据）
 
 ```
-%APPDATA%\karakeep-desktop\
+%APPDATA%\saiye-desktop\
 ├─ config.json        # 端口、密钥、用户透传 env（OPENAI_* 等）
 ├─ data\              # DATA_DIR：sqlite + assets\
 ├─ meili\             # meilisearch --db-path
@@ -66,8 +66,8 @@ flowchart TB
 安装目录（分发 zip 解压即用）：
 
 ```
-karakeep-desktop\
-├─ karakeep.cmd       # 入口（Phase 1 换 Tauri exe）
+saiye-desktop\
+├─ saiye.cmd       # 入口（Phase 1 换 Tauri exe）
 ├─ node\node.exe      # 官方 win-x64 zip，锁 24.x
 ├─ runtime\
 │  ├─ migrate\        # ncc 产物 migrate.js + drizzle\（复用 Docker 构建方法）
@@ -100,7 +100,7 @@ karakeep-desktop\
 
 | 变量 | web | workers | 说明 |
 |---|---|---|---|
-| `DATA_DIR` | ✓ | ✓ | `%APPDATA%\karakeep-desktop\data` |
+| `DATA_DIR` | ✓ | ✓ | `%APPDATA%\saiye-desktop\data` |
 | `MEILI_ADDR` | ✓ | ✓ | `http://127.0.0.1:<meiliPort>` |
 | `MEILI_MASTER_KEY` | ✓ | ✓ | config.json |
 | `PORT` / `HOSTNAME` | ✓ | — | webPort / `127.0.0.1` |
@@ -145,7 +145,7 @@ getServerAuthSession():
   return getServerSession(authOptions)   # 原逻辑不动
 ```
 
-- `localUserId` 懒创建：users 表为空时插入 `local@desktop.karakeep.local`（随机不可用密码哈希，role=admin）；非空时取该 email 用户；
+- `localUserId` 懒创建：users 表为空时插入 `local@desktop.saiye.local`（随机不可用密码哈希，role=admin）；非空时取该 email 用户；
 - **不改**任何 procedure、不改 NextAuth 回调、服务端默认行为零变化（env 未开时走原路径）；
 - 首启即免登录直达 dashboard，无需登录页/令牌 URL/cookie 注入（系统浏览器场景下 cookie 注入本就不可行）。
 
@@ -181,7 +181,7 @@ getServerAuthSession():
    - yt-dlp（单 exe，--js-runtimes node）
    - monolith win build（可选；404 则跳过并记 warning）
 6. node/node.exe：官方 win-x64 zip（版本 = better-sqlite3 prebuilds 支持的 24.x，与构建机一致）
-7. 产出 dist/karakeep-desktop/ + karakeep-desktop-<version>-win-x64.zip
+7. 产出 dist/saiye-desktop/ + saiye-desktop-<version>-win-x64.zip
 ```
 
 安装时无需 `pnpm install`：所有 node_modules 均为构建期产物，目标机零依赖。
@@ -216,7 +216,7 @@ getServerAuthSession():
 
 | # | 位置 | 类型 | 内容 | 复杂度 |
 |---|---|---|---|---|
-| 1 | `apps/desktop/`（新） | 新包 | supervisor（lifecycle/config/procs/logging）+ build.mjs + karakeep.cmd | 中 |
+| 1 | `apps/desktop/`（新） | 新包 | supervisor（lifecycle/config/procs/logging）+ build.mjs + saiye.cmd | 中 |
 | 2 | `packages/shared/config.ts` | 修改 | +`SAIYE_LOCAL_MODE` | 低 |
 | 3 | `apps/web/server/auth.ts` | 修改 | `getServerAuthSession` 本地旁路 | 低 |
 | 4 | `docs/` | 新增 | 桌面版使用说明（含 AGPL 源码获取指引） | 低 |
@@ -232,7 +232,7 @@ getServerAuthSession():
 **验收**：浏览器免登录可用；保存 URL 抓取成功（确认无 BROWSER_WEB_URL 的降级路径存在且质量可接受，产出降级页面清单）；搜索、AI 聊天（配 OPENAI_API_KEY）可用。
 
 **完成记录**：
-- 实现：`packages/shared/config.ts`（`SAIYE_LOCAL_MODE`）、`apps/web/server/auth.ts`（`getServerAuthSession` 本地旁路，懒建 `local@desktop.karakeep.local` admin）、`apps/desktop/scripts/dev.mjs`（迁移 + meili + web + workers 四子进程、健康探活、config.json 端口回写）。
+- 实现：`packages/shared/config.ts`（`SAIYE_LOCAL_MODE`）、`apps/web/server/auth.ts`（`getServerAuthSession` 本地旁路，懒建 `local@desktop.saiye.local` admin）、`apps/desktop/scripts/dev.mjs`（迁移 + meili + web + workers 四子进程、健康探活、config.json 端口回写）。
 - 验证结果：免登录访问 `/`（307→dashboard，whoami=Local User）✓；保存 qq.com 抓取全链路 success（标题/描述/favicon/banner 资产入库，AI 打标与摘要 success，复用既有 bigmodel 配置）✓；搜索 `bookmarks.searchBookmarks`（fts）命中本地 meili ✓；typecheck 通过（workers 包 0 错误；CanvasEditor.tsx 为 fork 既有无关错误）✓。
 - AI 聊天未单独验证（推理链已经 tagging/summarization 验证），随 M0.4 一并覆盖；10 站点降级抽样留待 M0.4 验收项 3（本阶段：qq.com 纯 fetch 降级路径质量可接受；百度搜索页被反爬验证码拦截，属站点特性）。
 - **Windows 实测发现与修复**（均已在代码中处理）：
@@ -262,7 +262,7 @@ getServerAuthSession():
 
 ### M0.3 打包
 build.mjs 全流程 + zip。
-**验收**：无 Node/无 Docker 的干净 Windows 环境解压 → 双击 karakeep.cmd → 冷启动至浏览器可用；全程离线（首次 OCR 除外）。
+**验收**：无 Node/无 Docker 的干净 Windows 环境解压 → 双击 saiye.cmd → 冷启动至浏览器可用；全程离线（首次 OCR 除外）。
 
 ### M0.4 验收测试（Phase 0 退出）
 | # | 验收项 | 标准 |
