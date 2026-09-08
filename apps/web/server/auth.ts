@@ -33,6 +33,11 @@ import {
   validatePassword,
 } from "@saiye/trpc/auth";
 import { User } from "@saiye/trpc/models/users";
+import {
+  fetchWeChatAccessToken,
+  fetchWeChatUserInfo,
+  wechatEmailFromOpenid,
+} from "./wechat";
 
 type UserRole = "admin" | "user";
 
@@ -173,12 +178,9 @@ const providers: Provider[] = [
 const wechat = serverConfig.auth.wechat;
 if (wechat.appId && wechat.appSecret) {
   // 微信开放平台「网站应用」扫码登录（scope=snsapi_login）。
-  // 微信协议非标准 OAuth2：token 端点为 GET + query 且返回 JSON、
-  // userinfo 的 access_token 走 query、且不提供 email —— 故用函数形式
-  // 端点完全自定义，email 以 openid 合成（`{openid}@wechat-users.saiye.local`）。
+  // 协议交互（GET token/JSON/合成 email）见 server/wechat.ts；
   // 桌面/内网场景通过 WECHAT_REDIRECT_URI 指向公网中转
   // （apps/desktop/relay），由中转 302 回本机 NextAuth 回调。
-  const WECHAT_EMAIL_DOMAIN = "wechat-users.saiye.local";
   providers.push({
     id: "wechat",
     name: "微信扫码",
@@ -198,66 +200,20 @@ if (wechat.appId && wechat.appSecret) {
     checks: ["state"],
     token: {
       async request({ params }) {
-        const url = new URL(
-          "https://api.weixin.qq.com/sns/oauth2/access_token",
-        );
-        url.searchParams.set("appid", wechat.appId!);
-        url.searchParams.set("secret", wechat.appSecret!);
-        url.searchParams.set("code", String(params.code));
-        url.searchParams.set("grant_type", "authorization_code");
-        const res = await fetch(url, {
-          headers: { accept: "application/json" },
+        const tokens = await fetchWeChatAccessToken({
+          appId: wechat.appId!,
+          appSecret: wechat.appSecret!,
+          code: String(params.code),
         });
-        const json = (await res.json()) as {
-          access_token?: string;
-          expires_in?: number;
-          openid?: string;
-          errcode?: number;
-          errmsg?: string;
-        };
-        if (!res.ok || !json.access_token || !json.openid) {
-          throw new Error(
-            `WeChat token exchange failed: ${json.errcode ?? res.status} ${json.errmsg ?? ""}`,
-          );
-        }
-        return {
-          tokens: {
-            access_token: json.access_token,
-            token_type: "Bearer",
-            expires_in: json.expires_in,
-            openid: json.openid,
-          },
-        };
+        return { tokens };
       },
     },
     userinfo: {
       async request({ tokens }) {
-        const url = new URL("https://api.weixin.qq.com/sns/userinfo");
-        url.searchParams.set("access_token", String(tokens.access_token));
-        url.searchParams.set("openid", String(tokens.openid));
-        const res = await fetch(url, {
-          headers: { accept: "application/json" },
+        return fetchWeChatUserInfo({
+          accessToken: String(tokens.access_token),
+          openid: String(tokens.openid),
         });
-        const json = (await res.json()) as {
-          openid?: string;
-          nickname?: string;
-          headimgurl?: string;
-          errcode?: number;
-          errmsg?: string;
-        };
-        if (!res.ok || !json.openid) {
-          throw new Error(
-            `WeChat userinfo failed: ${json.errcode ?? res.status} ${json.errmsg ?? ""}`,
-          );
-        }
-        // sub/name 是 NextAuth Profile 的已知属性，保证类型兼容
-        return {
-          sub: json.openid,
-          name: json.nickname,
-          openid: json.openid,
-          nickname: json.nickname,
-          headimgurl: json.headimgurl,
-        };
       },
     },
     async profile(profile: {
@@ -265,7 +221,7 @@ if (wechat.appId && wechat.appSecret) {
       nickname?: string;
       headimgurl?: string;
     }) {
-      const email = `${profile.openid}@${WECHAT_EMAIL_DOMAIN}`;
+      const email = wechatEmailFromOpenid(profile.openid);
       const [admin, firstUser] = await Promise.all([
         isAdmin(email),
         isFirstUser(),

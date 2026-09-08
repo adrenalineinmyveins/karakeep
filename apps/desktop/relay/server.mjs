@@ -14,6 +14,7 @@
  * 用法：
  *   node server.mjs            # PORT 环境变量可改监听端口，默认 8080
  *   pm2 start server.mjs --name wechat-relay
+ *   node --test relay/         # 运行 server.test.mjs
  *
  * 微信开放平台配置（「网站应用」→ 授权回调域）：填本服务域名（不含协议与路径）。
  *
@@ -24,20 +25,21 @@
  *   （cb 端口 = 桌面 web 实际端口；部署到公网的 web 版无需 WECHAT_REDIRECT_URI）
  */
 import http from "node:http";
+import { pathToFileURL } from "node:url";
 
-const PORT = Number(process.env.PORT ?? 8080);
-// cb 白名单：仅允许重定向回本机回环地址
+// cb 白名单：仅允许重定向回本机回环地址（不带路径）
 const CB_PATTERN = /^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?$/;
+const DEFAULT_CB = "http://127.0.0.1:3000";
 
-http
-  .createServer((req, res) => {
+export function createRelayServer() {
+  return http.createServer((req, res) => {
     const url = new URL(req.url ?? "/", `http://${req.headers.host}`);
     if (url.pathname !== "/wechat/callback") {
       res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
       res.end("not found");
       return;
     }
-    const cb = url.searchParams.get("cb") ?? "http://127.0.0.1:3000";
+    const cb = url.searchParams.get("cb") ?? DEFAULT_CB;
     if (!CB_PATTERN.test(cb)) {
       res.writeHead(400, { "content-type": "text/plain; charset=utf-8" });
       res.end("cb must be a loopback address (127.0.0.1 / localhost)");
@@ -52,7 +54,16 @@ http
     }
     res.writeHead(302, { location: target.toString() });
     res.end();
-  })
-  .listen(PORT, () => {
+  });
+}
+
+// 直接运行（node server.mjs）时才监听，作为模块导入（测试）时不监听
+const isMain =
+  process.argv[1] !== undefined &&
+  import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMain) {
+  const PORT = Number(process.env.PORT ?? 8080);
+  createRelayServer().listen(PORT, () => {
     console.log(`[wechat-relay] listening on :${PORT}`);
   });
+}

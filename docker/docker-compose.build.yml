@@ -8,7 +8,8 @@ services:
     volumes:
       - data:/data
     ports:
-      - 3000:3000
+      # WEB_PORT 可覆盖宿主端口（默认 3000），避免与本地服务冲突
+      - ${WEB_PORT:-3000}:3000
     env_file:
       - ../.env
     environment:

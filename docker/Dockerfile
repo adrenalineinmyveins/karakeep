@@ -89,11 +89,12 @@ RUN (cd apps/web && \
     HTTPS_PROXY=http://host.docker.internal:7897 \
     NO_PROXY=localhost,127.0.0.1 \
     NODE_USE_ENV_PROXY=1 \
+    NEXT_FONT_GOOGLE_MIRROR_URL=https://fonts.googleapis.cn \
     pnpm --config.verify-deps-before-run=false exec next build --experimental-build-mode compile)
 
 # Build the worker code
 RUN (cd apps/workers && pnpm --config.verify-deps-before-run=false build)
-RUN CI=true pnpm deploy --node-linker=isolated --legacy --filter @saiye/workers --prod /prod/workers
+RUN pnpm deploy --node-linker=hoisted --legacy --config.dangerously-allow-all-builds=true --filter @saiye/workers --prod /prod/workers
 
 # Build the cli
 RUN (cd apps/cli && pnpm --config.verify-deps-before-run=false build)
