@@ -194,6 +194,7 @@ describe("User Routes", () => {
       // AI Settings
       autoSummarizationEnabled: null,
       autoTaggingEnabled: null,
+      chatKnowledgeContextEnabled: null,
       curatedTagIds: null,
       inferredTagLang: null,
       tagStyle: "titlecase-spaces",
@@ -236,6 +237,7 @@ describe("User Routes", () => {
       // AI Settings
       autoSummarizationEnabled: true,
       autoTaggingEnabled: true,
+      chatKnowledgeContextEnabled: null,
       curatedTagIds: null,
       inferredTagLang: "en",
       tagStyle: "lowercase-underscores",

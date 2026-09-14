@@ -666,6 +666,41 @@
       "when": 1788157192480,
       "tag": "0094_canvases_table",
       "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "6",
+      "when": 1788863599223,
+      "tag": "0095_add_widget_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "6",
+      "when": 1789006094753,
+      "tag": "0096_agent_profiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "6",
+      "when": 1789112195734,
+      "tag": "0097_add_chat_knowledge_context_enabled",
+      "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "6",
+      "when": 1789115591576,
+      "tag": "0098_add_agent_memories",
+      "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "6",
+      "when": 1789347400250,
+      "tag": "0099_shared_agent_assets",
+      "breakpoints": true
     }
   ]
 }

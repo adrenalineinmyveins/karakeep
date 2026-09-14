@@ -7,11 +7,15 @@
 
 import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import serverConfig from "@saiye/shared/config";
+import { zWidgetPermissionSchema } from "@saiye/shared/types/widgets";
+import type { ZWidgetPermission } from "@saiye/shared/types/widgets";
 import { z } from "zod";
 
-import { createCallerFactory, type Context } from "../../index";
+import { createCallerFactory } from "../../index";
+import type { Context } from "../../index";
 import type { ToolDefinition } from "./sdkAdapter";
 import { zodToToolSchema } from "./sdkAdapter";
+import { WIDGET_SPEC } from "./widgetSpec";
 
 // ── 书签卡片尺寸常量（与 web 端 withBookmarkCard 渲染尺寸一致） ──
 const BOOKMARK_CARD_WIDTH = 256;
@@ -150,9 +154,14 @@ async function ensureBrowserLikeEnv() {
           actualBoundingBoxDescent: 0.25 * fontSize,
         };
       },
+      // 2D context 桩：这些方法在测量场景下无需实现，空实现即所需行为
+      // oxlint-disable-next-line no-empty-function
       setTransform: () => {},
+      // oxlint-disable-next-line no-empty-function
       save: () => {},
+      // oxlint-disable-next-line no-empty-function
       restore: () => {},
+      // oxlint-disable-next-line no-empty-function
       clearRect: () => {},
     };
   };
@@ -657,7 +666,7 @@ export function buildBookmarkCanvasElements(
   bookmarks: BookmarkCardInput[],
   links: CanvasLinkInput[],
   origin: [number, number] = [0, 0],
-): Array<BookmarkCardElement | CanvasLineElement> {
+): (BookmarkCardElement | CanvasLineElement)[] {
   // 卡片网格布局
   const cards: BookmarkCardElement[] = bookmarks.map((b, i) => {
     const row = Math.floor(i / GRID_COLUMNS);
@@ -936,8 +945,7 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
           });
         }
 
-        let elements: Array<BookmarkCardElement | CanvasLineElement | object> =
-          [];
+        let elements: (BookmarkCardElement | CanvasLineElement | object)[] = [];
 
         // ① mermaid → drawnix 元素
         if (mermaid) {
@@ -949,13 +957,13 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
               []) as object[];
             // ① flowchart 整齐化重排（分层对齐 + 正交直线连线）
             elements = relayoutMermaidFlowchart(
-              elements as Array<{ type: string; id: string; points?: Pt[] }>,
+              elements as { type: string; id: string; points?: Pt[] }[],
               mermaid,
-            ) as Array<BookmarkCardElement | CanvasLineElement | object>;
+            ) as (BookmarkCardElement | CanvasLineElement | object)[];
             // ② 修复 mermaid 线锚点越界 / 悬空（线端点不贴框）
             elements = reanchorMermaidLines(
-              elements as Array<{ type: string; id: string; points?: Pt[] }>,
-            ) as Array<BookmarkCardElement | CanvasLineElement | object>;
+              elements as { type: string; id: string; points?: Pt[] }[],
+            ) as (BookmarkCardElement | CanvasLineElement | object)[];
           } catch (e) {
             return JSON.stringify({
               error: `mermaid 转 drawnix 失败: ${(e as Error).message}`,
@@ -1016,6 +1024,212 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
         });
       },
     ),
+    // ── 长期记忆（B1：跨会话记住用户偏好与事实） ──────────
+    zodToToolSchema(
+      "save_memory",
+      "将用户的长期偏好或事实保存为记忆，供未来所有对话使用。只在用户表达了跨会话有效的信息时调用：明确的偏好（如『我喜欢简洁的回答』『回答用中文』）、稳定的个人事实（职业、项目、家庭等）、明确的嘱托（『记住……』）。不要保存：临时上下文、单次任务细节、用户未确认的猜测。记忆容量上限 100 条，内容重复时不会新增；若返回错误提示记忆已满，用 list_memories 列出现有记忆，经用户确认后用 delete_memory 删除过时的，再重新保存。",
+      z.object({
+        content: z
+          .string()
+          .min(1)
+          .max(2000)
+          .describe("记忆内容，一句话陈述（如『用户偏好简洁的中文回答』）"),
+      }),
+      async (args) => {
+        try {
+          const memory = await caller.memories.create({
+            content: args.content as string,
+          });
+          return JSON.stringify({
+            saved: true,
+            id: memory.id,
+            deduplicated: memory.deduplicated,
+          });
+        } catch (e) {
+          return JSON.stringify({ error: (e as Error).message });
+        }
+      },
+    ),
+
+    zodToToolSchema(
+      "list_memories",
+      "列出已保存的长期记忆（用户偏好与事实）。回答『你记得我什么』类问题时调用。",
+      z.object({}),
+      async () => {
+        const result = await caller.memories.list();
+        return JSON.stringify(
+          result.memories.map((m) => ({ id: m.id, content: m.content })),
+        );
+      },
+    ),
+
+    zodToToolSchema(
+      "delete_memory",
+      "删除一条长期记忆。仅在用户明确要求遗忘某条记忆时调用。",
+      z.object({
+        id: z.string().describe("要删除的记忆 ID（来自 list_memories）"),
+      }),
+      async (args) => {
+        await caller.memories.delete({ id: args.id as string });
+        return JSON.stringify({ deleted: true });
+      },
+    ),
+
+    // ── Widget 生成（chat 用户定制组件，沙箱执行） ─────────
+    zodToToolSchema(
+      "save_widget",
+      `为用户创建一个沙箱小组件（显示在"小组件"页面）。适用场景：用户想要一个自定义卡片/统计视图/仪表盘（如"显示本周保存书签数的卡片"）。\n\n${WIDGET_SPEC}`,
+      z.object({
+        name: z.string().describe("组件名称，简短，如「本周书签统计」"),
+        description: z.string().optional().describe("一句话说明组件用途"),
+        size: z
+          .enum(["sm", "md", "lg"])
+          .default("md")
+          .describe(
+            "组件占位大小：sm 小卡 / md 标准 / lg 大卡（图表类建议 lg）",
+          ),
+        permissions: z
+          .array(zWidgetPermissionSchema)
+          .default([])
+          .describe("组件需要的数据能力，按实际用到的 API 声明"),
+        code: z
+          .string()
+          .describe("组件 HTML 片段，必须严格遵守规范中的代码契约"),
+      }),
+      async (args) => {
+        const widget = await caller.widgets.save({
+          name: args.name as string,
+          description: args.description as string | undefined,
+          manifest: {
+            apiVersion: 1,
+            size: args.size as "sm" | "md" | "lg",
+            permissions: args.permissions as ZWidgetPermission[],
+          },
+          code: args.code as string,
+        });
+        return JSON.stringify({
+          widgetId: widget.id,
+          version: widget.version,
+          message:
+            "组件已创建（草稿态）。用户在对话预览卡上点「安装」后才会显示在小组件页面。",
+        });
+      },
+    ),
+
+    zodToToolSchema(
+      "update_widget",
+      "修改用户已有的小组件（迭代效果、改样式、改数据逻辑）。widgetId 从本对话的工具结果获取，或先用 list_widgets 查询，不要凭记忆编造。",
+      z.object({
+        widgetId: z.string().describe("要修改的组件 ID"),
+        code: z
+          .string()
+          .optional()
+          .describe("新的组件 HTML 片段（遵守组件规范）"),
+        name: z.string().optional().describe("新的组件名称"),
+        description: z.string().optional().describe("新的一句话说明"),
+        size: z.enum(["sm", "md", "lg"]).optional().describe("新的占位大小"),
+        permissions: z
+          .array(zWidgetPermissionSchema)
+          .optional()
+          .describe(
+            "新的数据能力。注意：新增能力会导致组件需要用户重新安装确认",
+          ),
+      }),
+      async (args) => {
+        const manifest = (
+          args.size !== undefined || args.permissions !== undefined
+            ? {
+                apiVersion: 1,
+                ...(args.size !== undefined ? { size: args.size } : {}),
+                ...(args.permissions !== undefined
+                  ? { permissions: args.permissions }
+                  : {}),
+              }
+            : undefined
+        ) as
+          | {
+              apiVersion: 1;
+              size?: "sm" | "md" | "lg";
+              permissions?: ZWidgetPermission[];
+            }
+          | undefined;
+        const widget = await caller.widgets.update({
+          widgetId: args.widgetId as string,
+          ...(args.code !== undefined ? { code: args.code as string } : {}),
+          ...(args.name !== undefined ? { name: args.name as string } : {}),
+          ...(args.description !== undefined
+            ? { description: args.description as string }
+            : {}),
+          ...(manifest ? { manifest } : {}),
+        });
+        return JSON.stringify({
+          widgetId: widget.id,
+          version: widget.version,
+          reInstallRequired: widget.reInstallRequired,
+          message: widget.reInstallRequired
+            ? "组件已更新为新版本，但新增了数据权限，需要用户重新点「安装」确认。"
+            : "组件已更新为新版本，用户重新安装后生效（若之前已安装则自动生效）。",
+        });
+      },
+    ),
+
+    zodToToolSchema(
+      "list_widgets",
+      "列出用户的所有小组件（含 ID、名称、状态、版本）。用于找回之前创建的组件 ID 或了解现有组件。",
+      z.object({}),
+      async () => {
+        const widgets = await caller.widgets.list();
+        return JSON.stringify(
+          widgets.map((w) => ({
+            widgetId: w.id,
+            name: w.name,
+            status: w.status,
+            version: w.currentVersion,
+            description: w.description,
+          })),
+        );
+      },
+    ),
+
+    zodToToolSchema(
+      "delete_widget",
+      "删除用户的小组件（不可恢复）。需用户明确表达删除意愿后再调用。",
+      z.object({
+        widgetId: z.string().describe("要删除的组件 ID"),
+      }),
+      async (args) => {
+        await caller.widgets.delete({ widgetId: args.widgetId as string });
+        return JSON.stringify({ success: true });
+      },
+    ),
+
+    zodToToolSchema(
+      "rollback_widget",
+      "把小组件回滚到之前的版本（默认上一版）。用户对某次修改不满意时使用。回滚会生成新版本，历史不会丢失。",
+      z.object({
+        widgetId: z.string().describe("要回滚的组件 ID"),
+        version: z
+          .number()
+          .int()
+          .positive()
+          .optional()
+          .describe("目标版本号，不传则回滚到上一版"),
+      }),
+      async (args) => {
+        const widget = await caller.widgets.rollback({
+          widgetId: args.widgetId as string,
+          ...(args.version !== undefined
+            ? { version: args.version as number }
+            : {}),
+        });
+        return JSON.stringify({
+          widgetId: args.widgetId,
+          newVersion: widget.version,
+          rolledBackFrom: widget.rolledBackFrom,
+          reInstallRequired: widget.reInstallRequired,
+        });
+      },
+    ),
   ];
 
   // ── 网络搜索（可选，需配置 TAVILY_API_KEY） ────────────
@@ -1053,11 +1267,11 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
 
           const data = (await resp.json()) as {
             answer?: string;
-            results: Array<{
+            results: {
               title: string;
               url: string;
               content: string;
-            }>;
+            }[];
           };
 
           const parts: string[] = [];
@@ -1100,8 +1314,8 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
           }
 
           const data = (await resp.json()) as {
-            results?: Array<{ url: string; raw_content?: string | null }>;
-            failed_results?: Array<{ url: string; error: string }>;
+            results?: { url: string; raw_content?: string | null }[];
+            failed_results?: { url: string; error: string }[];
           };
 
           const raw = data.results?.[0]?.raw_content;

@@ -102,6 +102,10 @@ export const users = sqliteTable("user", {
   autoSummarizationEnabled: integer("autoSummarizationEnabled", {
     mode: "boolean",
   }),
+  // Chat knowledge context injection (nullable = default ON, null means enabled)
+  chatKnowledgeContextEnabled: integer("chatKnowledgeContextEnabled", {
+    mode: "boolean",
+  }),
   tagStyle: text("tagStyle", {
     enum: [
       "lowercase-hyphens",
@@ -650,6 +654,59 @@ export const customPrompts = sqliteTable(
   (bl) => [index("customPrompts_userId_idx").on(bl.userId)],
 );
 
+/**
+ * Agent 档案：用户可配置的外部 agent / OpenAI 兼容端点。
+ * - openai-compatible：baseUrl + apiKey + model（pi-ai 每档案独立 provider）
+ * - trae-cli：command + timeoutMinutes（CLI 子进程 adapter）
+ */
+export const agentProfiles = sqliteTable(
+  "agentProfiles",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    type: text("type", { enum: ["openai-compatible", "trae-cli"] }).notNull(),
+    baseUrl: text("baseUrl"),
+    apiKey: text("apiKey"),
+    model: text("model"),
+    command: text("command"),
+    timeoutMinutes: integer("timeoutMinutes").notNull().default(5),
+    systemPrompt: text("systemPrompt"),
+    enableTools: integer("enableTools", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    createdAt: createdAtMsField(),
+    modifiedAt: modifiedAtMsField(),
+  },
+  (ap) => [index("agentProfiles_userId_idx").on(ap.userId)],
+);
+
+// B1 长期记忆固化：agent 对话中提炼的用户偏好/事实，
+// 注入三源 RAG 上下文，让 agent 越用越懂用户。
+export const agentMemories = sqliteTable(
+  "agentMemories",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    // 来源会话（可空）；不设 FK——会话删除后记忆保留
+    sourceChatId: text("sourceChatId"),
+    createdAt: createdAtMsField(),
+    modifiedAt: modifiedAtMsField(),
+  },
+  (am) => [index("agentMemories_userId_idx").on(am.userId)],
+);
+
 export const chatSessions = sqliteTable(
   "chatSessions",
   {
@@ -661,6 +718,9 @@ export const chatSessions = sqliteTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    agentProfileId: text("agentProfileId").references(() => agentProfiles.id, {
+      onDelete: "set null",
+    }),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },
@@ -709,6 +769,88 @@ export const canvases = sqliteTable(
   (c) => [
     index("canvases_userId_idx").on(c.userId),
     index("canvases_userId_modifiedAt_idx").on(c.userId, c.modifiedAt),
+  ],
+);
+
+// ── Widget 沙箱（chat 用户定制组件）──────────────────────
+//
+// widgets 保存组件当前状态（code 为当前版本内容），
+// widgetVersions 为 append-only 版本历史（回滚 = 复制目标版本为新版本）。
+
+export const widgets = sqliteTable(
+  "widgets",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    // WidgetManifest（@saiye/shared/types/widgets）：{ apiVersion, size, permissions }
+    manifest: text("manifest", { mode: "json" }).$type<unknown>(),
+    // HTML 片段（非完整文档），只在客户端沙箱内执行，服务端永不 eval
+    code: text("code").notNull(),
+    status: text("status", { enum: ["draft", "enabled"] }).notNull(),
+    currentVersion: integer("current_version").notNull().default(1),
+    createdAt: createdAtMsField(),
+    modifiedAt: modifiedAtMsField(),
+  },
+  (w) => [
+    index("widgets_userId_idx").on(w.userId),
+    index("widgets_userId_modifiedAt_idx").on(w.userId, w.modifiedAt),
+  ],
+);
+
+export const widgetVersions = sqliteTable(
+  "widgetVersions",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    widgetId: text("widgetId")
+      .notNull()
+      .references(() => widgets.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    code: text("code").notNull(),
+    manifest: text("manifest", { mode: "json" }).$type<unknown>(),
+    createdAt: createdAtMsField(),
+  },
+  (wv) => [index("widgetVersions_widgetId_idx").on(wv.widgetId, wv.version)],
+);
+
+// ── C2 分享链接（快照语义）──────────────────────────
+//
+// 用户把 agentProfile/widget/prompt 以快照形式分享为公开链接：
+// - payload 与 C1 导出信封的 data 同构（apiKey 永不入快照）
+// - 源资产后续修改/删除不影响已分享内容
+// - revoke = 删除行（链接即失效）
+export const sharedAgentAssets = sqliteTable(
+  "sharedAgentAssets",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    assetType: text("assetType", {
+      enum: ["agentProfile", "widget", "prompt"],
+    }).notNull(),
+    // 源资产 id（参考字段，不设 FK——源删除后分享快照仍有效）
+    assetId: text("assetId").notNull(),
+    shareToken: text("shareToken").notNull().unique(),
+    name: text("name").notNull(),
+    payload: text("payload", { mode: "json" }).$type<unknown>().notNull(),
+    createdAt: createdAtMsField(),
+  },
+  (s) => [
+    index("sharedAgentAssets_userId_idx").on(s.userId),
+    unique().on(s.userId, s.assetType, s.assetId),
   ],
 );
 
@@ -1085,6 +1227,7 @@ export const userRelations = relations(users, ({ many, one }) => ({
   webhooks: many(webhooksTable),
   rules: many(ruleEngineRulesTable),
   chatSessions: many(chatSessions),
+  agentProfiles: many(agentProfiles),
   canvases: many(canvases),
   invites: many(invites),
   subscription: one(subscriptions),
@@ -1298,8 +1441,30 @@ export const chatSessionsRelations = relations(
       references: [users.id],
     }),
     messages: many(chatMessages),
+    agentProfile: one(agentProfiles, {
+      fields: [chatSessions.agentProfileId],
+      references: [agentProfiles.id],
+    }),
   }),
 );
+
+export const agentProfilesRelations = relations(
+  agentProfiles,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [agentProfiles.userId],
+      references: [users.id],
+    }),
+    chatSessions: many(chatSessions),
+  }),
+);
+
+export const agentMemoriesRelations = relations(agentMemories, ({ one }) => ({
+  user: one(users, {
+    fields: [agentMemories.userId],
+    references: [users.id],
+  }),
+}));
 
 export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
   chat: one(chatSessions, {

@@ -5,18 +5,19 @@ import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@saiye/shared-react/trpc";
 import { formatDistanceToNow } from "date-fns";
-import { zhCN } from "date-fns/locale";
+import { enUS, zhCN } from "date-fns/locale";
 
-type CanvasSummary = {
+import { useTranslation } from "@/lib/i18n/client";
+
+interface CanvasSummary {
   id: string;
   title: string;
   createdAt: Date;
   modifiedAt: Date | null;
-};
+}
 
 export default function CanvasList({
   initialCanvases,
@@ -26,6 +27,8 @@ export default function CanvasList({
   const api = useTRPC();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language.startsWith("zh") ? zhCN : enUS;
 
   const createCanvas = useMutation(
     api.canvases.createCanvas.mutationOptions({
@@ -53,7 +56,7 @@ export default function CanvasList({
           disabled={createCanvas.isPending}
         >
           <Plus className="size-4" />
-          <span>新建画布</span>
+          <span>{t("canvas.new_canvas")}</span>
         </Button>
       </div>
 
@@ -61,7 +64,7 @@ export default function CanvasList({
         <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed py-16 text-center">
           <Plus className="size-8 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">
-            还没有画布，点击右上角创建第一个吧
+            {t("canvas.empty_hint")}
           </p>
         </div>
       ) : (
@@ -83,15 +86,27 @@ export default function CanvasList({
                 </h3>
                 <p className="text-xs text-muted-foreground">
                   {canvas.modifiedAt
-                    ? `${formatDistanceToNow(new Date(canvas.modifiedAt), { addSuffix: true, locale: zhCN })}更新`
-                    : `${formatDistanceToNow(new Date(canvas.createdAt), { addSuffix: true, locale: zhCN })}创建`}
+                    ? t("canvas.updated_at", {
+                        time: formatDistanceToNow(new Date(canvas.modifiedAt), {
+                          addSuffix: true,
+                          locale: dateLocale,
+                        }),
+                      })
+                    : t("canvas.created_at", {
+                        time: formatDistanceToNow(new Date(canvas.createdAt), {
+                          addSuffix: true,
+                          locale: dateLocale,
+                        }),
+                      })}
                 </p>
               </Link>
               <button
                 className="absolute right-2 top-2 rounded-md bg-background/80 p-1 opacity-0 transition-opacity group-hover:opacity-100"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (confirm(`删除「${canvas.title}」？此操作不可撤销`)) {
+                  if (
+                    confirm(t("canvas.delete_confirm", { title: canvas.title }))
+                  ) {
                     deleteCanvas.mutate({ canvasId: canvas.id });
                   }
                 }}

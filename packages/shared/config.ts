@@ -94,6 +94,9 @@ const allEnv = z.object({
   OLLAMA_KEEP_ALIVE: z.string().optional(),
   CHAT_ENABLED: stringBool("false"),
   CHAT_MODEL: z.string().optional(),
+  // A3 三源 RAG 检索注入的可调参数（top K）
+  KNOWLEDGE_BOOKMARK_TOP_K: z.coerce.number().int().min(1).max(20).optional(),
+  KNOWLEDGE_CHAT_TOP_K: z.coerce.number().int().min(0).max(20).optional(),
   TAVILY_API_KEY: z.string().optional(),
   SEMANTIC_SEARCH_ENABLED: stringBool("true"),
   INFERENCE_JOB_TIMEOUT_SEC: z.coerce.number().default(30),
@@ -384,6 +387,10 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
     },
     chat: {
       enabled: val.CHAT_ENABLED,
+      knowledgeContext: {
+        bookmarkTopK: val.KNOWLEDGE_BOOKMARK_TOP_K ?? 5,
+        chatTopK: val.KNOWLEDGE_CHAT_TOP_K ?? 3,
+      },
     },
     tavily: {
       apiKey: val.TAVILY_API_KEY,

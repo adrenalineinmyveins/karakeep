@@ -18,6 +18,7 @@ export const UserSettingsContext = createContext<ZUserSettings>({
   readerFontFamily: null,
   autoTaggingEnabled: null,
   autoSummarizationEnabled: null,
+  chatKnowledgeContextEnabled: null,
   tagStyle: "as-generated",
   curatedTagIds: null,
   inferredTagLang: null,

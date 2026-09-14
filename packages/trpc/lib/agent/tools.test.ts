@@ -19,6 +19,13 @@ const fakeCaller = {
   tags: { list: vi.fn() },
   lists: { list: vi.fn(), addToList: vi.fn() },
   canvases: { createCanvas: vi.fn() },
+  widgets: {
+    save: vi.fn(),
+    update: vi.fn(),
+    list: vi.fn(),
+    delete: vi.fn(),
+    rollback: vi.fn(),
+  },
 };
 
 // 拦截 createCallerFactory，让 getCaller 返回 fakeCaller
@@ -65,10 +72,27 @@ beforeEach(() => {
 });
 
 describe("buildAgentTools", () => {
-  it("包含 create_canvas 工具（无 Tavily key 时共 9 个）", async () => {
+  it("包含 create_canvas 工具（无 Tavily key 时共 17 个）", async () => {
     const tools = await buildAgentTools(ctx);
     expect(tools.map((t) => t.name)).toContain("create_canvas");
-    expect(tools).toHaveLength(9);
+    expect(tools).toHaveLength(17);
+  });
+
+  it("包含全部 widget 工具，且 save_widget 描述内嵌组件规范", async () => {
+    const tools = await buildAgentTools(ctx);
+    const names = tools.map((t) => t.name);
+    expect(names).toEqual(
+      expect.arrayContaining([
+        "save_widget",
+        "update_widget",
+        "list_widgets",
+        "delete_widget",
+        "rollback_widget",
+      ]),
+    );
+    const save = tools.find((t) => t.name === "save_widget")!;
+    expect(save.description).toContain("Widget 组件规范");
+    expect(save.description).toContain("saiye.bookmarks.recent");
   });
 });
 
@@ -308,12 +332,11 @@ describe("create_canvas：mermaid 模式", () => {
         mermaid: "graph TD; A-->B; A-->C; B-->D; C-->D",
       });
 
-      const data = fakeCaller.canvases.createCanvas.mock.calls[0]![0]
-        .data as Array<{
+      const data = fakeCaller.canvases.createCanvas.mock.calls[0]![0].data as {
         id: string;
         type: string;
         points: number[][];
-      }>;
+      }[];
       const byId = new Map(data.map((e) => [e.id, e]));
       const node = (id: string) => byId.get(id)!.points;
 
@@ -430,13 +453,12 @@ describe("create_canvas：mermaid 模式", () => {
         mermaid: "graph TD; A-->B; A-->C; A-->U; B-->D",
       });
 
-      const data = fakeCaller.canvases.createCanvas.mock.calls[0]![0]
-        .data as Array<{
+      const data = fakeCaller.canvases.createCanvas.mock.calls[0]![0].data as {
         id: string;
         type: string;
         points: number[][];
         groupId?: string;
-      }>;
+      }[];
       const byId = new Map(data.map((e) => [e.id, e]));
       const node = (id: string) => byId.get(id)!.points;
 
@@ -523,12 +545,11 @@ describe("create_canvas：mermaid 模式", () => {
         mermaid: "graph TD; A-->B; B-->C; C-->D; C-->E; E-->B",
       });
 
-      const data = fakeCaller.canvases.createCanvas.mock.calls[0]![0]
-        .data as Array<{
+      const data = fakeCaller.canvases.createCanvas.mock.calls[0]![0].data as {
         id: string;
         type: string;
         points: number[][];
-      }>;
+      }[];
       const byId = new Map(data.map((e) => [e.id, e]));
       const yOf = (id: string) => byId.get(id)!.points[0]![1];
 
@@ -739,5 +760,216 @@ describe("buildBookmarkCanvasElements：网格布局", () => {
       [128, 88],
       [128, 168],
     ]);
+  });
+});
+
+// ── Widget 工具 ──────────────────────────────────────────
+
+async function getWidgetTool(name: string) {
+  const tools = await buildAgentTools(ctx);
+  const tool = tools.find((t) => t.name === name);
+  if (!tool) throw new Error(`${name} tool not found`);
+  return tool;
+}
+
+describe("save_widget", () => {
+  it("调用 widgets.save 并组装 manifest（apiVersion 固定为 1）", async () => {
+    fakeCaller.widgets.save.mockResolvedValue({ id: "w-1", version: 1 });
+
+    const tool = await getWidgetTool("save_widget");
+    const raw = await tool.execute({
+      name: "本周书签统计",
+      size: "md",
+      permissions: ["bookmarks:read"],
+      code: '<div id="root"></div><script>/* ... */</script>',
+    });
+    const result = JSON.parse(raw);
+
+    expect(fakeCaller.widgets.save).toHaveBeenCalledWith({
+      name: "本周书签统计",
+      description: undefined,
+      manifest: {
+        apiVersion: 1,
+        size: "md",
+        permissions: ["bookmarks:read"],
+      },
+      code: '<div id="root"></div><script>/* ... */</script>',
+    });
+    expect(result.widgetId).toBe("w-1");
+    expect(result.version).toBe(1);
+    expect(result.message).toContain("安装");
+  });
+
+  it("声明 v1 写权限时透传到 manifest（W4 回归）", async () => {
+    fakeCaller.widgets.save.mockResolvedValue({ id: "w-2", version: 1 });
+
+    const tool = await getWidgetTool("save_widget");
+    const raw = await tool.execute({
+      name: "快速保存",
+      permissions: ["bookmarks:read", "bookmarks:write"],
+      code: '<div id="root"></div><script>/* ... */</script>',
+    });
+    JSON.parse(raw);
+
+    const call = fakeCaller.widgets.save.mock.calls[0][0];
+    expect(call.manifest.permissions).toEqual([
+      "bookmarks:read",
+      "bookmarks:write",
+    ]);
+  });
+
+  it("调用失败（如 lint 拒绝）时错误向上抛出", async () => {
+    fakeCaller.widgets.save.mockRejectedValue(
+      new Error("Widget code lint failed: 禁止使用外部资源"),
+    );
+
+    const tool = await getWidgetTool("save_widget");
+    await expect(() =>
+      tool.execute({
+        name: "坏组件",
+        size: "md",
+        permissions: [],
+        code: '<script src="https://evil.com/x.js"></script>',
+      }),
+    ).rejects.toThrow(/lint failed/);
+  });
+});
+
+describe("update_widget", () => {
+  it("传 code → 更新内容，未扩权时提示自动生效", async () => {
+    fakeCaller.widgets.update.mockResolvedValue({
+      id: "w-1",
+      version: 2,
+      reInstallRequired: false,
+    });
+
+    const tool = await getWidgetTool("update_widget");
+    const raw = await tool.execute({ widgetId: "w-1", code: "<div></div>" });
+    const result = JSON.parse(raw);
+
+    expect(fakeCaller.widgets.update).toHaveBeenCalledWith({
+      widgetId: "w-1",
+      code: "<div></div>",
+    });
+    expect(result.version).toBe(2);
+    expect(result.reInstallRequired).toBe(false);
+  });
+
+  it("传 size/permissions → 组装部分 manifest；扩权时提示需重装", async () => {
+    fakeCaller.widgets.update.mockResolvedValue({
+      id: "w-1",
+      version: 3,
+      reInstallRequired: true,
+    });
+
+    const tool = await getWidgetTool("update_widget");
+    const raw = await tool.execute({
+      widgetId: "w-1",
+      code: "<div></div>",
+      permissions: ["bookmarks:read", "tags:read"],
+    });
+    const result = JSON.parse(raw);
+
+    const call = fakeCaller.widgets.update.mock.calls[0][0];
+    expect(call.manifest).toEqual({
+      apiVersion: 1,
+      permissions: ["bookmarks:read", "tags:read"],
+    });
+    expect(call.manifest.size).toBeUndefined();
+    expect(result.reInstallRequired).toBe(true);
+  });
+
+  it("只改名称 → 不传 manifest", async () => {
+    fakeCaller.widgets.update.mockResolvedValue({
+      id: "w-1",
+      version: 2,
+      reInstallRequired: false,
+    });
+
+    const tool = await getWidgetTool("update_widget");
+    await tool.execute({ widgetId: "w-1", name: "新名字" });
+
+    const call = fakeCaller.widgets.update.mock.calls[0][0];
+    expect(call.manifest).toBeUndefined();
+    expect(call.name).toBe("新名字");
+  });
+});
+
+describe("list_widgets", () => {
+  it("返回 widgetId/name/status/version 摘要", async () => {
+    fakeCaller.widgets.list.mockResolvedValue([
+      {
+        id: "w-1",
+        name: "统计卡",
+        status: "enabled",
+        currentVersion: 3,
+        description: "本周书签",
+      },
+    ]);
+
+    const tool = await getWidgetTool("list_widgets");
+    const raw = await tool.execute({});
+    const result = JSON.parse(raw);
+
+    expect(result).toEqual([
+      {
+        widgetId: "w-1",
+        name: "统计卡",
+        status: "enabled",
+        version: 3,
+        description: "本周书签",
+      },
+    ]);
+  });
+});
+
+describe("delete_widget", () => {
+  it("调用 widgets.delete 并返回 success", async () => {
+    fakeCaller.widgets.delete.mockResolvedValue({ success: true });
+
+    const tool = await getWidgetTool("delete_widget");
+    const raw = await tool.execute({ widgetId: "w-1" });
+    const result = JSON.parse(raw);
+
+    expect(fakeCaller.widgets.delete).toHaveBeenCalledWith({
+      widgetId: "w-1",
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("rollback_widget", () => {
+  it("不传 version → 默认回滚上一版", async () => {
+    fakeCaller.widgets.rollback.mockResolvedValue({
+      version: 4,
+      rolledBackFrom: 2,
+      reInstallRequired: false,
+    });
+
+    const tool = await getWidgetTool("rollback_widget");
+    const raw = await tool.execute({ widgetId: "w-1" });
+    const result = JSON.parse(raw);
+
+    expect(fakeCaller.widgets.rollback).toHaveBeenCalledWith({
+      widgetId: "w-1",
+    });
+    expect(result.newVersion).toBe(4);
+    expect(result.rolledBackFrom).toBe(2);
+  });
+
+  it("传 version → 回滚到指定版本", async () => {
+    fakeCaller.widgets.rollback.mockResolvedValue({
+      version: 5,
+      rolledBackFrom: 1,
+      reInstallRequired: false,
+    });
+
+    const tool = await getWidgetTool("rollback_widget");
+    await tool.execute({ widgetId: "w-1", version: 1 });
+
+    expect(fakeCaller.widgets.rollback).toHaveBeenCalledWith({
+      widgetId: "w-1",
+      version: 1,
+    });
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import { TagsEditor } from "@/components/dashboard/bookmarks/TagsEditor";
 import { ActionButton } from "@/components/ui/action-button";
 import { Badge } from "@/components/ui/badge";
@@ -34,12 +34,28 @@ import {
 import { toast } from "@/components/ui/sonner";
 import { Switch } from "@/components/ui/switch";
 import { useClientConfig } from "@/lib/clientConfig";
+import {
+  downloadJsonFile,
+  readJsonFile,
+  safeFilenamePart,
+} from "@/lib/assetTransfer";
+import AssetShareButtons from "@/components/shared/AssetShareButtons";
 import { useTranslation } from "@/lib/i18n/client";
 import { useUserSettings } from "@/lib/userSettings";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Info, Plus, Save, Trash2 } from "lucide-react";
+import {
+  Check,
+  Download,
+  Info,
+  Pencil,
+  Plus,
+  Save,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -87,6 +103,7 @@ export function AIPreferences() {
           inferredTagLang: settings.inferredTagLang ?? "",
           autoTaggingEnabled: settings.autoTaggingEnabled,
           autoSummarizationEnabled: settings.autoSummarizationEnabled,
+          chatKnowledgeContextEnabled: settings.chatKnowledgeContextEnabled,
         }
       : undefined,
   });
@@ -204,6 +221,37 @@ export function AIPreferences() {
             />
           )}
 
+          <Controller
+            name="chatKnowledgeContextEnabled"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field
+                orientation="horizontal"
+                className="rounded-lg border p-3"
+                data-invalid={fieldState.invalid}
+              >
+                <FieldContent>
+                  <FieldLabel htmlFor="chatKnowledgeContextEnabled">
+                    {t("settings.ai.chat_knowledge_context")}
+                  </FieldLabel>
+                  <FieldDescription>
+                    {t("settings.ai.chat_knowledge_context_description")}
+                  </FieldDescription>
+                </FieldContent>
+                <Switch
+                  id="chatKnowledgeContextEnabled"
+                  name={field.name}
+                  checked={field.value ?? true}
+                  onCheckedChange={field.onChange}
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+
           <div className="flex justify-end pt-4">
             <ActionButton type="submit" loading={isPending} variant="default">
               <Save className="mr-2 size-4" />
@@ -212,6 +260,141 @@ export function AIPreferences() {
           </div>
         </FieldGroup>
       </form>
+    </SettingsSection>
+  );
+}
+
+export function AgentMemoriesSection() {
+  const api = useTRPC();
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+
+  const { data, isLoading } = useQuery(api.memories.list.queryOptions());
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
+
+  const { mutate: updateMemory, isPending: isUpdating } = useMutation(
+    api.memories.update.mutationOptions({
+      onSuccess: () => {
+        toast({
+          description: t("settings.ai.memory_updated"),
+        });
+        setEditingId(null);
+        queryClient.invalidateQueries(api.memories.list.pathFilter());
+      },
+      onError: () => {
+        toast({
+          description: t("settings.ai.memory_update_failed"),
+          variant: "destructive",
+        });
+      },
+    }),
+  );
+
+  const { mutate: deleteMemory, isPending: isDeleting } = useMutation(
+    api.memories.delete.mutationOptions({
+      onSuccess: () => {
+        toast({
+          description: t("settings.ai.memory_deleted"),
+        });
+        queryClient.invalidateQueries(api.memories.list.pathFilter());
+      },
+      onError: () => {
+        toast({
+          description: t("settings.ai.memory_delete_failed"),
+          variant: "destructive",
+        });
+      },
+    }),
+  );
+
+  return (
+    <SettingsSection
+      title={t("settings.ai.agent_memories")}
+      description={t("settings.ai.agent_memories_description")}
+      action={
+        data ? (
+          <span className="text-sm tabular-nums text-muted-foreground">
+            {data.memories.length} / {data.capacity}
+          </span>
+        ) : undefined
+      }
+    >
+      {isLoading && <FullPageSpinner />}
+      {data && data.memories.length === 0 && (
+        <div className="flex items-start gap-2 rounded-md bg-muted p-4 text-sm text-muted-foreground">
+          <Info className="size-4 flex-shrink-0" />
+          <p>{t("settings.ai.no_memories")}</p>
+        </div>
+      )}
+      <div className="flex flex-col gap-2">
+        {data?.memories.map((memory) => (
+          <div
+            key={memory.id}
+            className="flex items-center justify-between gap-2 rounded-md border p-3 text-sm"
+          >
+            {editingId === memory.id ? (
+              <>
+                <Input
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  className="min-w-0"
+                />
+                <div className="flex flex-shrink-0 gap-1">
+                  <ActionButton
+                    loading={false}
+                    variant="ghost"
+                    onClick={() => setEditingId(null)}
+                    type="button"
+                  >
+                    <X className="size-4" />
+                  </ActionButton>
+                  <ActionButton
+                    loading={isUpdating}
+                    disabled={!editContent.trim()}
+                    onClick={() =>
+                      updateMemory({ id: memory.id, content: editContent })
+                    }
+                    type="button"
+                  >
+                    <Check className="size-4" />
+                  </ActionButton>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="min-w-0">
+                  <p className="break-words">{memory.content}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {new Date(memory.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex flex-shrink-0 gap-1">
+                  <ActionButton
+                    loading={false}
+                    onClick={() => {
+                      setEditingId(memory.id);
+                      setEditContent(memory.content);
+                    }}
+                    type="button"
+                  >
+                    <Pencil className="size-4" />
+                  </ActionButton>
+                  <ActionButton
+                    loading={isDeleting}
+                    variant="destructive"
+                    onClick={() => deleteMemory({ id: memory.id })}
+                    type="button"
+                  >
+                    <Trash2 className="size-4" />
+                  </ActionButton>
+                </div>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
     </SettingsSection>
   );
 }
@@ -458,6 +641,7 @@ export function PromptEditor() {
   const api = useTRPC();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof zNewPromptSchema>>({
     resolver: zodResolver(zNewPromptSchema),
@@ -477,6 +661,25 @@ export function PromptEditor() {
       },
     }),
   );
+
+  const { mutate: importPrompt, isPending: isImporting } = useMutation(
+    api.prompts.importAsset.mutationOptions({
+      onSuccess: () => {
+        toast({ description: t("assets.imported") });
+        queryClient.invalidateQueries(api.prompts.list.pathFilter());
+      },
+      onError: (e) => toast({ description: e.message, variant: "destructive" }),
+    }),
+  );
+
+  const onImportFile = async (file: File) => {
+    try {
+      const envelope = await readJsonFile(file);
+      importPrompt({ envelope: envelope as never });
+    } catch {
+      toast({ description: t("assets.invalid_file"), variant: "destructive" });
+    }
+  };
 
   return (
     <Form {...form}>
@@ -552,6 +755,29 @@ export function PromptEditor() {
           <Plus className="mr-2 size-4" />
           {t("actions.add")}
         </ActionButton>
+        <ActionButton
+          type="button"
+          loading={isImporting}
+          variant="outline"
+          className="items-center"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Upload className="mr-2 size-4" />
+          {t("assets.import")}
+        </ActionButton>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              onImportFile(file);
+            }
+            e.target.value = "";
+          }}
+        />
       </form>
     </Form>
   );
@@ -578,6 +804,16 @@ export function PromptRow({ prompt }: { prompt: ZPrompt }) {
           description: "Prompt has been deleted!",
         });
         queryClient.invalidateQueries(api.prompts.list.pathFilter());
+      },
+    }),
+  );
+  const { mutate: exportPrompt, isPending: isExporting } = useMutation(
+    api.prompts.exportAsset.mutationOptions({
+      onSuccess: (envelope) => {
+        downloadJsonFile(
+          `saiye-prompt-${safeFilenamePart(prompt.text)}.json`,
+          envelope,
+        );
       },
     }),
   );
@@ -678,6 +914,17 @@ export function PromptRow({ prompt }: { prompt: ZPrompt }) {
           <Save className="mr-2 size-4" />
           {t("actions.save")}
         </ActionButton>
+        <ActionButton
+          loading={isExporting}
+          variant="secondary"
+          type="button"
+          className="items-center"
+          onClick={() => exportPrompt({ promptId: prompt.id })}
+        >
+          <Download className="mr-2 size-4" />
+          {t("assets.export")}
+        </ActionButton>
+        <AssetShareButtons assetType="prompt" assetId={prompt.id} />
         <ActionButton
           loading={isDeleting}
           variant="destructive"
@@ -877,6 +1124,7 @@ export default function AISettings() {
   return (
     <SettingsPage title={t("settings.ai.ai_settings")}>
       <AIPreferences />
+      <AgentMemoriesSection />
       <TagStyleSelector />
       <CuratedTagsSelector />
       <TaggingRules />

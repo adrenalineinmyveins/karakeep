@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@saiye/shared-react/trpc";
 import { getBookmarkTitle } from "@saiye/shared/utils/bookmarkUtils";
+import { useTranslation } from "@/lib/i18n/client";
 
 import type { ZBookmark } from "@saiye/shared/types/bookmarks";
 
@@ -34,6 +35,7 @@ export default function BookmarkPickerDialog({
 }: Props) {
   const api = useTRPC();
   const [search, setSearch] = useState("");
+  const { t } = useTranslation();
 
   const { data, isLoading } = useQuery(
     api.bookmarks.getBookmarks.queryOptions(
@@ -61,13 +63,13 @@ export default function BookmarkPickerDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[70vh] sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>插入书签到画布</DialogTitle>
+          <DialogTitle>{t("canvas.picker_title")}</DialogTitle>
         </DialogHeader>
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 size-4 text-gray-400" />
           <Input
             autoFocus
-            placeholder="搜索书签标题或链接…"
+            placeholder={t("canvas.picker_search_placeholder")}
             className="pl-8"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -76,11 +78,13 @@ export default function BookmarkPickerDialog({
         <div className="max-h-[45vh] overflow-y-auto">
           {isLoading && (
             <div className="flex justify-center py-8 text-gray-400">
-              加载中…
+              {t("canvas.picker_loading")}
             </div>
           )}
           {!isLoading && bookmarks.length === 0 && (
-            <div className="py-8 text-center text-gray-400">没有匹配的书签</div>
+            <div className="py-8 text-center text-gray-400">
+              {t("canvas.picker_empty")}
+            </div>
           )}
           <div className="flex flex-col gap-1">
             {bookmarks.map((b) => {
@@ -114,7 +118,9 @@ export default function BookmarkPickerDialog({
                     </div>
                     <div className="flex items-center gap-1 truncate text-xs text-gray-400">
                       <Globe className="size-3 shrink-0" />
-                      <span className="truncate">{url || "非链接书签"}</span>
+                      <span className="truncate">
+                        {url || t("canvas.picker_not_link")}
+                      </span>
                     </div>
                   </div>
                 </button>

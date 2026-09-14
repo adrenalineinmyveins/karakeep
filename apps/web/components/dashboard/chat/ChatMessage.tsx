@@ -5,7 +5,11 @@ import ReactMarkdown from "react-markdown";
 
 import { cn } from "@/lib/utils";
 
+import WidgetPreviewCard from "@/components/dashboard/chat/WidgetPreviewCard";
 import type { ChatMessageInfo } from "@/lib/hooks/useChat";
+
+/** widget 类工具：结果用预览卡渲染而非普通 badge */
+const WIDGET_TOOL_NAMES = new Set(["save_widget", "update_widget"]);
 
 export default function ChatMessage({ message }: { message: ChatMessageInfo }) {
   const isUser = message.role === "user";
@@ -27,15 +31,20 @@ export default function ChatMessage({ message }: { message: ChatMessageInfo }) {
         <div
           className={cn(
             "rounded-2xl px-4 py-2 text-sm",
-            isUser
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted",
+            isUser ? "bg-primary text-primary-foreground" : "bg-muted",
           )}
         >
           {message.content ? (
             <ReactMarkdown>{message.content}</ReactMarkdown>
           ) : message.pending ? (
-            <span className="animate-pulse">思考中...</span>
+            <span className="flex items-center gap-1.5">
+              <span>思考中</span>
+              <span className="flex gap-0.5">
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:0ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:150ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:300ms]" />
+              </span>
+            </span>
           ) : (
             ""
           )}
@@ -47,9 +56,15 @@ export default function ChatMessage({ message }: { message: ChatMessageInfo }) {
         {/* 工具调用 */}
         {message.toolCalls && message.toolCalls.length > 0 && (
           <div className="flex flex-col gap-1">
-            {message.toolCalls.map((tc, i) => (
-              <ToolCallBadge key={i} toolCall={tc} />
-            ))}
+            {message.toolCalls.map((tc, i) =>
+              WIDGET_TOOL_NAMES.has(tc.toolName) ? (
+                tc.status === "end" && tc.result !== undefined ? (
+                  <WidgetPreviewCard key={i} result={tc.result} />
+                ) : null
+              ) : (
+                <ToolCallBadge key={i} toolCall={tc} />
+              ),
+            )}
           </div>
         )}
       </div>
@@ -72,7 +87,7 @@ function ToolCallBadge({
     <div
       className={cn(
         "flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground",
-        isRunning ? "bg-muted/50 animate-pulse" : "bg-muted/30",
+        isRunning ? "animate-pulse bg-muted/50" : "bg-muted/30",
       )}
     >
       <Wrench size={12} />

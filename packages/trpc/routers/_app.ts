@@ -1,5 +1,6 @@
 import { router } from "../index";
 import { adminAppRouter } from "./admin";
+import { agentProfilesAppRouter } from "./agentProfiles";
 import { apiKeysAppRouter } from "./apiKeys";
 import { assetsAppRouter } from "./assets";
 import { backupsAppRouter } from "./backups";
@@ -12,18 +13,24 @@ import { highlightsAppRouter } from "./highlights";
 import { importSessionsRouter } from "./importSessions";
 import { invitesAppRouter } from "./invites";
 import { listsAppRouter } from "./lists";
+import { memoriesAppRouter } from "./memories";
 import { promptsAppRouter } from "./prompts";
 import { publicBookmarks } from "./publicBookmarks";
+import { publicSharedAssets, sharedAssetsAppRouter } from "./sharedAssets";
 import { rulesAppRouter } from "./rules";
 import { subscriptionsRouter } from "./subscriptions";
 import { tagsAppRouter } from "./tags";
 import { usersAppRouter } from "./users";
 import { webhooksAppRouter } from "./webhooks";
+import { widgetsAppRouter } from "./widgets";
 
 export const appRouter = router({
   bookmarks: bookmarksAppRouter,
   chats: chatsAppRouter,
+  memories: memoriesAppRouter,
+  agentProfiles: agentProfilesAppRouter,
   canvases: canvasesAppRouter,
+  widgets: widgetsAppRouter,
   apiKeys: apiKeysAppRouter,
   users: usersAppRouter,
   lists: listsAppRouter,
@@ -39,6 +46,8 @@ export const appRouter = router({
   rules: rulesAppRouter,
   invites: invitesAppRouter,
   publicBookmarks: publicBookmarks,
+  publicSharedAssets: publicSharedAssets,
+  sharedAssets: sharedAssetsAppRouter,
   subscriptions: subscriptionsRouter,
   config: configAppRouter,
 });

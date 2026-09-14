@@ -112,6 +112,8 @@ function AudioContentSection({ bookmark }: { bookmark: ZBookmark }) {
   const transcription = bookmark.content.content;
   return (
     <div className="flex h-full min-w-full flex-col items-center gap-4 p-4">
+      {/* 用户上传的原始音频，无字幕轨道数据可提供（转录文本以下方纯文本展示） */}
+      {/* oxlint-disable-next-line media-has-caption */}
       <audio
         controls
         className="w-full"

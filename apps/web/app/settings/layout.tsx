@@ -11,6 +11,7 @@ import { TFunction } from "i18next";
 import {
   ArrowLeft,
   BarChart3,
+  Bot,
   CloudDownload,
   CreditCard,
   Download,
@@ -98,6 +99,11 @@ const settingsSidebarItems = (
       name: t("settings.webhooks.webhooks"),
       icon: <Webhook size={18} />,
       path: "/settings/webhooks",
+    },
+    {
+      name: t("settings.agent_profiles.agent_profiles"),
+      icon: <Bot size={18} />,
+      path: "/settings/agents",
     },
     {
       name: t("settings.rules.rules"),

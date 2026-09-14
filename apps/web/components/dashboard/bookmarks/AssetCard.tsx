@@ -71,6 +71,8 @@ function AssetImage({
           <Link href={`/dashboard/preview/${bookmark.id}`}>
             <FileAudio2 size={60} />
           </Link>
+          {/* 用户上传的原始音频，无字幕轨道数据可提供 */}
+          {/* oxlint-disable-next-line media-has-caption */}
           <audio
             controls
             preload="none"

@@ -5,7 +5,11 @@ import { defineConfig } from "vitest/config";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [tsconfigPaths({ skip: (dir) => dir === ".claude" })],
+  plugins: [
+    tsconfigPaths({
+      skip: (dir) => dir === ".claude" || dir === ".docker-ctx",
+    }),
+  ],
   test: {
     alias: {
       "@/*": "./*",

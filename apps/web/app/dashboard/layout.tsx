@@ -13,8 +13,10 @@ import { TFunction } from "i18next";
 import {
   Archive,
   ClipboardList,
+  Compass,
   Highlighter,
   Home,
+  LayoutDashboard,
   MessageCircle,
   Paintbrush,
   Search,
@@ -86,9 +88,19 @@ export default async function Dashboard({
         path: "/dashboard/highlights",
       },
       {
-        name: "画布",
+        name: t("common.canvas"),
         icon: <Paintbrush size={18} />,
         path: "/dashboard/canvas",
+      },
+      {
+        name: t("common.widgets"),
+        icon: <LayoutDashboard size={18} />,
+        path: "/dashboard/widgets",
+      },
+      {
+        name: t("discover.title"),
+        icon: <Compass size={18} />,
+        path: "/dashboard/discover",
       },
       {
         name: t("common.archive"),

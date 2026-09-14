@@ -392,6 +392,7 @@
                     "type": "string",
                     "enum": [
                       "image",
+                      "audio",
                       "pdf"
                     ]
                   },
@@ -1145,6 +1146,7 @@
                             "type": "string",
                             "enum": [
                               "image",
+                              "audio",
                               "pdf"
                             ]
                           },

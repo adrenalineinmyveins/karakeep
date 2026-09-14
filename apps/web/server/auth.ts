@@ -6,8 +6,8 @@ import NextAuth, {
   DefaultSession,
   getServerSession,
   NextAuthOptions,
-  type Session,
 } from "next-auth";
+import type { Session } from "next-auth";
 import { Adapter as NextAuthAdapater } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { Provider } from "next-auth/providers/index";

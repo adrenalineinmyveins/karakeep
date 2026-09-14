@@ -22,8 +22,8 @@ import {
   createModels,
   createProvider,
   envApiKeyAuth,
-  type MutableModels,
 } from "@earendil-works/pi-ai";
+import type { ApiKeyAuth, MutableModels } from "@earendil-works/pi-ai";
 import { openAICompletionsApi } from "@earendil-works/pi-ai/api/openai-completions.lazy";
 import { openAIResponsesApi } from "@earendil-works/pi-ai/api/openai-responses.lazy";
 import { OPENAI_MODELS } from "@earendil-works/pi-ai/providers/openai.models";
@@ -32,9 +32,9 @@ import { z } from "zod";
 
 import serverConfig from "@saiye/shared/config";
 import logger from "@saiye/shared/logger";
+import type { AgentProfileType } from "@saiye/shared/types/agentProfiles";
 
-// ── 对外接口抽象 ──────────────────────────────────────
-
+import { createCliAgent } from "./cliAdapter";
 /** 业务侧的工具定义（在 SDK 边界由 zodToToolSchema 构造） */
 export interface ToolDefinition {
   name: string;
@@ -68,10 +68,10 @@ export interface AgentInterface {
 export interface CreateAgentParams {
   systemPrompt: string;
   tools: ToolDefinition[];
-  history?: Array<{ role: "user" | "assistant"; content: string }>;
+  history?: { role: "user" | "assistant"; content: string }[];
+  /** 用户自定义 agent 档案（null = 服务器默认模型） */
+  profile?: AgentProfileConfig | null;
 }
-
-// ── Zod → JSON Schema ────────────────────────────────
 
 /**
  * 将 Zod schema 转换为 PI SDK 要求的 JSON Schema 工具定义。
@@ -181,21 +181,148 @@ function ensureModels(): MutableModels {
   return modelsInstance;
 }
 
-// ── Agent 工厂 ───────────────────────────────────────
+// ── Agent 档案配置（chats.ts 从 DB 加载后传入） ──
 
-/** 单轮 LLM 调用（一次 streamSimple）的硬超时 */
-const LLM_STREAM_TIMEOUT_MS = 60_000;
+export interface AgentProfileConfig {
+  id: string;
+  type: AgentProfileType;
+  name: string;
+  baseUrl: string | null;
+  apiKey: string | null;
+  model: string | null;
+  command: string | null;
+  timeoutMinutes: number;
+  systemPrompt: string | null;
+  enableTools: boolean;
+}
 
-export function createAgent(params: CreateAgentParams): AgentInterface {
-  const models = ensureModels();
-  const { provider, modelId } = resolveDefaultPattern();
-  const model = models.getModel(provider, modelId);
-  if (!model) {
+/** 档案指纹：任一字段变化即视为档案变更（用于会话缓存失效） */
+export function profileFingerprint(p: AgentProfileConfig): string {
+  return JSON.stringify([
+    p.id,
+    p.type,
+    p.name,
+    p.baseUrl,
+    p.apiKey,
+    p.model,
+    p.command,
+    p.timeoutMinutes,
+    p.systemPrompt,
+    p.enableTools,
+  ]);
+}
+
+// ── 档案专属 Models（每档案独立 provider，进程级缓存） ──
+
+interface ProfileModelsEntry {
+  fingerprint: string;
+  models: MutableModels;
+}
+
+const profileModelsCache = new Map<string, ProfileModelsEntry>();
+
+function profileProviderKey(profileId: string): string {
+  return `agent-profile-${profileId}`;
+}
+
+/** 裸 string 不满足 pi-ai 的 ApiKeyAuth 接口，包装为带 resolve 的实现 */
+function staticApiKeyAuth(name: string, apiKey: string): ApiKeyAuth {
+  return {
+    name,
+    resolve: async () => ({
+      auth: { apiKey },
+      source: "agent profile",
+    }),
+  };
+}
+
+/** 每个档案注册独立 provider（openai-completions 协议），按指纹缓存 */
+function ensureProfileModels(profile: AgentProfileConfig): MutableModels {
+  const key = profileProviderKey(profile.id);
+  const cached = profileModelsCache.get(key);
+  if (cached && cached.fingerprint === profileFingerprint(profile)) {
+    return cached.models;
+  }
+
+  if (!profile.baseUrl || !profile.model) {
     throw new Error(
-      `Model not found: ${provider}/${modelId}. Check CHAT_MODEL config.`,
+      `Agent profile "${profile.name}" is missing baseUrl or model.`,
     );
   }
 
+  const models = createModels();
+  models.setProvider(
+    createProvider({
+      id: profileProviderKey(profile.id),
+      name: `Agent Profile ${profile.name}`,
+      baseUrl: profile.baseUrl,
+      auth: {
+        apiKey: staticApiKeyAuth(
+          `${profile.name} API key`,
+          profile.apiKey ?? "",
+        ),
+      },
+      models: [
+        {
+          id: profile.model,
+          name: profile.model,
+          api: "openai-completions",
+          provider: profileProviderKey(profile.id),
+          baseUrl: profile.baseUrl,
+          reasoning: false,
+          input: ["text"],
+          cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+          // 保守默认：兼容端点的真实窗口未知，由模型侧自行截断
+          contextWindow: 128000,
+          maxTokens: 4096,
+        },
+      ],
+      api: openAICompletionsApi(),
+    }),
+  );
+
+  profileModelsCache.set(key, {
+    fingerprint: profileFingerprint(profile),
+    models,
+  });
+  return models;
+}
+
+// ── Agent 工厂 ────────────────────────────────────────
+
+const LLM_STREAM_TIMEOUT_MS = 60_000;
+
+export function createAgent(params: CreateAgentParams): AgentInterface {
+  const profile = params.profile ?? null;
+
+  // CLI 型档案：走子进程 adapter（无状态拼接、一次性出结果）
+  if (profile?.type === "trae-cli") {
+    return createCliAgent(
+      {
+        command: profile.command ?? "traecli",
+        timeoutMinutes: profile.timeoutMinutes,
+        systemPrompt: params.systemPrompt,
+      },
+      {
+        history: params.history ?? [],
+        tools: params.tools,
+      },
+    );
+  }
+
+  // 模型解析：档案（openai-compatible）优先，否则服务器默认
+  const models = profile ? ensureProfileModels(profile) : ensureModels();
+  const defaultPattern = profile ? null : resolveDefaultPattern();
+  const model = profile
+    ? models.getModel(profileProviderKey(profile.id), profile.model!)
+    : models.getModel(defaultPattern!.provider, defaultPattern!.modelId);
+  if (!model) {
+    throw new Error(
+      profile
+        ? `Model not found for agent profile "${profile.name}": ${profile.model}. Check profile settings.`
+        : `Model not found: ${defaultPattern!.provider}/${defaultPattern!.modelId}. Check CHAT_MODEL config.`,
+    );
+  }
   // 工具映射：ToolDefinition → AgentTool
   const tools = params.tools.map((t) => ({
     name: t.name,

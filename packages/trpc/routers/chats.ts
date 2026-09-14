@@ -3,22 +3,72 @@ import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@saiye/db";
-import { chatMessages, chatSessions } from "@saiye/db/schema";
+import {
+  agentProfiles,
+  chatMessages,
+  chatSessions,
+  users,
+} from "@saiye/db/schema";
 import { InferenceClientFactory } from "@saiye/shared/inference";
 import logger from "@saiye/shared/logger";
-
-import { authedProcedure, router } from "../index";
 import { AgentOrchestrator } from "../lib/agent/orchestrator";
+import type { AgentProfileConfig } from "../lib/agent/sdkAdapter";
 import { buildAgentTools } from "../lib/agent/tools";
+import { authedProcedure, router } from "../index";
 
 /**
- * 清理 LLM 生成的标题：
- * - 尝试解析 JSON（{title: "..."}）
- * - 去除首尾引号
- * - 截断到 50 字
+ * A3 读取用户级知识注入开关（null = 默认开启；用户不存在时也走默认）。
  */
-function sanitizeTitle(raw: string): string {
-  let t = raw.trim();
+async function loadKnowledgeContextEnabled(
+  userId: string,
+): Promise<boolean | null> {
+  const [row] = await db
+    .select({
+      chatKnowledgeContextEnabled: users.chatKnowledgeContextEnabled,
+    })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  return row?.chatKnowledgeContextEnabled ?? null;
+}
+
+/**
+ * 加载会话绑定的 agent 档案（含归属校验）。
+ * 返回 null = 无绑定或绑定已被删除（回退默认助手）。
+ */
+async function loadAgentProfile(
+  userId: string,
+  profileId: string | null | undefined,
+): Promise<AgentProfileConfig | null> {
+  if (!profileId) {
+    return null;
+  }
+  const [profile] = await db
+    .select()
+    .from(agentProfiles)
+    .where(
+      and(eq(agentProfiles.id, profileId), eq(agentProfiles.userId, userId)),
+    )
+    .limit(1);
+  if (!profile) {
+    return null;
+  }
+  return {
+    id: profile.id,
+    type: profile.type,
+    name: profile.name,
+    baseUrl: profile.baseUrl,
+    apiKey: profile.apiKey,
+    model: profile.model,
+    command: profile.command,
+    timeoutMinutes: profile.timeoutMinutes,
+    systemPrompt: profile.systemPrompt,
+    enableTools: profile.enableTools,
+  };
+}
+
+/** LLM 生成的标题清洗：剥 JSON 壳、去引号、限长 */
+function sanitizeTitle(t: string): string {
   try {
     const parsed = JSON.parse(t);
     if (
@@ -81,13 +131,38 @@ export const chatsAppRouter = router({
 
   // 创建会话
   createSession: authedProcedure
-    .input(z.object({ title: z.string().optional() }))
+    .input(
+      z.object({
+        title: z.string().optional(),
+        agentProfileId: z.string().nullable().optional(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
+      // 绑定档案时先校验归属，避免挂到他人档案
+      if (input.agentProfileId) {
+        const [profile] = await db
+          .select({ id: agentProfiles.id })
+          .from(agentProfiles)
+          .where(
+            and(
+              eq(agentProfiles.id, input.agentProfileId),
+              eq(agentProfiles.userId, ctx.user.id),
+            ),
+          )
+          .limit(1);
+        if (!profile) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Agent profile not found",
+          });
+        }
+      }
       const [session] = await db
         .insert(chatSessions)
         .values({
           userId: ctx.user.id,
           title: input.title ?? "新对话",
+          agentProfileId: input.agentProfileId ?? null,
         })
         .returning();
       return session;
@@ -157,9 +232,14 @@ export const chatsAppRouter = router({
       return { success: true };
     }),
 
-  // 更新会话标题
+  // 修改会话标题
   updateTitle: authedProcedure
-    .input(z.object({ sessionId: z.string(), title: z.string() }))
+    .input(
+      z.object({
+        sessionId: z.string(),
+        title: z.string().min(1).max(100),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const [session] = await db
         .select({ id: chatSessions.id })
@@ -182,6 +262,65 @@ export const chatsAppRouter = router({
         .update(chatSessions)
         .set({ title: input.title, modifiedAt: new Date() })
         .where(eq(chatSessions.id, input.sessionId));
+      return { success: true };
+    }),
+
+  // 切换会话绑定的 agent 档案（null = 默认助手）
+  updateSessionAgent: authedProcedure
+    .input(
+      z.object({
+        sessionId: z.string(),
+        agentProfileId: z.string().nullable(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // 档案归属校验：不存在则拒绝，避免静默落到默认助手
+      if (input.agentProfileId) {
+        const [profile] = await db
+          .select({ id: agentProfiles.id })
+          .from(agentProfiles)
+          .where(
+            and(
+              eq(agentProfiles.id, input.agentProfileId),
+              eq(agentProfiles.userId, ctx.user.id),
+            ),
+          )
+          .limit(1);
+        if (!profile) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Agent profile not found",
+          });
+        }
+      }
+
+      const [session] = await db
+        .select({ id: chatSessions.id })
+        .from(chatSessions)
+        .where(
+          and(
+            eq(chatSessions.id, input.sessionId),
+            eq(chatSessions.userId, ctx.user.id),
+          ),
+        )
+        .limit(1);
+      if (!session) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Session not found",
+        });
+      }
+
+      await db
+        .update(chatSessions)
+        .set({ agentProfileId: input.agentProfileId, modifiedAt: new Date() })
+        .where(eq(chatSessions.id, input.sessionId));
+
+      // 档案变更后使内存中的 agent 缓存失效（下次请求按新档案重建）
+      AgentOrchestrator.getInstance().abortSession(
+        ctx.user.id,
+        input.sessionId,
+      );
       return { success: true };
     }),
 
@@ -314,22 +453,45 @@ ${transcript}`,
         tools.length,
       );
 
-      // 4. 流式输出 Agent 事件并累积 assistant 内容
+      // 3.5 加载会话绑定的 agent 档案（null = 默认助手）
+      const profile = await loadAgentProfile(
+        ctx.user.id,
+        session.agentProfileId,
+      );
+
+      // 3.6 A3 用户级知识注入开关
+      const knowledgeContextEnabled = await loadKnowledgeContextEnabled(
+        ctx.user.id,
+      );
+
+      // 4. 流式输出 Agent 事件并累积 assistant 内容与工具调用记录
       let assistantContent = "";
+      const toolCalls: {
+        toolName: string;
+        args?: unknown;
+        result?: unknown;
+      }[] = [];
       try {
-        console.log("[chat.sendMessage] STEP 5: calling streamConversation");
         for await (const event of AgentOrchestrator.getInstance().streamConversation(
           {
             userId: ctx.user.id,
             sessionId: input.sessionId,
             prompt: input.content,
             tools,
+            profile,
+            knowledgeContextEnabled,
           },
         )) {
           console.log("[chat.sendMessage] yielding event:", event.type);
           yield event;
           if (event.type === "token_delta") {
             assistantContent += event.delta;
+          } else if (event.type === "tool_call") {
+            toolCalls.push({
+              toolName: event.toolName,
+              args: event.args,
+              result: event.result,
+            });
           }
         }
 
@@ -339,6 +501,8 @@ ${transcript}`,
             chatId: input.sessionId,
             role: "assistant",
             content: assistantContent,
+            // 工具调用记录（如 widget 预览卡）持久化到 metadata，历史会话可恢复
+            ...(toolCalls.length > 0 ? { metadata: { toolCalls } } : {}),
           });
         }
         await db
@@ -414,16 +578,22 @@ ${transcript}`,
 
       // 3. 流式事件聚合为一次性结果
       const tools = await buildAgentTools(ctx);
+      const profile = await loadAgentProfile(
+        ctx.user.id,
+        session.agentProfileId,
+      );
+      // A3 用户级知识注入开关
+      const knowledgeContextEnabled = await loadKnowledgeContextEnabled(
+        ctx.user.id,
+      );
 
       let content = "";
-      const toolCalls: Array<{
+      let error: string | undefined;
+      const toolCalls: {
         toolName: string;
-        status: "start" | "end";
         args?: unknown;
         result?: unknown;
-      }> = [];
-      let error: string | null = null;
-
+      }[] = [];
       try {
         for await (const event of AgentOrchestrator.getInstance().streamConversation(
           {
@@ -431,6 +601,8 @@ ${transcript}`,
             sessionId: input.sessionId,
             prompt: input.content,
             tools,
+            profile,
+            knowledgeContextEnabled,
           },
         )) {
           switch (event.type) {
@@ -440,7 +612,6 @@ ${transcript}`,
             case "tool_call":
               toolCalls.push({
                 toolName: event.toolName,
-                status: event.status,
                 args: event.args,
                 result: event.result,
               });
@@ -459,6 +630,8 @@ ${transcript}`,
             chatId: input.sessionId,
             role: "assistant",
             content,
+            // 工具调用记录（如 widget 预览卡）持久化到 metadata，历史会话可恢复
+            ...(toolCalls.length > 0 ? { metadata: { toolCalls } } : {}),
           });
         }
         await db

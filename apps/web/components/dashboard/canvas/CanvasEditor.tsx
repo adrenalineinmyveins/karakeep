@@ -3,7 +3,15 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, BookmarkPlus, Check, Loader2, Network, Pencil, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  BookmarkPlus,
+  Check,
+  Loader2,
+  Network,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import { getViewBoxCenterPoint, PlaitBoard, Transforms } from "@plait/core";
 
 import { Button } from "@/components/ui/button";
@@ -16,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@saiye/shared-react/trpc";
+import { useTranslation } from "@/lib/i18n/client";
 
 import BookmarkPickerDialog from "./BookmarkPickerDialog";
 import {
@@ -25,8 +34,8 @@ import {
   isBookmarkCard,
   normalizeCanvasValue,
   removeBookmarkCard,
-  type BookmarkCardElement,
 } from "./plugins/withBookmarkCard";
+import type { BookmarkCardElement } from "./plugins/withBookmarkCard";
 
 // @drawnix 生态三个包的 exports 都只暴露了 JS 入口，无法用包名子路径引 CSS，
 // 只能用相对路径引入（5 层向上到仓库根的 node_modules）。三份缺一不可：
@@ -49,13 +58,13 @@ const Drawnix = dynamic(
   },
 );
 
-type CanvasData = {
+interface CanvasData {
   id: string;
   title: string;
   data: unknown;
   createdAt: Date;
   modifiedAt: Date | null;
-};
+}
 
 // embedded：独立路由模式（/canvas/[id]，无 dashboard 头部），
 // 全屏高度且不渲染返回按钮（主要供移动端 WebView 使用）
@@ -68,6 +77,7 @@ export default function CanvasEditor({
 }) {
   const api = useTRPC();
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [title, setTitle] = useState(canvas.title);
@@ -98,9 +108,7 @@ export default function CanvasEditor({
   const boardRef = useRef<PlaitBoard | null>(null);
 
   // 按 id 找到画布中当前的书签卡片（编辑/删除可能发生在元素对象被替换后）
-  const findCardById = (
-    id: string,
-  ): BookmarkCardElement | undefined =>
+  const findCardById = (id: string): BookmarkCardElement | undefined =>
     boardRef.current?.children.find(
       (c): c is BookmarkCardElement => c.id === id && isBookmarkCard(c),
     );
@@ -255,13 +263,13 @@ export default function CanvasEditor({
           {saveState === "saving" && (
             <>
               <Loader2 className="size-3 animate-spin" />
-              <span>保存中…</span>
+              <span>{t("canvas.saving")}</span>
             </>
           )}
           {saveState === "saved" && (
             <>
               <Check className="size-3 text-green-600" />
-              <span>已保存</span>
+              <span>{t("canvas.saved")}</span>
             </>
           )}
         </div>
@@ -291,7 +299,7 @@ export default function CanvasEditor({
           onClick={() => setPickerOpen(true)}
         >
           <BookmarkPlus className="size-4" />
-          插入书签
+          {t("canvas.insert_bookmark")}
         </Button>
         <BookmarkPickerDialog
           open={pickerOpen}
@@ -323,7 +331,7 @@ export default function CanvasEditor({
               }}
             >
               <Pencil className="size-3.5" />
-              编辑
+              {t("actions.edit")}
             </button>
             <button
               className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
@@ -337,7 +345,7 @@ export default function CanvasEditor({
               }}
             >
               <Network className="size-3.5" />
-              加入思维导图
+              {t("canvas.add_to_mindmap")}
             </button>
             <button
               className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-red-600 hover:bg-accent"
@@ -347,7 +355,7 @@ export default function CanvasEditor({
               }}
             >
               <Trash2 className="size-3.5" />
-              删除
+              {t("actions.delete")}
             </button>
           </div>
         )}
@@ -358,12 +366,14 @@ export default function CanvasEditor({
         >
           <DialogContent className="sm:max-w-sm">
             <DialogHeader>
-              <DialogTitle>编辑书签卡片</DialogTitle>
+              <DialogTitle>{t("canvas.edit_dialog_title")}</DialogTitle>
             </DialogHeader>
             {editDraft && (
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-sm text-muted-foreground">标题</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("common.title")}
+                  </span>
                   <Input
                     value={editDraft.title}
                     onChange={(e) =>
@@ -372,7 +382,9 @@ export default function CanvasEditor({
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-sm text-muted-foreground">链接</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("canvas.field_link")}
+                  </span>
                   <Input
                     value={editDraft.url}
                     onChange={(e) =>
@@ -382,9 +394,9 @@ export default function CanvasEditor({
                 </div>
                 <div className="flex justify-end gap-2">
                   <Button variant="outline" onClick={() => setEditDraft(null)}>
-                    取消
+                    {t("actions.cancel")}
                   </Button>
-                  <Button onClick={saveCardEdit}>保存</Button>
+                  <Button onClick={saveCardEdit}>{t("actions.save")}</Button>
                 </div>
               </div>
             )}

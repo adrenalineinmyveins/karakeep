@@ -213,6 +213,8 @@ export const zUserSettingsSchema = z.object({
   // AI settings (nullable = opt-in, null means use server default)
   autoTaggingEnabled: z.boolean().nullable(),
   autoSummarizationEnabled: z.boolean().nullable(),
+  // Chat knowledge context injection (nullable = default ON)
+  chatKnowledgeContextEnabled: z.boolean().nullable(),
   tagStyle: zTagStyleSchema,
   curatedTagIds: z.array(z.string()).nullable(),
   inferredTagLang: z.string().nullable(),
@@ -232,6 +234,7 @@ export const zUpdateUserSettingsSchema = zUserSettingsSchema.partial().pick({
   readerFontFamily: true,
   autoTaggingEnabled: true,
   autoSummarizationEnabled: true,
+  chatKnowledgeContextEnabled: true,
   tagStyle: true,
   curatedTagIds: true,
   inferredTagLang: true,

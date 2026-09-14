@@ -683,6 +683,8 @@ function installMutableTransformMocks(
     };
     remove((b as { children: PlaitElement[] }).children, path);
   });
+  // mock 桩：setSelection 在此用例中无需副作用
+  // oxlint-disable-next-line no-empty-function
   mocks.setSelection.mockImplementation(() => {});
   expect(board.children).toBeDefined();
 }
@@ -1044,11 +1046,11 @@ describe("页面导航时的渲染状态（卸载竞态回归）", () => {
 
 describe("BookmarkCardComponent 生命周期（幽灵圆点回归）", () => {
   /** 与源码 destroy 交互所需的最小组件契约 */
-  type ComponentLike = {
+  interface ComponentLike {
     context: unknown;
     initialize(): void;
     destroy(): void;
-  };
+  }
 
   afterEach(() => {
     vi.restoreAllMocks();
@@ -1059,12 +1061,15 @@ describe("BookmarkCardComponent 生命周期（幽灵圆点回归）", () => {
   it("destroy 调用 lineAutoCompleteGenerator.destroy（选中删除后圆点不残留）", () => {
     vi.clearAllMocks();
     // 隔离圆点 generator 的绘制流程（依赖真实 SVG host），只验证生命周期契约
+    // mock 桩：隔离绘制/销毁副作用，空实现即所需行为
     vi.spyOn(
       ArrowLineAutoCompleteGenerator.prototype,
       "processDrawing",
+      // oxlint-disable-next-line no-empty-function
     ).mockImplementation(() => {});
     const lineDotsDestroy = vi
       .spyOn(ArrowLineAutoCompleteGenerator.prototype, "destroy")
+      // oxlint-disable-next-line no-empty-function
       .mockImplementation(() => {});
 
     const card = makeCard();

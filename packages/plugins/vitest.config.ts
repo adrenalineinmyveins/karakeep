@@ -4,7 +4,11 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [tsconfigPaths({ skip: (dir) => dir === ".claude" })],
+  plugins: [
+    tsconfigPaths({
+      skip: (dir) => dir === ".claude" || dir === ".docker-ctx",
+    }),
+  ],
   test: {
     globalSetup: [
       "./queue-restate/src/tests/setup/startContainers.ts",
