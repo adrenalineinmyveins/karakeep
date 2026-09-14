@@ -15,10 +15,10 @@
   "dependencies": {
     "@earendil-works/pi-agent-core": "^0.83.0",
     "@earendil-works/pi-ai": "^0.83.0",
+    "@plait-board/mermaid-to-drawnix": "0.0.8",
     "@saiye/db": "workspace:*",
     "@saiye/shared": "workspace:*",
     "@saiye/shared-server": "workspace:*",
-    "@plait-board/mermaid-to-drawnix": "0.0.8",
     "@trpc/server": "^11.9.0",
     "bcryptjs": "^2.4.3",
     "deep-equal": "^2.2.3",

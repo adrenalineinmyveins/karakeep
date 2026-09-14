@@ -5,10 +5,10 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@saiye/shared": "workspace:^0.1.0",
-    "@saiye/trpc": "workspace:^0.1.0",
     "@radix-ui/react-popover": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.4",
+    "@saiye/shared": "workspace:^0.1.0",
+    "@saiye/trpc": "workspace:^0.1.0",
     "@tanstack/react-query": "5.90.2",
     "@trpc/client": "^11.9.0",
     "@trpc/tanstack-react-query": "^11.9.0",

@@ -39,8 +39,8 @@
     "directory": "apps/mcp"
   },
   "dependencies": {
-    "@saiye/sdk": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "@saiye/sdk": "workspace:*",
     "turndown": "^7.2.0",
     "zod": "^4.0.0"
   }

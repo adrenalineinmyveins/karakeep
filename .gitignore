@@ -90,6 +90,13 @@ apps/desktop/src-tauri/payload.tar.gz
 .tmp-workers-out.txt
 apps/mobile/tsc-code.txt
 
+# Local build/debug artifacts（构建日志、docker 快照上下文、IDE 本地目录、本地数据库）
+*.log
+*.err
+.docker-ctx/
+.trae/
+**/*.sqlite
+
 # Docker image build downloads
 docker/downloads/
 docker/s6-overlay/
