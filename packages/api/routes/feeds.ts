@@ -1,10 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 
-import {
-  zNewFeedSchema,
-  zUpdateFeedSchema,
-} from "@saiye/shared/types/feeds";
+import { zNewFeedSchema, zUpdateFeedSchema } from "@saiye/shared/types/feeds";
 
 import { authMiddleware } from "../middlewares/auth";
 

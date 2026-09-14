@@ -30,9 +30,7 @@ describe("validateRedirectUrl", () => {
 
   it("should allow saiye:// scheme for mobile app", () => {
     expect(validateRedirectUrl("saiye://")).toBe("saiye://");
-    expect(validateRedirectUrl("saiye://callback")).toBe(
-      "saiye://callback",
-    );
+    expect(validateRedirectUrl("saiye://callback")).toBe("saiye://callback");
     expect(validateRedirectUrl("saiye://callback/path")).toBe(
       "saiye://callback/path",
     );

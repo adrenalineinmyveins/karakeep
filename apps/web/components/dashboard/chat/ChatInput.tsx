@@ -126,7 +126,7 @@ export default function ChatInput({
           onKeyDown={handleKeyDown}
           placeholder="输入消息，Enter 发送，Shift+Enter 换行"
           disabled={disabled}
-          className="min-h-[40px] max-h-[200px] resize-none"
+          className="max-h-[200px] min-h-[40px] resize-none"
           rows={1}
         />
         {!isStreaming && (

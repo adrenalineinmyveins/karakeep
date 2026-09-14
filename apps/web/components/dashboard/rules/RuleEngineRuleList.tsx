@@ -9,10 +9,7 @@ import { Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import type { RuleEngineRule } from "@saiye/shared/types/rules";
-import {
-  useDeleteRule,
-  useUpdateRule,
-} from "@saiye/shared-react/hooks/rules";
+import { useDeleteRule, useUpdateRule } from "@saiye/shared-react/hooks/rules";
 
 export default function RuleList({
   rules,

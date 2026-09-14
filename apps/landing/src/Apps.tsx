@@ -147,8 +147,8 @@ export default function Apps() {
         </h1>
         <p className="mt-3 max-w-2xl text-base text-gray-600 sm:text-lg">
           Use Saiye anywhere with our mobile apps and browser extensions. This
-          fork is not published on the app stores — everything is available
-          from the GitHub repository.
+          fork is not published on the app stores — everything is available from
+          the GitHub repository.
         </p>
         <div className="mt-10 space-y-6">
           <ListingSection

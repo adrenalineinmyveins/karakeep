@@ -1,10 +1,7 @@
 import RSS from "rss";
 
 import serverConfig from "@saiye/shared/config";
-import {
-  BookmarkTypes,
-  ZPublicBookmark,
-} from "@saiye/shared/types/bookmarks";
+import { BookmarkTypes, ZPublicBookmark } from "@saiye/shared/types/bookmarks";
 import { getAssetUrl } from "@saiye/shared/utils/assetUtils";
 import { isAllowedBookmarkUrl } from "@saiye/shared/utils/url";
 

@@ -1,10 +1,7 @@
 import { z } from "zod";
 
 import { AssetTypes } from "@saiye/db/schema";
-import {
-  ZAssetType,
-  zAssetTypesSchema,
-} from "@saiye/shared/types/bookmarks";
+import { ZAssetType, zAssetTypesSchema } from "@saiye/shared/types/bookmarks";
 
 export function mapDBAssetTypeToUserType(assetType: AssetTypes): ZAssetType {
   const map: Record<AssetTypes, z.infer<typeof zAssetTypesSchema>> = {

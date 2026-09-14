@@ -18,10 +18,7 @@ import Masonry from "react-masonry-css";
 import resolveConfig from "tailwindcss/resolveConfig";
 
 import { useTRPC } from "@saiye/shared-react/trpc";
-import {
-  BookmarkTypes,
-  ZPublicBookmark,
-} from "@saiye/shared/types/bookmarks";
+import { BookmarkTypes, ZPublicBookmark } from "@saiye/shared/types/bookmarks";
 import { ZCursor } from "@saiye/shared/types/pagination";
 
 function TagPill({ tag }: { tag: string }) {

@@ -26,9 +26,7 @@ export default {
         light: "./assets/icon.png",
         tinted: "./assets/icon-tinted.png",
       },
-      bundleIdentifier: IS_DEV
-        ? "app.saiye.mobile.dev"
-        : "app.saiye.mobile",
+      bundleIdentifier: IS_DEV ? "app.saiye.mobile.dev" : "app.saiye.mobile",
       splash: {
         image: "./assets/splash.png",
         resizeMode: "contain",
@@ -65,9 +63,7 @@ export default {
           backgroundColor: "#000000",
         },
       },
-      package: IS_DEV
-        ? "app.saiye.mobile.dev"
-        : "app.saiye.mobile",
+      package: IS_DEV ? "app.saiye.mobile.dev" : "app.saiye.mobile",
       versionCode: 44,
     },
     plugins: [

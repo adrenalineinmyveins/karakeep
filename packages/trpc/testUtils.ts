@@ -116,8 +116,7 @@ export async function buildTestContext(
 export function defaultBeforeEach(seedDB = true) {
   return async (context: object) => {
     vi.mock("@saiye/shared-server", async (original) => {
-      const mod =
-        (await original()) as typeof import("@saiye/shared-server");
+      const mod = (await original()) as typeof import("@saiye/shared-server");
       return {
         ...mod,
         AssetPreprocessingQueue: {

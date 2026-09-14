@@ -20,10 +20,7 @@ import { AlertTriangle, Eye, EyeOff, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import {
-  useDeleteAccount,
-  useWhoAmI,
-} from "@saiye/shared-react/hooks/users";
+import { useDeleteAccount, useWhoAmI } from "@saiye/shared-react/hooks/users";
 
 import { Button } from "../ui/button";
 import { SettingsSection } from "./SettingsPage";

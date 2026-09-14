@@ -22,11 +22,7 @@ import { abortRace, abortRaceResolve, raceWith, timeoutRace } from "utils";
 
 import { db } from "@saiye/db";
 import { users } from "@saiye/db/schema";
-import {
-  getTracer,
-  setSpanAttributes,
-  withSpan,
-} from "@saiye/shared-server";
+import { getTracer, setSpanAttributes, withSpan } from "@saiye/shared-server";
 import serverConfig from "@saiye/shared/config";
 import logger from "@saiye/shared/logger";
 import { tryCatch } from "@saiye/shared/tryCatch";

@@ -10,10 +10,7 @@ import { Command } from "@commander-js/extra-typings";
 import chalk from "chalk";
 import { getBorderCharacters, table } from "table";
 
-import {
-  listNameFromPath,
-  listsToTree,
-} from "@saiye/shared/utils/listUtils";
+import { listNameFromPath, listsToTree } from "@saiye/shared/utils/listUtils";
 
 export const listsCmd = new Command()
   .name("lists")

@@ -12,17 +12,8 @@ import { withWorkerEventLog, withWorkerTracing } from "workerTracing";
 
 import type { ZBackupRequest } from "@saiye/shared-server";
 import { db } from "@saiye/db";
-import {
-  assets,
-  AssetTypes,
-  bookmarksInLists,
-  users,
-} from "@saiye/db/schema";
-import {
-  addLogFields,
-  BackupQueue,
-  QuotaService,
-} from "@saiye/shared-server";
+import { assets, AssetTypes, bookmarksInLists, users } from "@saiye/db/schema";
+import { addLogFields, BackupQueue, QuotaService } from "@saiye/shared-server";
 import { saveAssetFromFile } from "@saiye/shared/assetdb";
 import {
   toExportFormat,
@@ -197,10 +188,7 @@ async function run(req: DequeuedJob<ZBackupRequest>) {
     tmpdir(),
     `saiye-backup-${userId}-${timestamp}.json`,
   );
-  const tempZipPath = join(
-    tmpdir(),
-    `saiye-backup-${userId}-${timestamp}.zip`,
-  );
+  const tempZipPath = join(tmpdir(), `saiye-backup-${userId}-${timestamp}.zip`);
 
   let backup: Backup | null = null;
 

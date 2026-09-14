@@ -1,10 +1,6 @@
 import { SpanKind } from "@opentelemetry/api";
 
-import {
-  getTracer,
-  setSpanAttributes,
-  withSpan,
-} from "@saiye/shared-server";
+import { getTracer, setSpanAttributes, withSpan } from "@saiye/shared-server";
 import serverConfig from "@saiye/shared/config";
 
 import type { Context } from "../index";

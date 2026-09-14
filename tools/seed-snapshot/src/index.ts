@@ -8,10 +8,7 @@ import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
 
 import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
-import type {
-  ZBookmark,
-  ZBookmarkedLink,
-} from "@saiye/shared/types/bookmarks";
+import type { ZBookmark, ZBookmarkedLink } from "@saiye/shared/types/bookmarks";
 import type { ZBookmarkList } from "@saiye/shared/types/lists";
 import type { ZTagBasic } from "@saiye/shared/types/tags";
 import type { AppRouter } from "@saiye/trpc/routers/_app";

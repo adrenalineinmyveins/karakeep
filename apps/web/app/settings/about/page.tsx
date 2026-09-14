@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
-import { SettingsPage, SettingsSection } from "@/components/settings/SettingsPage";
+import {
+  SettingsPage,
+  SettingsSection,
+} from "@/components/settings/SettingsPage";
 import SaiyeLogo from "@/components/SaiyeIcon";
 import {
   Card,
@@ -39,9 +42,7 @@ export default async function AboutPage() {
           <SaiyeLogo height={40} />
           <div>
             <p className="font-medium">Saiye v{serverConfig.serverVersion}</p>
-            <CardDescription>
-              {t("settings.about.description")}
-            </CardDescription>
+            <CardDescription>{t("settings.about.description")}</CardDescription>
           </div>
         </CardContent>
       </Card>

@@ -3,10 +3,7 @@ import { createMMKV, useMMKVString } from "react-native-mmkv";
 import superjson from "superjson";
 import { z } from "zod";
 
-import {
-  BookmarkTypes,
-  zBookmarkSchema,
-} from "@saiye/shared/types/bookmarks";
+import { BookmarkTypes, zBookmarkSchema } from "@saiye/shared/types/bookmarks";
 import {
   getBookmarkTitle,
   getSourceUrl,

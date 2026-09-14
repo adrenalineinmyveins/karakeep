@@ -14,10 +14,7 @@ import { z } from "zod";
 
 import { useUpdateUserSettings } from "@saiye/shared-react/hooks/users";
 import { langNameMappings } from "@saiye/shared/langs";
-import {
-  ZUserSettings,
-  zUserSettingsSchema,
-} from "@saiye/shared/types/users";
+import { ZUserSettings, zUserSettingsSchema } from "@saiye/shared/types/users";
 
 import { Form, FormField } from "../ui/form";
 import { Label } from "../ui/label";

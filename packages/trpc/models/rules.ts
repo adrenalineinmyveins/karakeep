@@ -3,10 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db as DONT_USE_DB } from "@saiye/db";
-import {
-  ruleEngineActionsTable,
-  ruleEngineRulesTable,
-} from "@saiye/db/schema";
+import { ruleEngineActionsTable, ruleEngineRulesTable } from "@saiye/db/schema";
 import {
   RuleEngineRule,
   zNewRuleEngineRuleSchema,

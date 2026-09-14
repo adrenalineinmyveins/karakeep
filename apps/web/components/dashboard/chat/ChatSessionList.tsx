@@ -84,7 +84,10 @@ export default function ChatSessionList({
                       deleteSession.mutate({ sessionId: session.id })
                     }
                   >
-                    <Trash2 size={14} className="text-muted-foreground hover:text-destructive" />
+                    <Trash2
+                      size={14}
+                      className="text-muted-foreground hover:text-destructive"
+                    />
                   </button>
                 </div>
               </li>

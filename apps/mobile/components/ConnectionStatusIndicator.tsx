@@ -10,8 +10,7 @@ export function ConnectionStatusIndicator() {
     return null;
   }
 
-  const label =
-    status === "device-offline" ? "Offline" : "Saiye unavailable";
+  const label = status === "device-offline" ? "Offline" : "Saiye unavailable";
 
   return (
     <View

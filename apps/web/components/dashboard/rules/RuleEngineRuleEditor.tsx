@@ -19,10 +19,7 @@ import type {
   RuleEngineRule,
   RuleEngineRuleEvent,
 } from "@saiye/shared/types/rules";
-import {
-  useCreateRule,
-  useUpdateRule,
-} from "@saiye/shared-react/hooks/rules";
+import { useCreateRule, useUpdateRule } from "@saiye/shared-react/hooks/rules";
 
 interface RuleEditorProps {
   rule: Omit<RuleEngineRule, "id"> & { id: string | null };
