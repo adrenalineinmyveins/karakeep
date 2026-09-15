@@ -12,6 +12,7 @@ export default {
           scheme: "saiye",
         }),
     slug: "saiye",
+    owner: "lxd11",
     version: "1.10.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
@@ -127,7 +128,7 @@ export default {
         origin: false,
       },
       eas: {
-        projectId: "55483bf0-9fe1-4bc9-b188-ae1734e2a0df",
+        projectId: "ac45ab5b-0410-489e-9c96-98c3ce7a6cf9",
       },
     },
   },
