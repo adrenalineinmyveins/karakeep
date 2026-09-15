@@ -1,0 +1,118 @@
+# 注意：本文件存在时 EAS 打包将完全以它为准（替代 .gitignore），
+# 因此需包含 .gitignore 的全部规则，再追加本地构建缓存排除。
+# 与 .gitignore 保持同步 + 以下两项：
+#
+# - apps/desktop/bin-cache：桌面端二进制缓存（meili/ffmpeg/yt-dlp，~475MB）
+# - apps/desktop/src-tauri/target：Rust/Tauri 编译产物（~8.8GB）
+# 不加这两项时 EAS 上传包会超过 2GB 上限。
+
+# dependencies
+node_modules
+.pnp
+.pnpm-store
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+coverage
+
+# next.js
+.next/
+**/next-env.d.ts
+
+# astro
+.astro/
+out/
+
+# production
+build
+dist
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# The sqlite database
+**/*.db
+data
+
+# Desktop M0.1 prototype workspace
+.desktop-m01/
+
+# PWA Files
+**/public/sw.js
+**/public/workbox-*.js
+**/public/worker-*.js
+**/public/sw.js.map
+**/public/workbox-*.js.map
+**/public/worker-*.js.map
+
+# Turbo
+.turbo
+
+# Idea
+.idea
+*.iml
+
+# Aider
+.aider*
+
+# VS-Code
+.vscode
+auth_failures.log
+.claude/settings.local.json
+
+# Local directory for AI agent contexts
+.aicontext/
+.codex
+.claude/worktrees
+jean.json
+
+# Tauri installer build artifact
+apps/desktop/src-tauri/payload.tar.gz
+
+# Expo local files
+.expo/
+
+# Local recovery workspace
+.recover/
+
+# Local debug outputs
+.tmp-workers-out.txt
+apps/mobile/tsc-code.txt
+
+# Local build/debug artifacts（构建日志、docker 快照上下文、IDE 本地目录、本地数据库）
+*.log
+*.err
+.docker-ctx/
+.trae/
+**/*.sqlite
+
+# Docker image build downloads
+docker/downloads/
+docker/s6-overlay/
+
+# Rebrand working files (keep scripts + SVG masters only)
+.rebrand/profile*
+.rebrand/*.log
+.rebrand/*.txt
+.rebrand/*.png
+
+# ── EAS 追加：本地构建缓存（git 未跟踪，但会进云构建 tarball）──
+apps/desktop/bin-cache/
+apps/desktop/src-tauri/target/
