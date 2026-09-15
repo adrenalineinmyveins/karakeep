@@ -483,7 +483,7 @@ ${transcript}`,
           },
         )) {
           console.log("[chat.sendMessage] yielding event:", event.type);
-          yield event;
+          // 先累积再 yield：断连时生成器在 yield 点被 return，最后一条事件不会丢
           if (event.type === "token_delta") {
             assistantContent += event.delta;
           } else if (event.type === "tool_call") {
@@ -493,9 +493,11 @@ ${transcript}`,
               result: event.result,
             });
           }
+          yield event;
         }
-
-        // 5. 存储 assistant 消息 + 刷新会话排序时间
+      } finally {
+        // 正常结束与客户端断连（tRPC 调用 iterator.return()）都会走到这里：
+        // 将已累积的（含部分的）assistant 回复落库，流中断时不再整条丢失
         if (assistantContent) {
           await db.insert(chatMessages).values({
             chatId: input.sessionId,
@@ -509,8 +511,6 @@ ${transcript}`,
           .update(chatSessions)
           .set({ modifiedAt: new Date() })
           .where(eq(chatSessions.id, input.sessionId));
-      } finally {
-        // 客户端断连时 tRPC 调用 iterator.return()，此处自动触发
         AgentOrchestrator.getInstance().abortSession(
           ctx.user.id,
           input.sessionId,

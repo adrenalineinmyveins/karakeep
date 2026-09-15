@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import ChatPanel from "@/components/dashboard/chat/ChatPanel";
 import ChatSessionList from "@/components/dashboard/chat/ChatSessionList";
@@ -11,6 +11,15 @@ export default function ChatPageClient() {
   const [sessionId, setSessionId] = useState<string | undefined>();
   const api = useTRPC();
   const queryClient = useQueryClient();
+
+  // 进入页面时自动选中最近会话（列表按 modifiedAt 倒序，首项即上次对话），
+  // 避免退出后再进入显示空状态、对话内容"消失"。
+  const { data: sessions } = useQuery(api.chats.listSessions.queryOptions());
+  useEffect(() => {
+    if (!sessionId && sessions && sessions.length > 0) {
+      setSessionId(sessions[0].id);
+    }
+  }, [sessionId, sessions]);
 
   // 退出会话（切换/新建/离开页面）时自动总结对话并更新标题。
   // onSuccess 放在 mutationOptions 上，确保组件卸载后仍会刷新列表缓存。
