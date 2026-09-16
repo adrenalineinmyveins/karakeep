@@ -15,7 +15,7 @@ export default function ServerAddress() {
   const iconColor = colorScheme === "dark" ? "#d1d5db" : "#374151";
   const { settings, setSettings } = useAppSettings();
   const [address, setAddress] = useState(
-    settings.address ?? "http://localhost:3000",
+    settings.address ?? "http://8.160.162.251:3000",
   );
   const [error, setError] = useState<string | undefined>();
 
@@ -113,7 +113,7 @@ export default function ServerAddress() {
             Enter the URL of your Saiye server
           </Text>
           <Input
-            placeholder="http://localhost:3000"
+            placeholder="http://8.160.162.251:3000"
             value={address}
             onChangeText={(text) => {
               setAddress(text);

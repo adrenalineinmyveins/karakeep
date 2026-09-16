@@ -21,7 +21,7 @@ enum LoginType {
   ApiKey,
 }
 
-const DEFAULT_SERVER_ADDRESS = "http://localhost:3000";
+const DEFAULT_SERVER_ADDRESS = "http://8.160.162.251:3000";
 const CONNECTION_ERROR_MESSAGE =
   "Couldn’t connect to this Saiye server. Check the server address and your internet connection, then try again.";
 
