@@ -852,6 +852,17 @@
         "backup_deleted": "Backup has been deleted!"
       }
     },
+    "mirror": {
+      "mirror_export": "Markdown Mirror",
+      "page_title": "Markdown Mirror",
+      "page_description": "Your bookmarks are continuously mirrored as readable Markdown files on this device.",
+      "description": "Every text and link bookmark is saved as a .md file with its title, tags, highlights and note. The database remains the source of truth; the files are a readable copy for viewing or exporting.",
+      "export_dir": "Export directory",
+      "file_count": "Exported files",
+      "rebuild_now": "Rebuild Mirror",
+      "rebuild_queued": "Rebuild job has been queued! Your files will be refreshed shortly.",
+      "disabled_description": "Markdown mirror is not enabled on this server. Set the MIRROR_EXPORT_ENABLED environment variable to turn it on."
+    },
     "about": {
       "about": "About",
       "description": "Version, license and attribution information",

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Bookmarks from "@/components/dashboard/bookmarks/Bookmarks";
+import ConceptAnchorCard from "@/components/dashboard/concepts/ConceptAnchorCard";
 import ListHeader from "@/components/dashboard/lists/ListHeader";
 import { api } from "@/server/api/client";
 import { TRPCError } from "@trpc/server";
@@ -62,7 +63,12 @@ export default async function ListPage(props: {
         }}
         showDivider={true}
         showEditorCard={list.type === "manual" && canEdit}
-        header={<ListHeader initialData={list} />}
+        header={
+          <>
+            <ListHeader initialData={list} />
+            <ConceptAnchorCard anchorType="list" anchorId={list.id} />
+          </>
+        }
       />
     </BookmarkListContextProvider>
   );

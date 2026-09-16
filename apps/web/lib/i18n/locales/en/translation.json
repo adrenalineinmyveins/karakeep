@@ -801,6 +801,17 @@
         "backup_queued": "Backup job has been queued! It will be processed shortly.",
         "backup_deleted": "Backup has been deleted!"
       }
+    },
+    "mirror": {
+      "mirror_export": "Markdown Mirror",
+      "page_title": "Markdown Mirror",
+      "page_description": "Your bookmarks are continuously mirrored as readable Markdown files on this device.",
+      "description": "Every text and link bookmark is saved as a .md file with its title, tags, highlights and note. The database remains the source of truth; the files are a readable copy for viewing or exporting.",
+      "export_dir": "Export directory",
+      "file_count": "Exported files",
+      "rebuild_now": "Rebuild Mirror",
+      "rebuild_queued": "Rebuild job has been queued! Your files will be refreshed shortly.",
+      "disabled_description": "Markdown mirror is not enabled on this server. Set the MIRROR_EXPORT_ENABLED environment variable to turn it on."
     }
   },
   "admin": {
@@ -1085,6 +1096,34 @@
     "summary_bookmark_other": "{{count}} bookmarks",
     "items_count_one": "{{count}} item",
     "items_count_other": "{{count}} items"
+  },
+  "concepts": {
+    "title": "Concept Pages",
+    "entry_hint": "Let AI compile the bookmarks here into a single overview page",
+    "generate": "Generate concept page",
+    "generating": "Compiling concept page…",
+    "generating_page": "The AI is compiling this page. The previous version below stays readable.",
+    "view_page": "Concept page",
+    "stale_badge": "Updates available",
+    "failed_badge": "Compile failed",
+    "failure_hint": "Last compilation failed",
+    "recompile": "Recompile",
+    "sources": "Sources",
+    "sources_count_one": "{{count}} source",
+    "sources_count_other": "{{count}} sources",
+    "compiled": "Compiled",
+    "anchor_tag": "Tag",
+    "anchor_list": "List",
+    "overview_empty_title": "No concept pages yet",
+    "overview_empty_hint": "Open a tag or list page and click \"Generate concept page\" to let AI compile your bookmarks into an overview.",
+    "delete_confirm_title": "Delete concept page",
+    "delete_confirm_description": "The compiled page will be deleted. Your bookmarks are not affected, and you can regenerate the page at any time.",
+    "toasts": {
+      "created": "Concept page queued for compilation",
+      "recompile_queued": "Recompilation queued",
+      "deleted": "Concept page deleted",
+      "failed": "Something went wrong"
+    }
   },
   "tags": {
     "all_tags": "All Tags",

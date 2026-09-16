@@ -75,9 +75,10 @@ const FFMPEG_URL = `https://github.com/GyanD/codexffmpeg/releases/download/${FFM
 const YTDLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
 const YTDLP_FILE = "yt-dlp.exe";
 
-// monolith：Windows 构建不常发 release（且仓库构建需 Rust），缺失不阻塞，仅尝试
-const MONOLITH_VERSION = "2.8.6";
-const MONOLITH_URL = `https://github.com/Y2Z/monolith/releases/download/v${MONOLITH_VERSION}/x86_64-windows-msvc-monolith.exe`;
+// monolith：Windows release 资产名就是 monolith.exe（x86_64-windows-msvc-monolith.exe 不存在，会 404）；
+// github 直连不可达时，可手工把 monolith.exe 放到 bin-cache/monolith-${MONOLITH_VERSION}.exe（download 有缓存跳过）
+const MONOLITH_VERSION = "2.10.1";
+const MONOLITH_URL = `https://github.com/Y2Z/monolith/releases/download/v${MONOLITH_VERSION}/monolith.exe`;
 const MONOLITH_FILE = "monolith.exe";
 
 // Node 官方：与构建机 process.version 一致（锁 24.x）
@@ -397,6 +398,23 @@ async function step5_binaries() {
       }
     } else {
       step("  [WARN] 7z 解压后未找到 bin/，ffmpeg 未拷贝");
+    }
+  } else if (existsSync(ffmpegExtractedRoot)) {
+    // 预解压缓存：本机无 7z 时，可手工预置 bin-cache/ffmpeg-extracted/<子目录>/bin/，
+    // 结构与 7z x 解压结果一致，直接拷贝即可
+    let binDir = null;
+    for (const d of readdirSync(ffmpegExtractedRoot)) {
+      const b = path.join(ffmpegExtractedRoot, d, "bin");
+      if (existsSync(b)) { binDir = b; break; }
+    }
+    if (binDir) {
+      for (const f of readdirSync(binDir)) {
+        copyFileSync(path.join(binDir, f), path.join(binOut, f));
+      }
+      step("  [缓存] 使用预解压的 ffmpeg（bin-cache/ffmpeg-extracted）");
+    } else {
+      copyFileSync(ffmpegCached, path.join(binOut, FFMPEG_BASENAME));
+      step("  [WARN] 预解压目录存在但未找到 bin/，ffmpeg 7z 原文件已拷入 bin/");
     }
   } else {
     copyFileSync(ffmpegCached, path.join(binOut, FFMPEG_BASENAME));

@@ -55,15 +55,11 @@ fn resolve_layout(app: &AppHandle) -> Result<(PathBuf, PathBuf), String> {
     let node = res.join("node").join("node.exe");
     let run = res.join("runtime").join("supervisor").join("run.mjs");
 
-    // 已解压过 → 直接用
-    if node.exists() && run.exists() {
-        return Ok((node, run));
-    }
-
-    // 首次运行：从 payload.tar.gz 解压
+    // payload.tar.gz 存在 ⇔ 有新版本待解压（NSIS 每次安装都会覆盖写入该档案，
+    // 解压成功后即删除）。覆盖升级时旧 runtime 不再阻止新版生效。
     let payload = res.join("payload.tar.gz");
     if payload.exists() {
-        eprintln!("[desktop] 首次运行，正在解压 payload.tar.gz ...");
+        eprintln!("[desktop] 检测到 payload.tar.gz，正在解压（首次安装或升级）...");
         let status = Command::new("tar")
             .args(["xzf", &payload.to_string_lossy()])
             .current_dir(&res)
@@ -73,10 +69,12 @@ fn resolve_layout(app: &AppHandle) -> Result<(PathBuf, PathBuf), String> {
         if !status.success() {
             return Err(format!("payload 解压失败（tar exit={}）", status.code().unwrap_or(-1)));
         }
+        let _ = std::fs::remove_file(&payload); // 删除后，下次启动跳过解压
         eprintln!("[desktop] payload 解压完成");
-        if node.exists() && run.exists() {
-            return Ok((node, run));
-        }
+    }
+
+    if node.exists() && run.exists() {
+        return Ok((node, run));
     }
 
     Err(format!(

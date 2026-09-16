@@ -1,6 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { stripHtml, tokenizeQuery } from "./knowledgeRetrieval";
+// 模块顶层 import 会打开 SQLite 连接；纯函数测试不需要真实 db
+vi.mock("@saiye/db", () => ({ db: {} }));
+
+import {
+  applyKnowledgeBudget,
+  stripHtml,
+  tokenizeQuery,
+} from "./knowledgeRetrieval";
+import type { KnowledgeChunk } from "./knowledgeRetrieval";
 
 describe("tokenizeQuery", () => {
   it("中文切成 2-gram（连续段内组合）", () => {
@@ -70,5 +78,46 @@ describe("stripHtml", () => {
   it("空串与纯标签返回空", () => {
     expect(stripHtml("")).toBe("");
     expect(stripHtml("<br/><hr>")).toBe("");
+  });
+});
+
+describe("applyKnowledgeBudget", () => {
+  const chunk = (
+    source: KnowledgeChunk["source"],
+    content: string,
+    viaGraph = false,
+  ): KnowledgeChunk => ({ source, content, viaGraph: viaGraph || undefined });
+
+  it("优先级排序：记忆 > 直接命中 > 对话记忆 > 图谱扩展", () => {
+    // 乱序输入：图谱/对话在前，记忆最后
+    const chunks = [
+      chunk("bookmark", "b", true),
+      chunk("chat", "c"),
+      chunk("bookmark", "a"),
+      chunk("memory", "m"),
+    ];
+    const result = applyKnowledgeBudget(chunks, 100_000);
+    expect(result.map((c) => c.content)).toEqual(["m", "a", "c", "b"]);
+  });
+
+  it("超预算的片段被丢弃，放得下的仍可进入（continue 语义）", () => {
+    const chunks = [
+      chunk("bookmark", "x".repeat(600)), // 大片段
+      chunk("chat", "y".repeat(50)), // 小片段，可挤进剩余预算
+    ];
+    // 预算 600：bookmark 片段 600 + 100 开销 = 700 放不下；
+    // chat 片段 50 + 100 = 150 ≤ 600 放得下
+    const result = applyKnowledgeBudget(chunks, 600);
+    expect(result.map((c) => c.content[0])).toEqual(["y"]);
+  });
+
+  it("预算充足时全部保留", () => {
+    const chunks = [
+      chunk("memory", "m"),
+      chunk("bookmark", "a"),
+      chunk("chat", "c"),
+      chunk("bookmark", "g", true),
+    ];
+    expect(applyKnowledgeBudget(chunks, 100_000)).toHaveLength(4);
   });
 });

@@ -12,6 +12,7 @@ import { TRPCError } from "@trpc/server";
 import { TFunction } from "i18next";
 import {
   Archive,
+  BookOpenText,
   ClipboardList,
   Compass,
   Highlighter,
@@ -82,6 +83,15 @@ export default async function Dashboard({
         icon: <Tag size={18} />,
         path: "/dashboard/tags",
       },
+      ...(serverConfig.inference.isConfigured
+        ? [
+            {
+              name: t("concepts.title"),
+              icon: <BookOpenText size={18} />,
+              path: "/dashboard/concepts",
+            },
+          ]
+        : []),
       {
         name: t("common.highlights"),
         icon: <Highlighter size={18} />,

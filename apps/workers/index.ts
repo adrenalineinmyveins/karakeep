@@ -6,6 +6,7 @@ import {
   AdminMaintenanceQueue,
   AssetPreprocessingQueue,
   BackupQueue,
+  ConceptCompilationQueue,
   EmbeddingsQueue,
   FeedQueue,
   initEventLogger,
@@ -13,6 +14,7 @@ import {
   LinkCrawlerQueue,
   loadAllPlugins,
   LowPriorityCrawlerQueue,
+  MirrorExportQueue,
   OpenAIQueue,
   prepareQueue,
   RuleEngineQueue,
@@ -34,6 +36,9 @@ import { CrawlerWorker } from "./workers/crawlerWorker";
 import { EmbeddingsWorker } from "./workers/embeddingsWorker";
 import { FeedRefreshingWorker, FeedWorker } from "./workers/feedWorker";
 import { ImportWorker } from "./workers/importWorker";
+import { MirrorExportWorker } from "./workers/mirrorWorker";
+import { ConceptWorker } from "./workers/concepts/conceptWorker";
+import { ConceptSchedulingWorker } from "./workers/concepts/reconcile";
 import { OpenAiWorker } from "./workers/inference/inferenceWorker";
 import { RuleEngineWorker } from "./workers/ruleEngineWorker";
 import { SearchIndexingWorker } from "./workers/searchWorker";
@@ -89,6 +94,14 @@ const workerBuilders = {
     await BackupQueue.ensureInit();
     return BackupWorker.build();
   },
+  mirrorExport: async () => {
+    await MirrorExportQueue.ensureInit();
+    return MirrorExportWorker.build();
+  },
+  concept: async () => {
+    await ConceptCompilationQueue.ensureInit();
+    return ConceptWorker.build();
+  },
 } as const;
 
 type WorkerName = keyof typeof workerBuilders | "import";
@@ -133,6 +146,10 @@ async function main() {
     BackupSchedulingWorker.start();
   }
 
+  if (workers.some((w) => w.name === "concept")) {
+    ConceptSchedulingWorker.start();
+  }
+
   // Start import polling worker
   let importWorker: ImportWorker | null = null;
   let importWorkerPromise: Promise<void> | null = null;
@@ -159,6 +176,9 @@ async function main() {
   }
   if (workers.some((w) => w.name === "backup")) {
     BackupSchedulingWorker.stop();
+  }
+  if (workers.some((w) => w.name === "concept")) {
+    ConceptSchedulingWorker.stop();
   }
   if (importWorker) {
     importWorker.stop();

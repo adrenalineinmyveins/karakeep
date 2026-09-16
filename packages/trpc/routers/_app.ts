@@ -8,12 +8,14 @@ import { bookmarksAppRouter } from "./bookmarks";
 import { canvasesAppRouter } from "./canvases";
 import { chatsAppRouter } from "./chats";
 import { configAppRouter } from "./config";
+import { conceptsAppRouter } from "./concepts";
 import { feedsAppRouter } from "./feeds";
 import { highlightsAppRouter } from "./highlights";
 import { importSessionsRouter } from "./importSessions";
 import { invitesAppRouter } from "./invites";
 import { listsAppRouter } from "./lists";
 import { memoriesAppRouter } from "./memories";
+import { mirrorAppRouter } from "./mirror";
 import { promptsAppRouter } from "./prompts";
 import { publicBookmarks } from "./publicBookmarks";
 import { publicSharedAssets, sharedAssetsAppRouter } from "./sharedAssets";
@@ -50,6 +52,8 @@ export const appRouter = router({
   sharedAssets: sharedAssetsAppRouter,
   subscriptions: subscriptionsRouter,
   config: configAppRouter,
+  mirror: mirrorAppRouter,
+  concepts: conceptsAppRouter,
 });
 // export type definition of API
 export type AppRouter = typeof appRouter;

@@ -97,6 +97,13 @@ const allEnv = z.object({
   // A3 三源 RAG 检索注入的可调参数（top K）
   KNOWLEDGE_BOOKMARK_TOP_K: z.coerce.number().int().min(1).max(20).optional(),
   KNOWLEDGE_CHAT_TOP_K: z.coerce.number().int().min(0).max(20).optional(),
+  // A5 知识注入总字符预算（记忆 > 直接命中 > 对话记忆 > 图谱扩展，超出丢弃）
+  KNOWLEDGE_CONTEXT_MAX_CHARS: z.coerce
+    .number()
+    .int()
+    .min(1000)
+    .max(100_000)
+    .optional(),
   TAVILY_API_KEY: z.string().optional(),
   SEMANTIC_SEARCH_ENABLED: stringBool("true"),
   INFERENCE_JOB_TIMEOUT_SEC: z.coerce.number().default(30),
@@ -185,6 +192,8 @@ const allEnv = z.object({
   DEMO_MODE_PASSWORD: z.string().optional(),
   DATA_DIR: z.string().default(""),
   ASSETS_DIR: z.string().optional(),
+  MIRROR_EXPORT_ENABLED: stringBool("false"),
+  MIRROR_EXPORT_DIR: z.string().optional(),
   MAX_ASSET_SIZE_MB: z.coerce.number().default(50),
   HTML_CONTENT_SIZE_INLINE_THRESHOLD_BYTES: z.coerce.number().default(5 * 1024),
   INFERENCE_LANG: z.string().default("english"),
@@ -390,6 +399,7 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
       knowledgeContext: {
         bookmarkTopK: val.KNOWLEDGE_BOOKMARK_TOP_K ?? 5,
         chatTopK: val.KNOWLEDGE_CHAT_TOP_K ?? 3,
+        maxChars: val.KNOWLEDGE_CONTEXT_MAX_CHARS ?? 12_000,
       },
     },
     tavily: {
@@ -477,6 +487,10 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
       : undefined,
     dataDir: val.DATA_DIR,
     assetsDir: val.ASSETS_DIR ?? path.join(val.DATA_DIR, "assets"),
+    mirrorExport: {
+      enabled: val.MIRROR_EXPORT_ENABLED,
+      dir: val.MIRROR_EXPORT_DIR ?? path.join(val.DATA_DIR, "export"),
+    },
     maxAssetSizeMb: val.MAX_ASSET_SIZE_MB,
     legal: {
       termsOfServiceUrl: val.TERMS_OF_SERVICE_URL,

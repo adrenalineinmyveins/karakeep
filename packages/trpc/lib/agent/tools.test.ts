@@ -26,6 +26,7 @@ const fakeCaller = {
     delete: vi.fn(),
     rollback: vi.fn(),
   },
+  users: { settings: vi.fn(), updateSettings: vi.fn() },
 };
 
 // 拦截 createCallerFactory，让 getCaller 返回 fakeCaller
@@ -72,10 +73,10 @@ beforeEach(() => {
 });
 
 describe("buildAgentTools", () => {
-  it("包含 create_canvas 工具（无 Tavily key 时共 17 个）", async () => {
+  it("包含 create_canvas 工具（无 Tavily key 时共 19 个）", async () => {
     const tools = await buildAgentTools(ctx);
     expect(tools.map((t) => t.name)).toContain("create_canvas");
-    expect(tools).toHaveLength(17);
+    expect(tools).toHaveLength(19);
   });
 
   it("包含全部 widget 工具，且 save_widget 描述内嵌组件规范", async () => {
@@ -971,5 +972,72 @@ describe("rollback_widget", () => {
       widgetId: "w-1",
       version: 1,
     });
+  });
+});
+
+// ── 用户设置工具 ─────────────────────────────────────────
+
+async function getSettingsTool(name: string) {
+  const tools = await buildAgentTools(ctx);
+  const tool = tools.find((t) => t.name === name);
+  if (!tool) throw new Error(`${name} tool not found`);
+  return tool;
+}
+
+describe("get_user_settings", () => {
+  it("返回 users.settings 的完整设置", async () => {
+    const settings = {
+      bookmarkClickAction: "open_original_link",
+      archiveDisplayBehaviour: "show",
+      timezone: "UTC",
+      backupsEnabled: false,
+      backupsFrequency: "weekly",
+      backupsRetentionDays: 30,
+      readerFontSize: null,
+      readerLineHeight: null,
+      readerFontFamily: null,
+      autoTaggingEnabled: null,
+      autoSummarizationEnabled: null,
+      chatKnowledgeContextEnabled: null,
+      tagStyle: "as-generated",
+      curatedTagIds: null,
+      inferredTagLang: null,
+    };
+    fakeCaller.users.settings.mockResolvedValue(settings);
+
+    const tool = await getSettingsTool("get_user_settings");
+    const raw = await tool.execute({});
+    expect(JSON.parse(raw)).toEqual(settings);
+  });
+});
+
+describe("update_user_settings", () => {
+  it("部分字段更新 → 调 updateSettings 并返回变更前后对比", async () => {
+    fakeCaller.users.settings.mockResolvedValue({
+      timezone: "UTC",
+      autoTaggingEnabled: false,
+    });
+    fakeCaller.users.updateSettings.mockResolvedValue(undefined);
+
+    const tool = await getSettingsTool("update_user_settings");
+    const raw = await tool.execute({ timezone: "Asia/Shanghai" });
+    const result = JSON.parse(raw);
+
+    expect(fakeCaller.users.updateSettings).toHaveBeenCalledWith({
+      timezone: "Asia/Shanghai",
+    });
+    expect(result).toEqual({
+      success: true,
+      changed: [{ key: "timezone", before: "UTC", after: "Asia/Shanghai" }],
+    });
+  });
+
+  it("空参数 → 返回错误，不调用 updateSettings", async () => {
+    const tool = await getSettingsTool("update_user_settings");
+    const raw = await tool.execute({});
+    const result = JSON.parse(raw);
+
+    expect(result.error).toContain("至少提供");
+    expect(fakeCaller.users.updateSettings).not.toHaveBeenCalled();
   });
 });

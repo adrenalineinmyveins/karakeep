@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Bookmarks from "@/components/dashboard/bookmarks/Bookmarks";
+import ConceptAnchorCard from "@/components/dashboard/concepts/ConceptAnchorCard";
 import TagHeader from "@/components/dashboard/tags/TagHeader";
 import { api } from "@/server/api/client";
 import { TRPCError } from "@trpc/server";
@@ -50,7 +51,12 @@ export default async function TagPage(props: {
 
   return (
     <Bookmarks
-      header={<TagHeader initialData={tag} />}
+      header={
+        <>
+          <TagHeader initialData={tag} />
+          <ConceptAnchorCard anchorType="tag" anchorId={tag.id} />
+        </>
+      }
       showDivider={true}
       query={{
         tagId: tag.id,

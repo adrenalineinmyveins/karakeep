@@ -185,6 +185,13 @@ export function useChat(
                   return { ...m, toolCalls };
                 }),
               );
+              // chat 改了用户设置 → 失效设置缓存，设置页与全局 context 实时拿到新值
+              if (
+                event.toolName === "update_user_settings" &&
+                event.status === "end"
+              ) {
+                queryClient.invalidateQueries(api.users.settings.pathFilter());
+              }
               break;
 
             case "message_complete":

@@ -50,6 +50,7 @@ const SYSTEM_PROMPT = `你是 Saiye 的 AI 助手，帮助用户管理他们的�
 6. 画布生成：用户想把某个流程、架构、思路可视化成图时，先把内容转成合法的 mermaid 语法（graph TD / flowchart / mindmap 等），再调用 create_canvas 工具（mermaid 参数必填），工具会把 mermaid 转换为 drawnix 无限画布元素并保存，返回编辑链接
 7. 组件生成：用户想在自己界面里加一个小组件/卡片/统计视图时，用 save_widget 生成（遵循工具内的组件规范与宿主 API 文档，保持组件小型），生成后引导用户在预览卡上点「安装」；已安装组件的修改用 update_widget，用户不满意可 rollback_widget。注意：对话上下文中若找不到此前生成的 widgetId（如会话恢复后），先用 list_widgets 查询确认，不要凭记忆编造 ID。
 8. 长期记忆：用户表达跨会话有效的偏好或事实（如『记住我喜欢简洁的回答』）时，用 save_memory 保存；用户问『你记得我什么』时用 list_memories 回答；用户要求遗忘时用 delete_memory
+9. 设置管理：用户想查看或修改个人设置（时区、阅读器字体、AI 自动标签/摘要、备份策略、标签样式等）时，先用 get_user_settings 了解现状，再用 update_user_settings 修改（只传要改的字段），并把变更前后对比复述给用户
 
 行为规范：
 - 回答问题前，先用 search_bookmarks 检索相关书签
@@ -75,6 +76,11 @@ function buildKnowledgeContextBlock(chunks: KnowledgeChunk[]): string {
       }
       if (c.source === "chat") {
         return `[对话记忆]（会话：${c.title ?? "未命名"}，角色：${c.role ?? "user"}）\n${c.content}`;
+      }
+      if (c.viaGraph) {
+        return c.url
+          ? `[相关收藏]（与命中书签共享标签/清单，可能相关）${c.title ?? "(无标题)"}\nURL：${c.url}\n${c.content}`
+          : `[相关笔记]（与命中书签共享标签/清单，可能相关）${c.title ?? "(无标题)"}\n${c.content}`;
       }
       if (c.url) {
         return `[收藏] ${c.title ?? "(无标题)"}\nURL：${c.url}\n${c.content}`;
@@ -208,7 +214,8 @@ export class AgentOrchestrator {
       console.log(
         `[Orchestrator] knowledge context injected: ${chunks.length} chunks ` +
           `(${chunks.filter((c) => c.source === "memory").length} memories, ` +
-          `${chunks.filter((c) => c.source === "bookmark").length} bookmarks, ` +
+          `${chunks.filter((c) => c.source === "bookmark" && !c.viaGraph).length} bookmarks, ` +
+          `${chunks.filter((c) => c.viaGraph).length} graph-expanded, ` +
           `${chunks.filter((c) => c.source === "chat").length} chat memories)`,
       );
     }

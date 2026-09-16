@@ -7,6 +7,7 @@
 
 import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import serverConfig from "@saiye/shared/config";
+import { zUpdateUserSettingsSchema } from "@saiye/shared/types/users";
 import { zWidgetPermissionSchema } from "@saiye/shared/types/widgets";
 import type { ZWidgetPermission } from "@saiye/shared/types/widgets";
 import { z } from "zod";
@@ -1228,6 +1229,40 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
           rolledBackFrom: widget.rolledBackFrom,
           reInstallRequired: widget.reInstallRequired,
         });
+      },
+    ),
+
+    // ── 用户设置 ──────────────────────────────────────────
+    zodToToolSchema(
+      "get_user_settings",
+      "查看用户的当前个人设置，包括：bookmarkClickAction（点击书签行为）、archiveDisplayBehaviour（归档显示）、timezone、备份（backupsEnabled/backupsFrequency/backupsRetentionDays）、阅读器（readerFontSize/readerLineHeight/readerFontFamily）、AI 自动处理（autoTaggingEnabled/autoSummarizationEnabled/inferredTagLang）、chatKnowledgeContextEnabled（对话知识注入）、tagStyle（标签样式）。修改设置前先调用它了解现状。",
+      z.object({}),
+      async () => {
+        const settings = await caller.users.settings();
+        return JSON.stringify(settings);
+      },
+    ),
+
+    zodToToolSchema(
+      "update_user_settings",
+      "修改用户的个人设置。只传需要修改的字段，未传字段保持不变。字段含义与取值范围见参数 schema；reader/AI 类字段为 null 时表示恢复默认。修改成功后返回各字段变更前后对比，需向用户复述确认。不支持修改 curatedTagIds。",
+      zUpdateUserSettingsSchema.omit({ curatedTagIds: true }),
+      async (args) => {
+        if (Object.keys(args).length === 0) {
+          return JSON.stringify({
+            error: "至少提供要修改的一个设置字段",
+          });
+        }
+        const before = await caller.users.settings();
+        await caller.users.updateSettings(
+          args as Parameters<typeof caller.users.updateSettings>[0],
+        );
+        const changed = Object.keys(args).map((key) => ({
+          key,
+          before: before[key as keyof typeof before],
+          after: args[key],
+        }));
+        return JSON.stringify({ success: true, changed });
       },
     ),
   ];

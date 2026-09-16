@@ -411,6 +411,81 @@ export const highlights = sqliteTable(
   ],
 );
 
+// Concept pages: LLM-compiled knowledge digests anchored on a tag or a list.
+// The database stays the single source of truth; the compiled markdown is also
+// mirrored to export/{userId}/concepts/{slug}.md by the mirror export worker.
+// anchorId intentionally has no FK: it points at either bookmarkTags.id or
+// bookmarkLists.id. Orphaned anchors (tag/list deleted) are cleaned up by the
+// periodic reconciliation cron.
+export const conceptPages = sqliteTable(
+  "conceptPages",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+
+    anchorType: text("anchorType", { enum: ["tag", "list"] }).notNull(),
+    anchorId: text("anchorId").notNull(),
+
+    title: text("title").notNull(),
+    // Stable file name for the markdown mirror (unique per user)
+    slug: text("slug").notNull(),
+
+    // Markdown body produced by the LLM. Kept on stale/failure so the page
+    // always stays readable; only replaced after a successful compile.
+    content: text("content").notNull().default(""),
+
+    status: text("status", {
+      enum: ["pending", "generating", "ready", "stale", "failure"],
+    })
+      .notNull()
+      .default("pending"),
+    lastError: text("lastError"),
+
+    // Snapshot of the source set used for the current compile, used for
+    // stale detection during the reconciliation cron.
+    sourceCount: integer("sourceCount").notNull().default(0),
+    sourceContentHash: text("sourceContentHash"),
+
+    compileVersion: integer("compileVersion").notNull().default(0),
+    lastCompiledAt: integer("lastCompiledAt", { mode: "timestamp" }),
+    lastSourceChangeAt: modifiedAtField(),
+
+    createdAt: createdAtField(),
+  },
+  (tb) => [
+    unique().on(tb.userId, tb.anchorType, tb.anchorId),
+    unique().on(tb.userId, tb.slug),
+    index("conceptPages_userId_status_idx").on(tb.userId, tb.status),
+  ],
+);
+
+// Which bookmarks were fed into a concept page compile. Bookmark deletion
+// cascades rows away here; the reconciliation cron notices the mismatch with
+// conceptPages.sourceCount and marks the page stale.
+export const conceptPageSources = sqliteTable(
+  "conceptPageSources",
+  {
+    pageId: text("pageId")
+      .notNull()
+      .references(() => conceptPages.id, { onDelete: "cascade" }),
+    bookmarkId: text("bookmarkId")
+      .notNull()
+      .references(() => bookmarks.id, { onDelete: "cascade" }),
+    attachedAt: integer("attachedAt", { mode: "timestamp" }).$defaultFn(
+      () => new Date(),
+    ),
+  },
+  (tb) => [
+    primaryKey({ columns: [tb.pageId, tb.bookmarkId] }),
+    index("conceptPageSources_bookmarkId_idx").on(tb.bookmarkId),
+  ],
+);
+
 export const userReadingProgress = sqliteTable(
   "userReadingProgress",
   {
@@ -1299,6 +1374,31 @@ export const apiKeyRelations = relations(apiKeys, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const conceptPageRelations = relations(
+  conceptPages,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [conceptPages.userId],
+      references: [users.id],
+    }),
+    sources: many(conceptPageSources),
+  }),
+);
+
+export const conceptPageSourceRelations = relations(
+  conceptPageSources,
+  ({ one }) => ({
+    page: one(conceptPages, {
+      fields: [conceptPageSources.pageId],
+      references: [conceptPages.id],
+    }),
+    bookmark: one(bookmarks, {
+      fields: [conceptPageSources.bookmarkId],
+      references: [bookmarks.id],
+    }),
+  }),
+);
 
 export const bookmarkListsRelations = relations(
   bookmarkLists,

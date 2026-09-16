@@ -9,7 +9,7 @@
  * - 每片段 500 字符截断；任何失败静默降级（返回 []，不打断对话）
  */
 
-import { and, desc, eq, ne, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, ne, or, sql } from "drizzle-orm";
 
 import { db } from "@saiye/db";
 import {
@@ -17,8 +17,10 @@ import {
   bookmarkLinks,
   bookmarkTexts,
   bookmarks,
+  bookmarksInLists,
   chatMessages,
   chatSessions,
+  tagsOnBookmarks,
 } from "@saiye/db/schema";
 import logger from "@saiye/shared/logger";
 import serverConfig from "@saiye/shared/config";
@@ -39,6 +41,10 @@ const BOOKMARK_TOP_K = serverConfig.chat.knowledgeContext.bookmarkTopK;
 const CHAT_TOP_K = serverConfig.chat.knowledgeContext.chatTopK;
 /** 每片段内容截断长度 */
 const SNIPPET_MAX_CHARS = 500;
+/** 图谱扩展邻居书签数上限（A5） */
+const GRAPH_EXPAND_LIMIT = 4;
+/** 第二跳关联查询的单侧行数上限（防大清单拖回全库） */
+const GRAPH_HOP_ROW_LIMIT = 200;
 
 /** 中英文常见停用词（命中即不作为检索 token） */
 const STOP_WORDS = new Set([
@@ -109,6 +115,8 @@ export interface KnowledgeChunk {
   /** 对话消息的角色（chat 片段） */
   role?: "user" | "assistant" | "toolResult";
   content: string;
+  /** A5 图谱扩展片段：经共享标签/清单关联（非直接命中） */
+  viaGraph?: boolean;
 }
 
 export interface KnowledgeRetrievalParams {
@@ -200,7 +208,7 @@ export function stripHtml(html: string): string {
 async function searchBookmarks(
   userId: string,
   tokens: string[],
-): Promise<KnowledgeChunk[]> {
+): Promise<{ chunks: KnowledgeChunk[]; seedIds: string[] }> {
   // A2: htmlContent（link 书签抓取的网页正文）纳入 LIKE 匹配——
   // 正文是信息量最大的字段，summary 缺失时它是唯一可命中源。
   // 注意：对大正文列做 LIKE 是全表扫描，靠候选池 limit 控制读取行数。
@@ -240,7 +248,7 @@ async function searchBookmarks(
     .limit(BOOKMARK_CANDIDATE_LIMIT);
 
   // 覆盖数重排（候选池已按无关顺序取回，重排保证最相关的进 top K）
-  return rows
+  const ranked = rows
     .map((row) => {
       // 正文纯文本（link 书签）：截断后参与打分与片段生成，避免超大 HTML 全量处理
       const articleText = row.htmlContent
@@ -270,6 +278,7 @@ async function searchBookmarks(
         .join("\n")
         .toLowerCase();
       return {
+        id: row.id,
         source: "bookmark" as const,
         title: row.title,
         url: row.url,
@@ -279,8 +288,12 @@ async function searchBookmarks(
     })
     .filter((c): c is NonNullable<typeof c> => c !== null)
     .sort((a, b) => b._score - a._score)
-    .slice(0, BOOKMARK_TOP_K)
-    .map(({ _score, ...chunk }) => chunk);
+    .slice(0, BOOKMARK_TOP_K);
+
+  return {
+    chunks: ranked.map(({ id: _id, _score, ...chunk }) => chunk),
+    seedIds: ranked.map((r) => r.id),
+  };
 }
 
 // ── 对话记忆检索 ──────────────────────────────────────
@@ -344,6 +357,167 @@ async function loadMemories(userId: string): Promise<KnowledgeChunk[]> {
   }));
 }
 
+// ── 图谱扩展（A5：命中书签 → 共享标签/清单 → 邻居书签） ──
+
+/**
+ * 2 跳图谱扩展：直接命中的书签（seeds）→ 其标签/清单 → 同标签或
+ * 同清单的其他书签。共享信号计数排序（标签权重 2、清单权重 1，
+ * 大清单的弱关联天然沉底），取 top N 作为补充上下文。
+ * 移植自 llm_wiki 的"来源重叠/类型亲和"图谱信号，简化为计数版。
+ */
+async function expandByGraph(
+  userId: string,
+  seedIds: string[],
+): Promise<KnowledgeChunk[]> {
+  if (seedIds.length === 0) {
+    return [];
+  }
+
+  // 第一跳：seeds 的标签 id 与清单 id
+  const [tagRows, listRows] = await Promise.all([
+    db
+      .select({ tagId: tagsOnBookmarks.tagId })
+      .from(tagsOnBookmarks)
+      .where(inArray(tagsOnBookmarks.bookmarkId, seedIds)),
+    db
+      .select({ listId: bookmarksInLists.listId })
+      .from(bookmarksInLists)
+      .where(inArray(bookmarksInLists.bookmarkId, seedIds)),
+  ]);
+
+  const tagIds = [...new Set(tagRows.map((r) => r.tagId))];
+  const listIds = [...new Set(listRows.map((r) => r.listId))];
+  if (tagIds.length === 0 && listIds.length === 0) {
+    return [];
+  }
+
+  // 第二跳：同标签/同清单的书签 id（排除 seeds 自身）
+  const [siblingTagRows, siblingListRows] = await Promise.all([
+    tagIds.length > 0
+      ? db
+          .select({ bookmarkId: tagsOnBookmarks.bookmarkId })
+          .from(tagsOnBookmarks)
+          .where(inArray(tagsOnBookmarks.tagId, tagIds))
+          .limit(GRAPH_HOP_ROW_LIMIT)
+      : Promise.resolve([] as { bookmarkId: string }[]),
+    listIds.length > 0
+      ? db
+          .select({ bookmarkId: bookmarksInLists.bookmarkId })
+          .from(bookmarksInLists)
+          .where(inArray(bookmarksInLists.listId, listIds))
+          .limit(GRAPH_HOP_ROW_LIMIT)
+      : Promise.resolve([] as { bookmarkId: string }[]),
+  ]);
+
+  const seedSet = new Set(seedIds);
+  const counts = new Map<string, number>();
+  for (const r of siblingTagRows) {
+    if (!seedSet.has(r.bookmarkId)) {
+      counts.set(r.bookmarkId, (counts.get(r.bookmarkId) ?? 0) + 2);
+    }
+  }
+  for (const r of siblingListRows) {
+    if (!seedSet.has(r.bookmarkId)) {
+      counts.set(r.bookmarkId, (counts.get(r.bookmarkId) ?? 0) + 1);
+    }
+  }
+
+  const neighborIds = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, GRAPH_EXPAND_LIMIT)
+    .map(([id]) => id);
+  if (neighborIds.length === 0) {
+    return [];
+  }
+
+  // 邻居书签内容（字段与 searchBookmarks 一致，同样只取未归档）
+  const rows = await db
+    .select({
+      id: bookmarks.id,
+      title: bookmarkLinks.title,
+      summary: bookmarks.summary,
+      note: bookmarks.note,
+      url: bookmarkLinks.url,
+      linkDescription: bookmarkLinks.description,
+      textContent: bookmarkTexts.text,
+      htmlContent: bookmarkLinks.htmlContent,
+    })
+    .from(bookmarks)
+    .leftJoin(bookmarkLinks, eq(bookmarkLinks.id, bookmarks.id))
+    .leftJoin(bookmarkTexts, eq(bookmarkTexts.id, bookmarks.id))
+    .where(
+      and(
+        eq(bookmarks.userId, userId),
+        eq(bookmarks.archived, false),
+        inArray(bookmarks.id, neighborIds),
+      ),
+    );
+
+  // 保持计数排序顺序
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  return neighborIds
+    .map((id) => byId.get(id))
+    .filter((row): row is NonNullable<typeof row> => !!row)
+    .map((row) => {
+      const articleText = row.htmlContent
+        ? stripHtml(row.htmlContent).slice(0, 10_000)
+        : "";
+      const content =
+        row.summary?.trim() ||
+        row.note?.trim() ||
+        row.textContent?.trim() ||
+        row.linkDescription?.trim() ||
+        articleText ||
+        "";
+      return {
+        source: "bookmark" as const,
+        title: row.title,
+        url: row.url,
+        content: truncate(content || row.title || "(无标题)"),
+        viaGraph: true,
+      };
+    });
+}
+
+// ── 注入预算（A5：总字符上限，超预算的低优先级片段丢弃） ──
+
+/** 注入优先级：记忆 > 直接命中书签 > 对话记忆；图谱扩展整体垫底 */
+const SOURCE_PRIORITY: Record<KnowledgeChunk["source"], number> = {
+  memory: 0,
+  bookmark: 1,
+  chat: 2,
+};
+
+/** 每片段注入时的标注开销估算（标题行 + 分隔，与 buildKnowledgeContextBlock 对应） */
+const CHUNK_OVERHEAD_CHARS = 100;
+
+/**
+ * 按预算裁剪片段。稳定排序（组内保持检索排序），逐片段累加字符，
+ * 放不下的丢弃（continue 而非 break：尾部预算仍可容纳更小的片段）。
+ */
+export function applyKnowledgeBudget(
+  chunks: KnowledgeChunk[],
+  maxChars: number,
+): KnowledgeChunk[] {
+  const sorted = [...chunks].sort(
+    (a, b) =>
+      (a.viaGraph ? 1 : 0) - (b.viaGraph ? 1 : 0) ||
+      SOURCE_PRIORITY[a.source] - SOURCE_PRIORITY[b.source],
+  );
+  const result: KnowledgeChunk[] = [];
+  let used = 0;
+  for (const c of sorted) {
+    const size =
+      c.content.length + (c.title?.length ?? 0) + CHUNK_OVERHEAD_CHARS;
+    if (used + size > maxChars) {
+      continue;
+    }
+    result.push(c);
+    used += size;
+  }
+  return result;
+}
+
 // ── 对外入口 ──────────────────────────────────────────
 
 /**
@@ -359,12 +533,28 @@ export async function retrieveKnowledgeContext(
   }
 
   try {
-    const [bookmarksResult, chatResult, memoryResult] = await Promise.all([
+    const [bookmarkResult, chatResult, memoryResult] = await Promise.all([
       searchBookmarks(params.userId, tokens),
       searchChatMessages(params.userId, tokens, params.excludeChatId),
       loadMemories(params.userId),
     ]);
-    return [...memoryResult, ...bookmarksResult, ...chatResult];
+    // A5 图谱扩展：以直接命中书签为种子做 2 跳关联（失败静默跳过）
+    const graphResult = await expandByGraph(
+      params.userId,
+      bookmarkResult.seedIds,
+    ).catch(() => [] as KnowledgeChunk[]);
+
+    const all = [
+      ...memoryResult,
+      ...bookmarkResult.chunks,
+      ...chatResult,
+      ...graphResult,
+    ];
+    // A5 总预算裁剪：记忆 > 直接命中 > 对话记忆 > 图谱扩展
+    return applyKnowledgeBudget(
+      all,
+      serverConfig.chat.knowledgeContext.maxChars,
+    );
   } catch (e) {
     logger.warn(
       `[knowledgeRetrieval] 检索失败，静默降级为无知识注入: ${e instanceof Error ? e.message : e}`,

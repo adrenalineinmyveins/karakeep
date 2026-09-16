@@ -104,6 +104,21 @@ type EventLogInternal =
       "backup.uncompressed_size"?: number;
       "backup.compressed_size"?: number;
     }
+  | {
+      ["event.name"]: "mirrorExportWorker.run";
+      "bookmark.id"?: string;
+      "conceptPage.id"?: string;
+      "mirrorExport.type"?:
+        | "export"
+        | "delete"
+        | "rebuild"
+        | "concept_export"
+        | "concept_delete";
+    }
+  | {
+      ["event.name"]: "conceptWorker.run";
+      "conceptPage.id"?: string;
+    }
   // Product Events
   | {
       ["event.name"]: "user.login";

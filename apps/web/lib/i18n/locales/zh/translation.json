@@ -776,6 +776,17 @@
         "backup_deleted": "备份已删除！"
       }
     },
+    "mirror": {
+      "mirror_export": "Markdown 镜像",
+      "page_title": "Markdown 镜像",
+      "page_description": "你的书签会持续镜像为本机上可读的 Markdown 文件。",
+      "description": "每条文本和链接书签都会保存为 .md 文件，包含标题、标签、高亮和备注。数据库仍是唯一事实源；这些文件是供查看或导出的可读副本。",
+      "export_dir": "导出目录",
+      "file_count": "已导出文件数",
+      "rebuild_now": "重建镜像",
+      "rebuild_queued": "重建任务已加入队列！文件很快会刷新。",
+      "disabled_description": "此服务器未启用 Markdown 镜像。设置 MIRROR_EXPORT_ENABLED 环境变量即可开启。"
+    },
     "about": {
       "about": "关于",
       "description": "版本、许可证与致谢信息",
@@ -1070,6 +1081,34 @@
     "summary_bookmark_other": "{{count}} 书签",
     "items_count_one": "{{count}} 个项目",
     "items_count_other": "{{count}} 个项目"
+  },
+  "concepts": {
+    "title": "概念页",
+    "entry_hint": "让 AI 把这里的书签编译成一页综述",
+    "generate": "生成概念页",
+    "generating": "正在编译概念页…",
+    "generating_page": "AI 正在编译此页面，下方旧版本仍可阅读。",
+    "view_page": "概念页",
+    "stale_badge": "有更新",
+    "failed_badge": "编译失败",
+    "failure_hint": "上次编译失败",
+    "recompile": "重新编译",
+    "sources": "来源",
+    "sources_count_one": "{{count}} 个来源",
+    "sources_count_other": "{{count}} 个来源",
+    "compiled": "编译于",
+    "anchor_tag": "标签",
+    "anchor_list": "列表",
+    "overview_empty_title": "还没有概念页",
+    "overview_empty_hint": "打开标签或列表页，点击“生成概念页”，AI 会把书签编译成一页综述。",
+    "delete_confirm_title": "删除概念页",
+    "delete_confirm_description": "编译出的页面将被删除。书签不受影响，你可以随时重新生成。",
+    "toasts": {
+      "created": "概念页已加入编译队列",
+      "recompile_queued": "已加入重新编译队列",
+      "deleted": "概念页已删除",
+      "failed": "操作出错"
+    }
   },
   "tags": {
     "all_tags": "所有标签",

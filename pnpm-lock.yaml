@@ -1112,6 +1112,9 @@ importers:
       tsx:
         specifier: ^4.8.1
         version: 4.20.3
+      turndown:
+        specifier: ^7.2.0
+        version: 7.2.0
       typescript:
         specifier: ^5.9
         version: 5.9.3
@@ -1128,6 +1131,9 @@ importers:
       '@types/node-cron':
         specifier: ^3.0.11
         version: 3.0.11
+      '@types/turndown':
+        specifier: ^5.0.5
+        version: 5.0.5
       tsdown:
         specifier: ^0.12.9
         version: 0.12.9(typescript@5.9.3)

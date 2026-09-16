@@ -1,4 +1,4 @@
-################# Monolith Builder ##############
+﻿################# Monolith Builder ##############
 FROM rust:1-bookworm AS monolith_builder
 
 # Use USTC apt mirror for reliable downloads in China
@@ -15,7 +15,7 @@ RUN mkdir -p /usr/local/cargo && \
     && cargo install monolith --locked
 
 ################# Base Builder ##############
-FROM node:24-slim AS base
+FROM node:24.20-slim AS base
 
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
@@ -80,17 +80,12 @@ RUN cd packages/db && \
 
 
 # Compile the web app
-# 代理仅内联在本 RUN 内（宿主 Clash: host.docker.internal:7897），让 next build 拉 Google Fonts 走代理；
-# 不能用 --build-arg 传代理——Docker 预定义代理 build-arg 无需 ARG 声明即注入所有 RUN，
-# 会污染 pnpm install 层（better-sqlite3 prebuild/node-gyp 经代理下载会断连）。
-# NODE_USE_ENV_PROXY=1: Node 24 的 fetch 需显式启用环境变量代理
-RUN (cd apps/web && \
-    HTTP_PROXY=http://host.docker.internal:7897 \
-    HTTPS_PROXY=http://host.docker.internal:7897 \
-    NO_PROXY=localhost,127.0.0.1 \
-    NODE_USE_ENV_PROXY=1 \
-    NEXT_FONT_GOOGLE_MIRROR_URL=https://fonts.googleapis.cn \
-    pnpm --config.verify-deps-before-run=false exec next build --experimental-build-mode compile)
+# next build 需拉 Google Fonts：当前容器直连 fonts.googleapis.com 可达（实测 200），
+# 不再内联代理——宿主 Clash(7897) 已不在线，指向死代理反而构建失败。
+# 若日后直连又失败：在本 RUN 内联回 HTTP_PROXY/HTTPS_PROXY=http://host.docker.internal:7897
+# + NODE_USE_ENV_PROXY=1（Node 24 fetch 需显式启用 env 代理）；
+# 不可用 --build-arg 传代理（预定义代理 build-arg 会注入所有 RUN，污染 install 层）。
+RUN (cd apps/web && pnpm --config.verify-deps-before-run=false exec next build --experimental-build-mode compile)
 
 # Build the worker code
 RUN (cd apps/workers && pnpm --config.verify-deps-before-run=false build)
@@ -104,7 +99,7 @@ RUN (cd apps/mcp && pnpm --config.verify-deps-before-run=false build)
 
 ################# The All-in-one builder ##############
 
-FROM node:24-slim AS aio_builder
+FROM node:24.20-slim AS aio_builder
 LABEL org.opencontainers.image.source="https://github.com/adrenalineinmyveins/karakeep"
 WORKDIR /app
 
@@ -167,12 +162,16 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 ARG TARGETARCH
+# yt-dlp 二进制从构建上下文 COPY（docker/downloads/yt-dlp-linux-amd64，
+# 提取自上次成功构建的镜像）——容器内直连 github.com 不可达，运行时下载必败。
+# 仅支持 amd64；如需 arm64 构建，需自行放置对应架构二进制。
+COPY docker/downloads/yt-dlp-linux-amd64 /tmp/yt-dlp-in
 RUN case ${TARGETARCH} in \
-        "amd64")  YTDLP_FILE=yt-dlp_linux ;; \
-        "arm64")  YTDLP_FILE=yt-dlp_linux_aarch64 ;; \
-        *) echo "Unsupported arch: ${TARGETARCH}" && exit 1 ;; \
+        "amd64")  YTDLP_FILE=yt-dlp-linux-amd64 ;; \
+        *) echo "Unsupported arch: ${TARGETARCH}（本仓库仅缓存了 amd64 的 yt-dlp）" && exit 1 ;; \
     esac \
-    && curl --retry 10 --retry-delay 10 --retry-all-errors -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/${YTDLP_FILE} -o /usr/local/bin/yt-dlp \
+    && cp /tmp/yt-dlp-in /usr/local/bin/yt-dlp \
+    && rm /tmp/yt-dlp-in \
     && chmod +x /usr/local/bin/yt-dlp
 
 # yt-dlp >=2025.x requires a JavaScript runtime to extract YouTube formats.
@@ -251,7 +250,7 @@ ENV USING_LEGACY_SEPARATE_CONTAINERS=true
 
 ################# The cli ##############
 
-FROM node:24-slim AS cli
+FROM node:24.20-slim AS cli
 LABEL org.opencontainers.image.source="https://github.com/adrenalineinmyveins/karakeep"
 WORKDIR /app
 
@@ -266,7 +265,7 @@ ENTRYPOINT ["node", "index.mjs"]
 
 ################# MCP server ##############
 
-FROM node:24-slim AS mcp
+FROM node:24.20-slim AS mcp
 LABEL org.opencontainers.image.source="https://github.com/adrenalineinmyveins/karakeep"
 WORKDIR /app
 

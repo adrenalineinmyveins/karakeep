@@ -501,6 +501,9 @@ async function main() {
     [PATH_VAR]: `${BIN_DIR}${IS_WIN ? ";" : ":"}${PATH}`,
     // ── 覆盖用户配置，以下 saiye 自己保留不允许用户改 ──
     DATA_DIR,
+    // Markdown 镜像导出默认开启：书签以 .md 形式落在 data/export/，
+    // 保证本地数据直接可读（目录仍可通过 userEnv 的 MIRROR_EXPORT_DIR 覆盖）
+    MIRROR_EXPORT_ENABLED: "true",
     MEILI_ADDR: `http://127.0.0.1:${config.meiliPort}`,
     MEILI_MASTER_KEY: config.meiliMasterKey,
     NEXTAUTH_SECRET: config.nextauthSecret,

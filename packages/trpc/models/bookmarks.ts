@@ -32,7 +32,11 @@ import {
   rssFeedImportsTable,
   tagsOnBookmarks,
 } from "@saiye/db/schema";
-import { EmbeddingsQueue, SearchIndexingQueue } from "@saiye/shared-server";
+import {
+  EmbeddingsQueue,
+  SearchIndexingQueue,
+  triggerMirrorDelete,
+} from "@saiye/shared-server";
 
 import { WebhooksService } from "./webhooks.service";
 import { deleteAsset, readAsset } from "@saiye/shared/assetdb";
@@ -1039,6 +1043,9 @@ export class Bookmark extends BareBookmark {
         groupId: this.ctx.user.id,
       },
     );
+    // Mirror delete must carry the userId: the bookmark row is already gone
+    // when the job runs.
+    await triggerMirrorDelete(this.bookmark.id, this.bookmark.userId);
 
     const webhookService = new WebhooksService(this.ctx.db);
     await webhookService.triggerWebhook(

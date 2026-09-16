@@ -15,6 +15,7 @@ import {
   CloudDownload,
   CreditCard,
   Download,
+  FileText,
   GitBranch,
   Image,
   Info,
@@ -80,6 +81,15 @@ const settingsSidebarItems = (
       icon: <CloudDownload size={18} />,
       path: "/settings/backups",
     },
+    ...(serverConfig.mirrorExport.enabled
+      ? [
+          {
+            name: t("settings.mirror.mirror_export"),
+            icon: <FileText size={18} />,
+            path: "/settings/mirror",
+          },
+        ]
+      : []),
     {
       name: t("settings.import.import_export"),
       icon: <Download size={18} />,

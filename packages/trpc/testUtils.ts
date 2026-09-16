@@ -9,12 +9,18 @@ import { appRouter } from "./routers/_app";
 
 const testQueueMocks = vi.hoisted(() => ({
   assetPreprocessingEnqueue: vi.fn(),
+  conceptCompilationEnqueue: vi.fn(),
   embeddingsEnqueue: vi.fn(),
   linkCrawlerEnqueue: vi.fn(),
   lowPriorityCrawlerEnqueue: vi.fn(),
+  mirrorExportEnqueue: vi.fn(),
   openAIEnqueue: vi.fn(),
   ruleEngineEnqueue: vi.fn(),
   searchIndexingEnqueue: vi.fn(),
+  triggerConceptCompilation: vi.fn(),
+  triggerConceptMirrorDelete: vi.fn(),
+  triggerMirrorDelete: vi.fn(),
+  triggerMirrorExport: vi.fn(),
   triggerSearchReindex: vi.fn(),
 }));
 
@@ -122,6 +128,9 @@ export function defaultBeforeEach(seedDB = true) {
         AssetPreprocessingQueue: {
           enqueue: testQueueMocks.assetPreprocessingEnqueue,
         },
+        ConceptCompilationQueue: {
+          enqueue: testQueueMocks.conceptCompilationEnqueue,
+        },
         LinkCrawlerQueue: {
           enqueue: testQueueMocks.linkCrawlerEnqueue,
         },
@@ -134,12 +143,19 @@ export function defaultBeforeEach(seedDB = true) {
         EmbeddingsQueue: {
           enqueue: testQueueMocks.embeddingsEnqueue,
         },
+        MirrorExportQueue: {
+          enqueue: testQueueMocks.mirrorExportEnqueue,
+        },
         SearchIndexingQueue: {
           enqueue: testQueueMocks.searchIndexingEnqueue,
         },
         RuleEngineQueue: {
           enqueue: testQueueMocks.ruleEngineEnqueue,
         },
+        triggerConceptCompilation: testQueueMocks.triggerConceptCompilation,
+        triggerConceptMirrorDelete: testQueueMocks.triggerConceptMirrorDelete,
+        triggerMirrorDelete: testQueueMocks.triggerMirrorDelete,
+        triggerMirrorExport: testQueueMocks.triggerMirrorExport,
         triggerSearchReindex: testQueueMocks.triggerSearchReindex,
       };
     });

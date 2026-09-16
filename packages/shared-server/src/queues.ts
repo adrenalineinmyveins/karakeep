@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import serverConfig from "@saiye/shared/config";
 import {
   EnqueueOptions,
   getQueueClient,
@@ -190,6 +191,53 @@ export const SearchIndexingQueue = createDeferredQueue<ZSearchIndexingRequest>(
   },
 );
 
+// Mirror Export Worker
+//
+// Mirrors bookmarks as human-readable markdown files on disk. The database
+// remains the single source of truth; the mirror is one-way and best-effort.
+// - "export": (re)write the .md file for a bookmark. Skips the write when the
+//   file content is unchanged.
+// - "delete": remove the .md file. userId must be carried in the payload since
+//   the bookmark row is already gone by the time the job runs.
+// - "rebuild": full re-export of all of a user's bookmarks.
+// - "concept_export" / "concept_delete": same lifecycle for concept pages,
+//   mirrored under export/{userId}/concepts/{slug}.md.
+export const zMirrorExportRequestSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("export"),
+    bookmarkId: z.string(),
+  }),
+  z.object({
+    type: z.literal("delete"),
+    bookmarkId: z.string(),
+    userId: z.string(),
+  }),
+  z.object({
+    type: z.literal("rebuild"),
+    userId: z.string(),
+  }),
+  z.object({
+    type: z.literal("concept_export"),
+    conceptId: z.string(),
+  }),
+  z.object({
+    type: z.literal("concept_delete"),
+    userId: z.string(),
+    slug: z.string(),
+  }),
+]);
+export type ZMirrorExportRequest = z.infer<typeof zMirrorExportRequestSchema>;
+
+export const MirrorExportQueue = createDeferredQueue<ZMirrorExportRequest>(
+  "mirror_export_queue",
+  {
+    defaultJobArgs: {
+      numRetries: 3,
+    },
+    keepFailedJobs: false,
+  },
+);
+
 // Admin maintenance worker
 export const zTidyAssetsRequestSchema = z.object({
   cleanDanglingAssets: z.boolean().optional().default(false),
@@ -241,6 +289,91 @@ export async function triggerSearchReindex(
       ...opts,
       idempotencyKey: `index:${bookmarkId}`,
     },
+  );
+  // Piggy-back the mirror export on every reindex so that all write paths
+  // (create/update, crawler, AI tagging, summarization, asset preprocessing)
+  // keep the markdown mirror in sync without touching each call site.
+  await triggerMirrorExport(bookmarkId, opts);
+}
+
+export async function triggerMirrorExport(
+  bookmarkId: string,
+  opts?: Omit<EnqueueOptions, "idempotencyKey">,
+) {
+  if (!serverConfig.mirrorExport.enabled) {
+    return;
+  }
+  await MirrorExportQueue.enqueue(
+    { type: "export", bookmarkId },
+    { ...opts, idempotencyKey: `mirror:export:${bookmarkId}` },
+  );
+}
+
+export async function triggerMirrorDelete(bookmarkId: string, userId: string) {
+  if (!serverConfig.mirrorExport.enabled) {
+    return;
+  }
+  await MirrorExportQueue.enqueue(
+    { type: "delete", bookmarkId, userId },
+    { idempotencyKey: `mirror:delete:${bookmarkId}` },
+  );
+}
+
+export async function triggerMirrorRebuild(userId: string) {
+  if (!serverConfig.mirrorExport.enabled) {
+    return;
+  }
+  await MirrorExportQueue.enqueue(
+    { type: "rebuild", userId },
+    // Fixed key so repeated clicks coalesce instead of piling up jobs
+    { idempotencyKey: `mirror:rebuild:${userId}` },
+  );
+}
+
+// Concept page compilation worker
+//
+// Compiles a concept page (LLM digest of all bookmarks under a tag/list
+// anchor). The payload only carries the page id; the worker re-reads
+// everything from the DB so the freshest source set is always used.
+export const zConceptCompilationRequestSchema = z.object({
+  conceptId: z.string(),
+});
+export type ZConceptCompilationRequest = z.infer<
+  typeof zConceptCompilationRequestSchema
+>;
+
+export const ConceptCompilationQueue =
+  createDeferredQueue<ZConceptCompilationRequest>("concept_compilation_queue", {
+    defaultJobArgs: {
+      numRetries: 2,
+    },
+    keepFailedJobs: false,
+  });
+
+export async function triggerConceptCompilation(conceptId: string) {
+  await ConceptCompilationQueue.enqueue(
+    { conceptId },
+    { idempotencyKey: `concept:compile:${conceptId}` },
+  );
+}
+
+export async function triggerConceptMirrorExport(conceptId: string) {
+  if (!serverConfig.mirrorExport.enabled) {
+    return;
+  }
+  await MirrorExportQueue.enqueue(
+    { type: "concept_export", conceptId },
+    { idempotencyKey: `mirror:concept:${conceptId}` },
+  );
+}
+
+export async function triggerConceptMirrorDelete(userId: string, slug: string) {
+  if (!serverConfig.mirrorExport.enabled) {
+    return;
+  }
+  await MirrorExportQueue.enqueue(
+    { type: "concept_delete", userId, slug },
+    { idempotencyKey: `mirror:concept_delete:${userId}:${slug}` },
   );
 }
 

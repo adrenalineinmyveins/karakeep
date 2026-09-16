@@ -35,6 +35,8 @@ snapshots
 # 本地构建缓存/下载物与调试日志不入 context（镜像内按需下载）
 docker/s6-overlay
 docker/downloads
+# yt-dlp 二进制例外：容器内直连 github.com 不可达，从上下文 COPY（提取自上次成功镜像）
+!docker/downloads/yt-dlp-linux-amd64
 .expo
 /*.log
 /*.txt
