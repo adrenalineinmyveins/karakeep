@@ -1,0 +1,1 @@
+ALTER TABLE `agentPublications` ADD `billingCapPerSession` integer;

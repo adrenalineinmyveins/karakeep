@@ -15,6 +15,7 @@ import {
 
 import type { ZApiKeyScope } from "@saiye/shared/types/apiKeys";
 import { API_KEY_FULL_ACCESS_SCOPE } from "@saiye/shared/types/apiKeys";
+import type { KnowledgeScope } from "@saiye/shared/types/agentProfiles";
 import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import type { ZReaderViewReason } from "@saiye/shared/types/bookmarks";
 
@@ -755,6 +756,10 @@ export const agentProfiles = sqliteTable(
     enableTools: integer("enableTools", { mode: "boolean" })
       .notNull()
       .default(true),
+    // per-profile 语料隔离：绑定标签/清单作为咨询语料范围；null 或两者皆空 = 全部书签语料
+    knowledgeScope: text("knowledge_scope", {
+      mode: "json",
+    }).$type<KnowledgeScope | null>(),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },
@@ -796,6 +801,19 @@ export const chatSessions = sqliteTable(
     agentProfileId: text("agentProfileId").references(() => agentProfiles.id, {
       onDelete: "set null",
     }),
+    // ── D2 咨询会话维度 ──────────────────────
+    // ownerUserId/publicationId 非空 = 咨询会话：userId 是咨询者，
+    // ownerUserId 是领域专家所有者（知识检索按 owner、记忆隔离、按发布计量）。
+    // 所有者删号时级联置空，会话退化为普通会话（档案同时被删，回退默认助手）。
+    ownerUserId: text("ownerUserId").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    publicationId: text("publicationId").references(
+      () => agentPublications.id,
+      {
+        onDelete: "set null",
+      },
+    ),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },
@@ -823,6 +841,117 @@ export const chatMessages = sqliteTable(
   (cm) => [
     index("chatMessages_chatId_idx").on(cm.chatId),
     index("chatMessages_chatId_createdAt_idx").on(cm.chatId, cm.createdAt),
+  ],
+);
+
+// ── D1 领域专家发布（跨用户咨询）──────────────────────
+//
+// 所有者把 agentProfile 发布为可被其他用户付费调用的「领域专家」：
+// - published：正常接单
+// - delisting：下架缓冲期（默认 7 天），不接新会话、已购会话继续服务、可恢复
+// - delisted：彻底下架（delisting 到期后由读路径惰性转换），服务关闭
+// 删除 agentProfile 前必须先完成下架（router 层校验），防止绕过缓冲期。
+export const agentPublications = sqliteTable(
+  "agentPublications",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    agentProfileId: text("agentProfileId")
+      .notNull()
+      .references(() => agentProfiles.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    // 领域标签（发现/初筛用，L0 元数据）
+    tags: text("tags", { mode: "json" })
+      .$type<string[]>()
+      .notNull()
+      .default([]),
+    // 单次知识检索调用单价（单位：credits；P0 仅记账不结算）
+    pricePerCall: integer("pricePerCall").notNull().default(0),
+    // F2 per-publication 会话计费封顶（credits）；null = 跟随全局默认
+    // （serverConfig.consultation.sessionBillingCapCredits）
+    billingCapPerSession: integer("billingCapPerSession"),
+    status: text("status", {
+      enum: ["published", "delisting", "delisted"],
+    })
+      .notNull()
+      .default("published"),
+    delistingAt: integer("delistingAt", { mode: "timestamp_ms" }),
+    delistedAt: integer("delistedAt", { mode: "timestamp_ms" }),
+    createdAt: createdAtMsField(),
+    modifiedAt: modifiedAtMsField(),
+  },
+  (ap) => [
+    index("agentPublications_userId_idx").on(ap.userId),
+    index("agentPublications_status_idx").on(ap.status),
+    // 同一档案同一时间至多一个发布（delisted 后可复活）
+    unique().on(ap.userId, ap.agentProfileId),
+  ],
+);
+
+// ── D6 咨询计量（per-call 记账；P0 只记账不结算） ──────
+// 咨询会话每条成功回复记一笔，amount 是记账当时的单价快照
+// （发布调价不影响已记条目），为后续支付结算留数据基础。
+export const consultationUsages = sqliteTable(
+  "consultationUsages",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    publicationId: text("publicationId")
+      .notNull()
+      .references(() => agentPublications.id, { onDelete: "cascade" }),
+    consulteeUserId: text("consulteeUserId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sessionId: text("sessionId")
+      .notNull()
+      .references(() => chatSessions.id, { onDelete: "cascade" }),
+    // 本次调用单价快照（credits）
+    amount: integer("amount").notNull(),
+    // F4 结算归属；null = 未结算
+    settlementId: text("settlementId").references(
+      () => consultationSettlements.id,
+      { onDelete: "set null" },
+    ),
+    createdAt: createdAtMsField(),
+  },
+  (cu) => [
+    index("consultationUsages_sessionId_idx").on(cu.sessionId),
+    index("consultationUsages_publicationId_idx").on(cu.publicationId),
+  ],
+);
+
+// ── F4 咨询结算单：把一批未结算 usage 打包成快照 ──────
+// P1 无支付通道，结算 = 所有者触发的汇总快照（金额 + 笔数），
+// usage 行打上 settlementId 标记已结算；P2 接入真实支付后在此扩展。
+export const consultationSettlements = sqliteTable(
+  "consultationSettlements",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    publicationId: text("publicationId")
+      .notNull()
+      .references(() => agentPublications.id, { onDelete: "cascade" }),
+    // 结算时的所有者快照（发布转让后仍可追溯原主）
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    // 本单汇总（credits）
+    amount: integer("amount").notNull(),
+    usageCount: integer("usageCount").notNull(),
+    createdAt: createdAtMsField(),
+  },
+  (cs) => [
+    index("consultationSettlements_publicationId_idx").on(cs.publicationId),
   ],
 );
 
@@ -1572,6 +1701,20 @@ export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
     references: [chatSessions.id],
   }),
 }));
+
+export const agentPublicationsRelations = relations(
+  agentPublications,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [agentPublications.userId],
+      references: [users.id],
+    }),
+    agentProfile: one(agentProfiles, {
+      fields: [agentPublications.agentProfileId],
+      references: [agentProfiles.id],
+    }),
+  }),
+);
 
 export const importSessionsRelations = relations(
   importSessions,

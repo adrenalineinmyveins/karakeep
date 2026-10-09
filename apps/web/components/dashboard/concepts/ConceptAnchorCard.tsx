@@ -95,7 +95,9 @@ export default function ConceptAnchorCard({
       <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
         <BookOpenText className="size-4 text-muted-foreground" />
         {isCompiling ? (
-          <span className="text-muted-foreground">{t("concepts.generating")}</span>
+          <span className="text-muted-foreground">
+            {t("concepts.generating")}
+          </span>
         ) : (
           <Link
             href={`/dashboard/concepts/${status.slug}`}

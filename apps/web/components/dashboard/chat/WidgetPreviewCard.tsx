@@ -21,7 +21,7 @@ import WidgetHost from "@/components/dashboard/widgets/WidgetHost";
  */
 
 /** 从工具结果中提取文本：兼容字符串与 PI 原生 {content:[{type:"text",text}]} 两种形态 */
-function extractToolResultText(result: unknown): string | null {
+export function extractToolResultText(result: unknown): string | null {
   if (!result) return null;
   if (typeof result === "string") return result;
   if (typeof result === "object" && "content" in result) {

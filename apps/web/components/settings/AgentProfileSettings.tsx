@@ -2,7 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Download, Pencil, PlusCircle, Trash2, Upload } from "lucide-react";
+import {
+  Archive,
+  BadgeCheck,
+  Download,
+  Globe,
+  Hourglass,
+  Pencil,
+  PlusCircle,
+  Trash2,
+  Undo2,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import ActionConfirmingDialog from "@/components/ui/action-confirming-dialog";
@@ -42,7 +53,11 @@ import {
 import { useTranslation } from "@/lib/i18n/client";
 import { useTRPC } from "@saiye/shared-react/trpc";
 import { AGENT_PROFILE_TYPES } from "@saiye/shared/types/agentProfiles";
-import type { AgentProfileType } from "@saiye/shared/types/agentProfiles";
+import type {
+  AgentProfileType,
+  KnowledgeScope,
+} from "@saiye/shared/types/agentProfiles";
+import { Badge } from "@/components/ui/badge";
 
 /** list 返回的安全档案（无 apiKey，只有 hasApiKey 布尔） */
 interface AgentProfileRow {
@@ -55,6 +70,7 @@ interface AgentProfileRow {
   timeoutMinutes: number;
   systemPrompt: string | null;
   enableTools: boolean;
+  knowledgeScope: KnowledgeScope | null;
   hasApiKey: boolean;
 }
 
@@ -69,6 +85,9 @@ interface ProfileFormState {
   timeoutMinutes: string;
   systemPrompt: string;
   enableTools: boolean;
+  /** per-profile 语料范围：选中的标签/清单 id（提交时组装 knowledgeScope） */
+  scopeTagIds: string[];
+  scopeListIds: string[];
 }
 
 const emptyForm: ProfileFormState = {
@@ -81,6 +100,8 @@ const emptyForm: ProfileFormState = {
   timeoutMinutes: "5",
   systemPrompt: "",
   enableTools: true,
+  scopeTagIds: [],
+  scopeListIds: [],
 };
 
 /** trae-cli 分支的超时字段（合法整数才带上，否则走后端默认 5 分钟） */
@@ -105,6 +126,16 @@ function ProfileFormDialog({
 
   const [form, setForm] = useState<ProfileFormState>(emptyForm);
 
+  // 标签/清单（语料范围选择用；对话框打开时才拉取）
+  const tagsQuery = useQuery({
+    ...api.tags.list.queryOptions(),
+    enabled: open,
+  });
+  const listsQuery = useQuery({
+    ...api.lists.list.queryOptions(),
+    enabled: open,
+  });
+
   // 打开时按档案初始化（编辑不回显 apiKey）
   useEffect(() => {
     if (!open) return;
@@ -120,6 +151,8 @@ function ProfileFormDialog({
             timeoutMinutes: String(profile.timeoutMinutes),
             systemPrompt: profile.systemPrompt ?? "",
             enableTools: profile.enableTools,
+            scopeTagIds: profile.knowledgeScope?.tagIds ?? [],
+            scopeListIds: profile.knowledgeScope?.listIds ?? [],
           }
         : emptyForm,
     );
@@ -155,10 +188,16 @@ function ProfileFormDialog({
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // 语料范围：两者皆空 = null（全部书签语料）
+    const knowledgeScope: KnowledgeScope | null =
+      form.scopeTagIds.length > 0 || form.scopeListIds.length > 0
+        ? { tagIds: form.scopeTagIds, listIds: form.scopeListIds }
+        : null;
     const base = {
       name: form.name.trim(),
       systemPrompt: form.systemPrompt.trim() || null,
       enableTools: form.enableTools,
+      knowledgeScope,
     };
     const input =
       form.type === "openai-compatible"
@@ -324,6 +363,83 @@ function ProfileFormDialog({
             />
           </div>
 
+          <div className="space-y-2 rounded-lg border p-3">
+            <div className="space-y-0.5">
+              <Label>{t(`${tp}.knowledge_scope`)}</Label>
+              <p className="text-xs text-muted-foreground">
+                {t(`${tp}.knowledge_scope_hint`)}
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                {t(`${tp}.knowledge_scope_tags`)}
+              </p>
+              <div className="flex max-h-28 flex-wrap gap-1.5 overflow-y-auto">
+                {tagsQuery.data?.tags.length ? (
+                  tagsQuery.data.tags.map((tag) => (
+                    <Badge
+                      key={tag.id}
+                      variant={
+                        form.scopeTagIds.includes(tag.id)
+                          ? "default"
+                          : "outline"
+                      }
+                      className="cursor-pointer select-none"
+                      onClick={() =>
+                        set(
+                          "scopeTagIds",
+                          form.scopeTagIds.includes(tag.id)
+                            ? form.scopeTagIds.filter((id) => id !== tag.id)
+                            : [...form.scopeTagIds, tag.id],
+                        )
+                      }
+                    >
+                      {tag.name}
+                    </Badge>
+                  ))
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    {t(`${tp}.knowledge_scope_no_tags`)}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                {t(`${tp}.knowledge_scope_lists`)}
+              </p>
+              <div className="flex max-h-28 flex-wrap gap-1.5 overflow-y-auto">
+                {listsQuery.data?.lists.length ? (
+                  listsQuery.data.lists.map((list) => (
+                    <Badge
+                      key={list.id}
+                      variant={
+                        form.scopeListIds.includes(list.id)
+                          ? "default"
+                          : "outline"
+                      }
+                      className="cursor-pointer select-none"
+                      onClick={() =>
+                        set(
+                          "scopeListIds",
+                          form.scopeListIds.includes(list.id)
+                            ? form.scopeListIds.filter((id) => id !== list.id)
+                            : [...form.scopeListIds, list.id],
+                        )
+                      }
+                    >
+                      {list.icon} {list.name}
+                    </Badge>
+                  ))
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    {t(`${tp}.knowledge_scope_no_lists`)}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
           <DialogFooter>
             <Button
               type="button"
@@ -345,16 +461,210 @@ function ProfileFormDialog({
   );
 }
 
+/** 发布表单状态（string 摊平，提交时转换；价格/封顶留空 = 不传走后端默认） */
+interface PublishFormState {
+  title: string;
+  description: string;
+  pricePerCall: string;
+  billingCapPerSession: string;
+}
+
+/** 把表单数值字段转成 publish 输入（非法/留空 → 不带该字段） */
+function optionalInt(value: string): number | undefined {
+  const n = Number.parseInt(value, 10);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function PublishDialog({
+  profile,
+  open,
+  onOpenChange,
+}: {
+  profile: AgentProfileRow | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const api = useTRPC();
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+  const tp = "settings.agent_profiles";
+
+  const [form, setForm] = useState<PublishFormState>({
+    title: "",
+    description: "",
+    pricePerCall: "",
+    billingCapPerSession: "",
+  });
+
+  // 打开时按档案初始化（标题默认用档案名）
+  useEffect(() => {
+    if (!open) return;
+    setForm({
+      title: profile?.name ?? "",
+      description: "",
+      pricePerCall: "",
+      billingCapPerSession: "",
+    });
+  }, [open, profile]);
+
+  const publishMutation = useMutation(
+    api.agentPublications.publish.mutationOptions({
+      onSuccess: () => {
+        toast.success(t(`${tp}.has_been_published`));
+        queryClient.invalidateQueries(api.agentPublications.list.pathFilter());
+        onOpenChange(false);
+      },
+      onError: (e) => toast.error(e.message),
+    }),
+  );
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile) return;
+    publishMutation.mutate({
+      agentProfileId: profile.id,
+      title: form.title.trim(),
+      description: form.description.trim() || undefined,
+      ...(optionalInt(form.pricePerCall) !== undefined
+        ? { pricePerCall: optionalInt(form.pricePerCall) }
+        : {}),
+      ...(optionalInt(form.billingCapPerSession) !== undefined
+        ? { billingCapPerSession: optionalInt(form.billingCapPerSession) }
+        : {}),
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t(`${tp}.publish`)}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="grid gap-2">
+            <Label htmlFor="publish-title">{t(`${tp}.publish_title`)}</Label>
+            <Input
+              id="publish-title"
+              value={form.title}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, title: e.target.value }))
+              }
+              required
+              maxLength={120}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="publish-description">
+              {t(`${tp}.publish_description`)}
+            </Label>
+            <Textarea
+              id="publish-description"
+              rows={3}
+              maxLength={2000}
+              value={form.description}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, description: e.target.value }))
+              }
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="publish-price">{t(`${tp}.publish_price`)}</Label>
+            <Input
+              id="publish-price"
+              type="number"
+              min={0}
+              max={100000}
+              value={form.pricePerCall}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, pricePerCall: e.target.value }))
+              }
+            />
+            <p className="text-xs text-muted-foreground">
+              {t(`${tp}.publish_price_hint`)}
+            </p>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="publish-cap">
+              {t(`${tp}.publish_billing_cap`)}
+            </Label>
+            <Input
+              id="publish-cap"
+              type="number"
+              min={1}
+              max={10000000}
+              value={form.billingCapPerSession}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  billingCapPerSession: e.target.value,
+                }))
+              }
+            />
+            <p className="text-xs text-muted-foreground">
+              {t(`${tp}.publish_billing_cap_hint`)}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => onOpenChange(false)}
+            >
+              {t("actions.cancel")}
+            </Button>
+            <Button type="submit" disabled={publishMutation.isPending}>
+              {t(`${tp}.publish`)}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function AgentProfileSettings() {
   const api = useTRPC();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const tp = "settings.agent_profiles";
 
   const { data, isLoading } = useQuery(api.agentProfiles.list.queryOptions());
+  // 发布状态（owner 全部发布；delisted 视为未发布，点发布按钮可复活）
+  const publicationsQuery = useQuery(api.agentPublications.list.queryOptions());
+  const pubByProfile = new Map(
+    (publicationsQuery.data?.publications ?? [])
+      .filter((pub) => pub.status !== "delisted")
+      .map((pub) => [pub.agentProfileId, pub]),
+  );
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<AgentProfileRow | null>(null);
+  const [publishingProfile, setPublishingProfile] =
+    useState<AgentProfileRow | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const invalidatePublications = () =>
+    queryClient.invalidateQueries(api.agentPublications.list.pathFilter());
+
+  const delistMutation = useMutation(
+    api.agentPublications.delist.mutationOptions({
+      onSuccess: () => {
+        toast.success(t(`${tp}.has_been_delisted`));
+        invalidatePublications();
+      },
+      onError: (e) => toast.error(e.message),
+    }),
+  );
+
+  const restoreMutation = useMutation(
+    api.agentPublications.restore.mutationOptions({
+      onSuccess: () => {
+        toast.success(t(`${tp}.has_been_restored`));
+        invalidatePublications();
+      },
+      onError: (e) => toast.error(e.message),
+    }),
+  );
 
   const deleteMutation = useMutation(
     api.agentProfiles.delete.mutationOptions({
@@ -404,7 +714,6 @@ export default function AgentProfileSettings() {
     }
   };
 
-  const tp = "settings.agent_profiles";
   const profiles = data?.profiles ?? [];
 
   return (
@@ -422,71 +731,136 @@ export default function AgentProfileSettings() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {profiles.map((p) => (
-              <TableRow key={p.id}>
-                <TableCell className="font-medium">{p.name}</TableCell>
-                <TableCell>
-                  {t(
-                    p.type === "openai-compatible"
-                      ? `${tp}.type_openai_compatible`
-                      : `${tp}.type_trae_cli`,
-                  )}
-                </TableCell>
-                <TableCell className="max-w-64 truncate text-muted-foreground">
-                  {p.type === "openai-compatible"
-                    ? `${p.model ?? ""} · ${p.baseUrl ?? ""}`
-                    : `${p.command ?? ""} · ${t(`${tp}.timeout_minutes`)} ${p.timeoutMinutes}`}
-                </TableCell>
-                <TableCell>
-                  <div className="flex justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => {
-                        setEditing(p);
-                        setDialogOpen(true);
-                      }}
-                    >
-                      <Pencil size={16} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      title={t("assets.export")}
-                      disabled={exportMutation.isPending}
-                      onClick={() => exportMutation.mutate({ id: p.id })}
-                    >
-                      <Download size={16} />
-                    </Button>
-                    <AssetShareButtons
-                      assetType="agentProfile"
-                      assetId={p.id}
-                    />
-                    <ActionConfirmingDialog
-                      title={t("actions.delete")}
-                      description={t(`${tp}.delete_confirm`)}
-                      actionButton={(setOpen) => (
+            {profiles.map((p) => {
+              const pub = pubByProfile.get(p.id);
+              return (
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium">
+                    <span className="flex items-center gap-1.5">
+                      {p.name}
+                      {pub?.status === "published" && (
+                        <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-600">
+                          <BadgeCheck className="size-3.5" />
+                          {t(`${tp}.published`)}
+                        </span>
+                      )}
+                      {pub?.status === "delisting" && (
+                        <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-amber-600">
+                          <Hourglass className="size-3.5" />
+                          {t(`${tp}.delisting`)}
+                        </span>
+                      )}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    {t(
+                      p.type === "openai-compatible"
+                        ? `${tp}.type_openai_compatible`
+                        : `${tp}.type_trae_cli`,
+                    )}
+                  </TableCell>
+                  <TableCell className="max-w-64 truncate text-muted-foreground">
+                    {p.type === "openai-compatible"
+                      ? `${p.model ?? ""} · ${p.baseUrl ?? ""}`
+                      : `${p.command ?? ""} · ${t(`${tp}.timeout_minutes`)} ${p.timeoutMinutes}`}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-end gap-1">
+                      {!pub ? (
                         <Button
-                          variant="destructive"
-                          onClick={() => {
-                            deleteMutation.mutate({ id: p.id });
-                            setOpen(false);
-                          }}
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          title={t(`${tp}.publish`)}
+                          onClick={() => setPublishingProfile(p)}
                         >
-                          {t("actions.delete")}
+                          <Globe size={16} />
+                        </Button>
+                      ) : pub.status === "published" ? (
+                        <ActionConfirmingDialog
+                          title={t(`${tp}.delist`)}
+                          description={t(`${tp}.delist_confirm`)}
+                          actionButton={(setOpen) => (
+                            <Button
+                              variant="destructive"
+                              onClick={() => {
+                                delistMutation.mutate({ id: pub.id });
+                                setOpen(false);
+                              }}
+                            >
+                              {t(`${tp}.delist`)}
+                            </Button>
+                          )}
+                        >
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            title={t(`${tp}.delist`)}
+                          >
+                            <Archive size={16} />
+                          </Button>
+                        </ActionConfirmingDialog>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          title={t(`${tp}.restore`)}
+                          onClick={() => restoreMutation.mutate({ id: pub.id })}
+                        >
+                          <Undo2 size={16} />
                         </Button>
                       )}
-                    >
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Trash2 size={16} />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          setEditing(p);
+                          setDialogOpen(true);
+                        }}
+                      >
+                        <Pencil size={16} />
                       </Button>
-                    </ActionConfirmingDialog>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        title={t("assets.export")}
+                        disabled={exportMutation.isPending}
+                        onClick={() => exportMutation.mutate({ id: p.id })}
+                      >
+                        <Download size={16} />
+                      </Button>
+                      <AssetShareButtons
+                        assetType="agentProfile"
+                        assetId={p.id}
+                      />
+                      <ActionConfirmingDialog
+                        title={t("actions.delete")}
+                        description={t(`${tp}.delete_confirm`)}
+                        actionButton={(setOpen) => (
+                          <Button
+                            variant="destructive"
+                            onClick={() => {
+                              deleteMutation.mutate({ id: p.id });
+                              setOpen(false);
+                            }}
+                          >
+                            {t("actions.delete")}
+                          </Button>
+                        )}
+                      >
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Trash2 size={16} />
+                        </Button>
+                      </ActionConfirmingDialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       )}
@@ -528,6 +902,14 @@ export default function AgentProfileSettings() {
         profile={editing}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+      />
+
+      <PublishDialog
+        profile={publishingProfile}
+        open={!!publishingProfile}
+        onOpenChange={(o) => {
+          if (!o) setPublishingProfile(null);
+        }}
       />
     </>
   );

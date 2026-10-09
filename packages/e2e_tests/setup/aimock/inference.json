@@ -411,6 +411,24 @@
       "response": {
         "content": "This page contains a short Hello World test document used to verify Saiye's inference worker end-to-end."
       }
+    },
+    {
+      "match": {
+        "model": "gpt-5.6-luna",
+        "userMessage": "你是一名知识编辑"
+      },
+      "response": {
+        "content": "## 核心概念\n\n概念页 E2E 编译摘要 [1]。\n\n## 实践要点\n\n来自材料的实践要点 [1]。"
+      }
+    },
+    {
+      "match": {
+        "model": "gpt-5.6-luna",
+        "userMessage": "E2E consultation question"
+      },
+      "response": {
+        "content": "E2E consultation reply: ownership and borrowing make Rust memory-safe without a garbage collector."
+      }
     }
   ]
 }

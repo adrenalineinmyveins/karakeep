@@ -4,6 +4,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { useTRPC } from "@saiye/shared-react/trpc";
+import { extractToolResultText } from "@/components/dashboard/chat/WidgetPreviewCard";
+import {
+  updateBookmarksLayout,
+  updateGridColumns,
+  updateImageFit,
+  updateInterfaceLang,
+  updateShowNotes,
+  updateShowTags,
+  updateShowTitle,
+} from "@/lib/userLocalSettings/userLocalSettings";
+import type { BookmarksLayoutTypes } from "@/lib/userLocalSettings/types";
 
 // ── 类型定义 ──────────────────────────────────────────
 
@@ -14,11 +25,18 @@ export interface ToolCallInfo {
   result?: unknown;
 }
 
+/** 咨询会话中显式引用的笔记（@引用） */
+export interface ChatAttachment {
+  id: string;
+  title: string;
+}
+
 export interface ChatMessageInfo {
   id: string;
   role: "user" | "assistant";
   content: string;
   toolCalls?: ToolCallInfo[];
+  attachments?: ChatAttachment[];
   pending?: boolean;
   /** 标记为失败的回复（用于下次输入时本地清理） */
   isError?: boolean;
@@ -26,6 +44,31 @@ export interface ChatMessageInfo {
 
 /** 客户端流空闲超时：超过该时长未收到任何事件视为断流兜底（服务端单轮 LLM 超时为 60s，正常情况下会先发出 error 事件） */
 const STREAM_IDLE_TIMEOUT_MS = 90_000;
+
+// ── Device local settings application (chat tool returns them but does not persist to DB, frontend writes cookie) ──────────────
+
+const LOCAL_SETTINGS_APPLIERS: Record<
+  string,
+  (value: unknown) => Promise<void>
+> = {
+  lang: (v) => updateInterfaceLang(v as string),
+  bookmarkGridLayout: (v) => updateBookmarksLayout(v as BookmarksLayoutTypes),
+  gridColumns: (v) => updateGridColumns(v as number),
+  showNotes: (v) => updateShowNotes(v as boolean),
+  showTags: (v) => updateShowTags(v as boolean),
+  showTitle: (v) => updateShowTitle(v as boolean),
+  imageFit: (v) => updateImageFit(v as "cover" | "contain"),
+};
+
+/** Apply localSettings returned by the tool one by one to cookie (calls in sequence to avoid concurrent read-modify-write races) */
+async function applyLocalSettings(localSettings: Record<string, unknown>) {
+  for (const [key, value] of Object.entries(localSettings)) {
+    const apply = LOCAL_SETTINGS_APPLIERS[key];
+    if (apply && value !== undefined) {
+      await apply(value);
+    }
+  }
+}
 
 // ── Hook ──────────────────────────────────────────────
 
@@ -40,6 +83,10 @@ export function useChat(
   const [isStreaming, setIsStreaming] = useState(false);
   // 待发送内容，只有当用户点击发送后才设置并触发 subscription
   const [pendingInput, setPendingInput] = useState<string | null>(null);
+  // 待发送的引用笔记（与 pendingInput 同生命周期）
+  const [pendingAttachments, setPendingAttachments] = useState<
+    ChatAttachment[] | null
+  >(null);
   const msgIdCounter = useRef(0);
 
   const invalidateSessions = useCallback(() => {
@@ -63,6 +110,7 @@ export function useChat(
       clearStreamTimer();
       setIsStreaming(false);
       setPendingInput(null);
+      setPendingAttachments(null);
       setMessages((prev) =>
         prev.map((m, i) =>
           i === prev.length - 1 && m.role === "assistant"
@@ -85,7 +133,7 @@ export function useChat(
   // ── 发送消息 ──────────────────────────────────────
 
   const sendMessage = useCallback(
-    (content: string) => {
+    (content: string, attached?: ChatAttachment[]) => {
       if (!sessionId || !content.trim()) return;
 
       // 立即追加用户消息到 UI
@@ -93,6 +141,7 @@ export function useChat(
         id: `user-${msgIdCounter.current++}`,
         role: "user",
         content,
+        ...(attached && attached.length > 0 ? { attachments: attached } : {}),
       };
       // 预占 assistant 消息位
       const assistantMsg: ChatMessageInfo = {
@@ -116,6 +165,7 @@ export function useChat(
       });
       setIsStreaming(true);
       setPendingInput(content);
+      setPendingAttachments(attached && attached.length > 0 ? attached : null);
       armStreamTimer();
     },
     [sessionId, armStreamTimer],
@@ -128,6 +178,7 @@ export function useChat(
       onSuccess: () => {
         setIsStreaming(false);
         setPendingInput(null);
+        setPendingAttachments(null);
       },
     }),
   );
@@ -139,6 +190,7 @@ export function useChat(
     // 立即更新 UI，不等网络返回
     setIsStreaming(false);
     setPendingInput(null);
+    setPendingAttachments(null);
     setMessages((prev) =>
       prev.map((m) =>
         m.pending
@@ -152,7 +204,15 @@ export function useChat(
 
   useSubscription(
     api.chats.sendMessage.subscriptionOptions(
-      { sessionId: sessionId!, content: pendingInput ?? "" },
+      {
+        sessionId: sessionId!,
+        content: pendingInput ?? "",
+        ...(pendingAttachments
+          ? {
+              attachedBookmarkIds: pendingAttachments.map((a) => a.id),
+            }
+          : {}),
+      },
       {
         enabled: !!sessionId && !!pendingInput,
         onData(event) {
@@ -185,12 +245,36 @@ export function useChat(
                   return { ...m, toolCalls };
                 }),
               );
-              // chat 改了用户设置 → 失效设置缓存，设置页与全局 context 实时拿到新值
-              if (
-                event.toolName === "update_user_settings" &&
-                event.status === "end"
-              ) {
-                queryClient.invalidateQueries(api.users.settings.pathFilter());
+              if (event.status === "end") {
+                // chat 改了用户设置 → 失效设置缓存，设置页与全局 context 实时拿到新值
+                if (event.toolName === "update_user_settings") {
+                  queryClient.invalidateQueries(
+                    api.users.settings.pathFilter(),
+                  );
+                  // 设备本地设置（语言/布局/列数/显示开关）不落库：
+                  // 从工具结果取出后写 cookie，让界面即时生效
+                  // 注意 result 是 PI 原生 {content:[{type:"text",text}]} 结构，不能直接 JSON.parse
+                  const text = extractToolResultText(event.result);
+                  if (text) {
+                    try {
+                      const { localSettings } = JSON.parse(text) as {
+                        localSettings?: Record<string, unknown>;
+                      };
+                      if (localSettings) {
+                        void applyLocalSettings(localSettings);
+                      }
+                    } catch {
+                      // 结果解析失败时忽略，不影响主流程
+                    }
+                  }
+                }
+                // RSS 订阅变更 → 失效订阅列表缓存，设置页订阅列表实时更新
+                if (
+                  event.toolName === "subscribe_feed" ||
+                  event.toolName === "unsubscribe_feed"
+                ) {
+                  queryClient.invalidateQueries(api.feeds.list.pathFilter());
+                }
               }
               break;
 
@@ -208,6 +292,7 @@ export function useChat(
               clearStreamTimer();
               setIsStreaming(false);
               setPendingInput(null);
+              setPendingAttachments(null);
               setMessages((prev) =>
                 prev.map((m) => (m.pending ? { ...m, pending: false } : m)),
               );
@@ -239,15 +324,19 @@ export function useChat(
     );
     setMessages(
       data.messages.map((m) => {
-        // 从 metadata 恢复工具调用记录（widget 预览卡等）
+        // 从 metadata 恢复工具调用记录（widget 预览卡等）与引用笔记
         const toolCalls = (
           m.metadata as { toolCalls?: ChatMessageInfo["toolCalls"] } | null
         )?.toolCalls;
+        const attachments = (
+          m.metadata as { attachments?: ChatAttachment[] } | null
+        )?.attachments;
         return {
           id: m.id,
           role: m.role as "user" | "assistant",
           content: m.content,
           ...(toolCalls && toolCalls.length > 0 ? { toolCalls } : {}),
+          ...(attachments && attachments.length > 0 ? { attachments } : {}),
         };
       }),
     );

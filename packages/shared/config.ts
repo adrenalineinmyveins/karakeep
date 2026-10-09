@@ -94,6 +94,10 @@ const allEnv = z.object({
   OLLAMA_KEEP_ALIVE: z.string().optional(),
   CHAT_ENABLED: stringBool("false"),
   CHAT_MODEL: z.string().optional(),
+  // F1 联邦化：领域专家发布下架缓冲期（ms），到期 delisting → delisted
+  AGENT_DELISTING_GRACE_PERIOD_MS: z.coerce.number().int().min(0).optional(),
+  // F1 联邦化：咨询会话计费封顶（credits）的全局默认，发布可单独覆盖
+  AGENT_SESSION_BILLING_CAP_CREDITS: z.coerce.number().int().min(1).optional(),
   // A3 三源 RAG 检索注入的可调参数（top K）
   KNOWLEDGE_BOOKMARK_TOP_K: z.coerce.number().int().min(1).max(20).optional(),
   KNOWLEDGE_CHAT_TOP_K: z.coerce.number().int().min(0).max(20).optional(),
@@ -401,6 +405,12 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
         chatTopK: val.KNOWLEDGE_CHAT_TOP_K ?? 3,
         maxChars: val.KNOWLEDGE_CONTEXT_MAX_CHARS ?? 12_000,
       },
+    },
+    // F1 联邦化：领域专家咨询平台的运营参数（P0 时是 router 模块常量）
+    consultation: {
+      delistingGracePeriodMs:
+        val.AGENT_DELISTING_GRACE_PERIOD_MS ?? 7 * 24 * 60 * 60 * 1000,
+      sessionBillingCapCredits: val.AGENT_SESSION_BILLING_CAP_CREDITS ?? 1000,
     },
     tavily: {
       apiKey: val.TAVILY_API_KEY,

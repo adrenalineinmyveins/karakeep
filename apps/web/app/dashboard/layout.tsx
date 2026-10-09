@@ -19,6 +19,7 @@ import {
   Home,
   LayoutDashboard,
   MessageCircle,
+  MessagesSquare,
   Paintbrush,
   Search,
   Tag,
@@ -123,6 +124,11 @@ export default async function Dashboard({
               name: t("common.chat"),
               icon: <MessageCircle size={18} />,
               path: "/dashboard/chat",
+            },
+            {
+              name: t("common.consult"),
+              icon: <MessagesSquare size={18} />,
+              path: "/dashboard/consult",
             },
           ]
         : []),

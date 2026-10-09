@@ -10,13 +10,7 @@ import RelativeTime from "@/components/ui/relative-time";
 import { toast } from "@/components/ui/sonner";
 import { useTranslation } from "@/lib/i18n/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  ArrowLeft,
-  Hash,
-  ListIcon,
-  RefreshCw,
-  Trash2,
-} from "lucide-react";
+import { ArrowLeft, Hash, ListIcon, RefreshCw, Trash2 } from "lucide-react";
 
 import { useTRPC } from "@saiye/shared-react/trpc";
 
@@ -122,7 +116,9 @@ export default function ConceptPageView({ slug }: { slug: string }) {
       </div>
 
       <div>
-        <h1 className="text-3xl font-semibold leading-tight">{concept.title}</h1>
+        <h1 className="text-3xl font-semibold leading-tight">
+          {concept.title}
+        </h1>
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             {concept.anchorType === "tag" ? (
@@ -138,7 +134,9 @@ export default function ConceptPageView({ slug }: { slug: string }) {
               )}
           </span>
           <span aria-hidden>·</span>
-          <span>{t("concepts.sources_count", { count: concept.sourceCount })}</span>
+          <span>
+            {t("concepts.sources_count", { count: concept.sourceCount })}
+          </span>
           {concept.lastCompiledAt && (
             <>
               <span aria-hidden>·</span>
@@ -185,7 +183,7 @@ export default function ConceptPageView({ slug }: { slug: string }) {
               <li key={source.bookmarkId} className="flex items-start gap-2">
                 <span className="text-muted-foreground">[{idx + 1}]</span>
                 <Link
-                  href={`/preview/${source.bookmarkId}`}
+                  href={`/dashboard/preview/${source.bookmarkId}`}
                   className="min-w-0 break-words hover:underline"
                 >
                   {source.title ?? source.bookmarkId}

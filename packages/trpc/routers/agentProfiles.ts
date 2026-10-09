@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 
-import { agentProfiles } from "@saiye/db/schema";
+import { agentProfiles, agentPublications } from "@saiye/db/schema";
 import { zAgentProfileInputSchema } from "@saiye/shared/types/agentProfiles";
 import {
   buildAssetExportEnvelope,
@@ -23,6 +23,7 @@ const safeColumns = {
   timeoutMinutes: agentProfiles.timeoutMinutes,
   systemPrompt: agentProfiles.systemPrompt,
   enableTools: agentProfiles.enableTools,
+  knowledgeScope: agentProfiles.knowledgeScope,
   hasApiKey: agentProfiles.apiKey,
 };
 
@@ -33,6 +34,7 @@ function toValues(input: z.infer<typeof zAgentProfileInputSchema>) {
     type: input.type,
     systemPrompt: input.systemPrompt ?? null,
     enableTools: input.enableTools ?? true,
+    knowledgeScope: input.knowledgeScope ?? null,
     ...(input.type === "openai-compatible"
       ? {
           baseUrl: input.baseUrl,
@@ -136,6 +138,24 @@ export const agentProfilesAppRouter = router({
   delete: authedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      // D1：存在未彻底下架的发布时禁止删除（防绕过下架缓冲期）
+      const [activePublication] = await ctx.db
+        .select({ id: agentPublications.id })
+        .from(agentPublications)
+        .where(
+          and(
+            eq(agentPublications.agentProfileId, input.id),
+            inArray(agentPublications.status, ["published", "delisting"]),
+          ),
+        )
+        .limit(1);
+      if (activePublication) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message:
+            "This profile is published as a domain expert. Delist it (including the grace period) before deleting.",
+        });
+      }
       // 会话上的 FK 是 set null，直接删即可
       await ctx.db
         .delete(agentProfiles)
@@ -162,6 +182,7 @@ export const agentProfilesAppRouter = router({
           timeoutMinutes: agentProfiles.timeoutMinutes,
           systemPrompt: agentProfiles.systemPrompt,
           enableTools: agentProfiles.enableTools,
+          knowledgeScope: agentProfiles.knowledgeScope,
         })
         .from(agentProfiles)
         .where(

@@ -79,7 +79,7 @@ export function useChatSync(sessionId: string | undefined) {
         const result = (await sendMessageMutation.mutateAsync({
           sessionId,
           content: trimmed,
-        } as never)) as {
+        } as never)) as unknown as {
           content: string;
           toolCalls: ToolCallInfo[];
           error: string | null;

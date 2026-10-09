@@ -27,11 +27,17 @@ const fakeCaller = {
     rollback: vi.fn(),
   },
   users: { settings: vi.fn(), updateSettings: vi.fn() },
+  feeds: { create: vi.fn(), list: vi.fn(), delete: vi.fn(), fetchNow: vi.fn() },
 };
 
-// 拦截 createCallerFactory，让 getCaller 返回 fakeCaller
+// 拦截 createCallerFactory，让 getCaller 返回 fakeCaller，
+// 并记录每次 caller 的 ctx（验证咨询工具集的身份切换）
+const callerCtxs: unknown[] = [];
 vi.mock("../../index", () => ({
-  createCallerFactory: () => (_ctx: unknown) => fakeCaller,
+  createCallerFactory: () => (c: unknown) => {
+    callerCtxs.push(c);
+    return fakeCaller;
+  },
 }));
 
 // 隔离真实路由树：getCaller 会动态 import _app 并拉起全部 router，
@@ -45,7 +51,12 @@ vi.mock("@plait-board/mermaid-to-drawnix", () => ({
 // eslint-disable-next-line import/first
 import { parseMermaidToDrawnix } from "@plait-board/mermaid-to-drawnix";
 // eslint-disable-next-line import/first
-import { buildAgentTools, buildBookmarkCanvasElements } from "./tools";
+import {
+  buildAgentTools,
+  buildBookmarkCanvasElements,
+  buildConsultationTools,
+  disableMemoryToolsForConsultation,
+} from "./tools";
 
 const ctx = { user: { id: "user-1" } } as never;
 
@@ -73,10 +84,10 @@ beforeEach(() => {
 });
 
 describe("buildAgentTools", () => {
-  it("包含 create_canvas 工具（无 Tavily key 时共 19 个）", async () => {
+  it("包含 create_canvas 工具（无 Tavily key 时共 22 个）", async () => {
     const tools = await buildAgentTools(ctx);
     expect(tools.map((t) => t.name)).toContain("create_canvas");
-    expect(tools).toHaveLength(19);
+    expect(tools).toHaveLength(22);
   });
 
   it("包含全部 widget 工具，且 save_widget 描述内嵌组件规范", async () => {
@@ -94,6 +105,164 @@ describe("buildAgentTools", () => {
     const save = tools.find((t) => t.name === "save_widget")!;
     expect(save.description).toContain("Widget 组件规范");
     expect(save.description).toContain("saiye.bookmarks.recent");
+  });
+});
+
+describe("disableMemoryToolsForConsultation (D4)", () => {
+  it("记忆三工具执行器替换为固定错误，其余工具原样保留", async () => {
+    const tools = await buildAgentTools(ctx);
+    const disabled = disableMemoryToolsForConsultation(tools);
+
+    for (const name of ["save_memory", "list_memories", "delete_memory"]) {
+      const tool = disabled.find((t) => t.name === name);
+      if (!tool) throw new Error(`${name} tool not found`);
+      const result = JSON.parse(await tool.execute({}));
+      expect(result.error).toContain("咨询会话");
+    }
+
+    // 非记忆工具不受影响（同引用）
+    const search = disabled.find((t) => t.name === "search_bookmarks")!;
+    expect(search).toBe(tools.find((t) => t.name === "search_bookmarks"));
+  });
+});
+
+// ── 咨询会话工具集（owner 只读知识工具） ───────────────
+
+/** 模拟 ctx.db.select().from().where().limit() 链（buildConsultationTools 查 owner） */
+function fakeOwnerDb(owner?: { id: string; name: string | null }) {
+  return {
+    select: () => ({
+      from: () => ({
+        where: () => ({
+          limit: async () => (owner ? [owner] : []),
+        }),
+      }),
+    }),
+  } as never;
+}
+
+/** 咨询者 ctx（user-1）+ 注入 owner 查询 db */
+function consultationCtx(db: unknown) {
+  return { user: { id: "user-1" }, db } as never;
+}
+
+describe("buildConsultationTools（咨询 owner 只读工具）", () => {
+  it("以 owner 身份构建工具：caller ctx 的 user 切换为专家所有者", async () => {
+    callerCtxs.length = 0;
+    await buildConsultationTools(
+      consultationCtx(fakeOwnerDb({ id: "owner-1", name: "专家" })),
+      "owner-1",
+    );
+    expect(callerCtxs.at(-1)).toMatchObject({ user: { id: "owner-1" } });
+  });
+
+  it("写操作与个人域工具执行器替换为固定错误，定义保留", async () => {
+    const db = fakeOwnerDb({ id: "owner-1", name: null });
+    const tools = await buildConsultationTools(consultationCtx(db), "owner-1");
+
+    const blocked = [
+      "create_bookmark",
+      "add_to_list",
+      "attach_tag",
+      "create_canvas",
+      "save_memory",
+      "list_memories",
+      "delete_memory",
+      "save_widget",
+      "list_widgets",
+      "get_user_settings",
+      "update_user_settings",
+      "subscribe_feed",
+      "list_feeds",
+    ];
+    for (const name of blocked) {
+      const tool = tools.find((t) => t.name === name);
+      if (!tool) throw new Error(`${name} tool not found`);
+      const result = JSON.parse(await tool.execute({}));
+      expect(result.error).toContain("咨询会话");
+    }
+  });
+
+  it("只读知识工具保持可用，search_bookmarks 描述切换为专家语义", async () => {
+    const db = fakeOwnerDb({ id: "owner-1", name: null });
+    const tools = await buildConsultationTools(consultationCtx(db), "owner-1");
+
+    const search = tools.find((t) => t.name === "search_bookmarks")!;
+    expect(search.description).toContain("专家自己的书签知识库");
+    // 执行器透传到 fakeCaller，输出经脱敏（空结果 → "[]"）
+    fakeCaller.bookmarks.searchBookmarks.mockResolvedValueOnce({
+      bookmarks: [],
+    });
+    expect(await search.execute({ query: "rust" })).toBe("[]");
+    expect(fakeCaller.bookmarks.searchBookmarks).toHaveBeenCalled();
+  });
+
+  it("咨询 search_bookmarks 输出脱敏：剥离 title/url", async () => {
+    const db = fakeOwnerDb({ id: "owner-1", name: null });
+    const tools = await buildConsultationTools(consultationCtx(db), "owner-1");
+
+    fakeCaller.bookmarks.searchBookmarks.mockResolvedValueOnce({
+      bookmarks: [
+        {
+          id: "bm-1",
+          title: "私有标题",
+          summary: "摘要内容",
+          content: {
+            type: "link",
+            url: "https://secret.example/private",
+            description: "公开网页描述",
+          },
+        },
+      ],
+    });
+    const out = await tools
+      .find((t) => t.name === "search_bookmarks")!
+      .execute({ query: "rust", limit: 5 });
+
+    expect(out).not.toContain("secret.example");
+    expect(out).not.toContain("私有标题");
+    expect(JSON.parse(out)).toEqual([
+      {
+        id: "bm-1",
+        summary: "摘要内容",
+        description: "公开网页描述",
+        sanitized: true,
+      },
+    ]);
+  });
+
+  it("咨询 get_bookmark_detail 输出脱敏：剥离 url/note/highlights/资产", async () => {
+    const db = fakeOwnerDb({ id: "owner-1", name: null });
+    const tools = await buildConsultationTools(consultationCtx(db), "owner-1");
+
+    fakeCaller.bookmarks.getBookmark.mockResolvedValueOnce({
+      id: "bm-1",
+      title: "私有标题",
+      note: "专家的私有笔记",
+      highlights: [{ text: "私有高亮" }],
+      summary: "摘要内容",
+      content: { type: "text", text: "正文片段" },
+      assets: [{ id: "asset-1", content: "YmFzZTY0..." }],
+    });
+    const out = await tools
+      .find((t) => t.name === "get_bookmark_detail")!
+      .execute({ bookmarkId: "bm-1" });
+
+    expect(out).not.toContain("私有笔记");
+    expect(out).not.toContain("私有高亮");
+    expect(out).not.toContain("YmFzZTY0");
+    expect(JSON.parse(out)).toEqual({
+      id: "bm-1",
+      summary: "摘要内容",
+      content: "正文片段",
+      sanitized: true,
+    });
+  });
+
+  it("owner 不存在时抛错", async () => {
+    await expect(
+      buildConsultationTools(consultationCtx(fakeOwnerDb()), "nope"),
+    ).rejects.toThrow("Consultation owner not found");
   });
 });
 
@@ -1039,5 +1208,143 @@ describe("update_user_settings", () => {
 
     expect(result.error).toContain("至少提供");
     expect(fakeCaller.users.updateSettings).not.toHaveBeenCalled();
+  });
+
+  it("只传 localSettings → 不写 DB，结果回显 localSettings", async () => {
+    const tool = await getSettingsTool("update_user_settings");
+    const raw = await tool.execute({ localSettings: { lang: "zh" } });
+    const result = JSON.parse(raw);
+
+    expect(fakeCaller.users.settings).not.toHaveBeenCalled();
+    expect(fakeCaller.users.updateSettings).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      success: true,
+      localSettings: { lang: "zh" },
+    });
+  });
+
+  it("localSettings 混合 DB 字段 → 剥离后写库，两者都回显", async () => {
+    fakeCaller.users.settings.mockResolvedValue({ timezone: "UTC" });
+    fakeCaller.users.updateSettings.mockResolvedValue(undefined);
+
+    const tool = await getSettingsTool("update_user_settings");
+    const raw = await tool.execute({
+      timezone: "Asia/Shanghai",
+      localSettings: { lang: "zh", gridColumns: 5 },
+    });
+    const result = JSON.parse(raw);
+
+    expect(fakeCaller.users.updateSettings).toHaveBeenCalledWith({
+      timezone: "Asia/Shanghai",
+    });
+    expect(result).toEqual({
+      success: true,
+      changed: [{ key: "timezone", before: "UTC", after: "Asia/Shanghai" }],
+      localSettings: { lang: "zh", gridColumns: 5 },
+    });
+  });
+
+  it("curatedTagIds 已开放 → 作为 DB 字段写库", async () => {
+    fakeCaller.users.settings.mockResolvedValue({ curatedTagIds: null });
+    fakeCaller.users.updateSettings.mockResolvedValue(undefined);
+
+    const tool = await getSettingsTool("update_user_settings");
+    const raw = await tool.execute({ curatedTagIds: ["tag-1", "tag-2"] });
+    const result = JSON.parse(raw);
+
+    expect(fakeCaller.users.updateSettings).toHaveBeenCalledWith({
+      curatedTagIds: ["tag-1", "tag-2"],
+    });
+    expect(result.changed).toEqual([
+      { key: "curatedTagIds", before: null, after: ["tag-1", "tag-2"] },
+    ]);
+  });
+});
+
+// ── RSS 订阅工具 ─────────────────────────────────────────
+
+async function getFeedTool(name: string) {
+  const tools = await buildAgentTools(ctx);
+  const tool = tools.find((t) => t.name === name);
+  if (!tool) throw new Error(`${name} tool not found`);
+  return tool;
+}
+
+describe("subscribe_feed", () => {
+  it("创建订阅并立即触发首次拉取", async () => {
+    fakeCaller.feeds.create.mockResolvedValue({
+      id: "feed-1",
+      name: "某作者的博客",
+      url: "https://example.com/feed.xml",
+      enabled: true,
+      importTags: false,
+      lastFetchedStatus: "pending",
+      lastFetchedAt: null,
+      lastSuccessfulFetchAt: null,
+    });
+    fakeCaller.feeds.fetchNow.mockResolvedValue(undefined);
+
+    const tool = await getFeedTool("subscribe_feed");
+    const raw = await tool.execute({
+      name: "某作者的博客",
+      url: "https://example.com/feed.xml",
+    });
+    const result = JSON.parse(raw);
+
+    expect(fakeCaller.feeds.create).toHaveBeenCalledWith({
+      name: "某作者的博客",
+      url: "https://example.com/feed.xml",
+      enabled: true,
+      importTags: false,
+    });
+    expect(fakeCaller.feeds.fetchNow).toHaveBeenCalledWith({
+      feedId: "feed-1",
+    });
+    expect(result).toEqual({
+      success: true,
+      feedId: "feed-1",
+      name: "某作者的博客",
+      url: "https://example.com/feed.xml",
+      enabled: true,
+      firstFetchTriggered: true,
+    });
+  });
+
+  it("创建失败 → 返回 error，不触发拉取", async () => {
+    fakeCaller.feeds.create.mockRejectedValue(new Error("invalid feed url"));
+
+    const tool = await getFeedTool("subscribe_feed");
+    const raw = await tool.execute({
+      name: "x",
+      url: "https://example.com/feed.xml",
+    });
+    const result = JSON.parse(raw);
+
+    expect(result.error).toContain("订阅失败");
+    expect(fakeCaller.feeds.fetchNow).not.toHaveBeenCalled();
+  });
+});
+
+describe("list_feeds / unsubscribe_feed", () => {
+  it("list_feeds 返回完整订阅列表", async () => {
+    fakeCaller.feeds.list.mockResolvedValue({
+      feeds: [
+        { id: "feed-1", name: "A", url: "https://a.com/rss", enabled: true },
+      ],
+    });
+
+    const tool = await getFeedTool("list_feeds");
+    const raw = await tool.execute({});
+    expect(JSON.parse(raw).feeds).toHaveLength(1);
+  });
+
+  it("unsubscribe_feed 按 feedId 删除", async () => {
+    fakeCaller.feeds.delete.mockResolvedValue(undefined);
+
+    const tool = await getFeedTool("unsubscribe_feed");
+    const raw = await tool.execute({ feedId: "feed-1" });
+
+    expect(fakeCaller.feeds.delete).toHaveBeenCalledWith({ feedId: "feed-1" });
+    expect(JSON.parse(raw)).toEqual({ success: true, feedId: "feed-1" });
   });
 });

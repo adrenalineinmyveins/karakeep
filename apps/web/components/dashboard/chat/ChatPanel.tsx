@@ -101,7 +101,13 @@ export default function ChatPanel({
         <Select
           value={sessionData?.session.agentProfileId ?? "default"}
           onValueChange={onAgentChange}
-          disabled={!sessionId || isStreaming || updateAgent.isPending}
+          disabled={
+            !sessionId ||
+            isStreaming ||
+            updateAgent.isPending ||
+            // 咨询会话绑定发布专家（publicationId），不允许切换
+            !!sessionData?.session.publicationId
+          }
         >
           <SelectTrigger className="h-8 w-56">
             <SelectValue />
@@ -145,12 +151,13 @@ export default function ChatPanel({
         )}
       </div>
 
-      {/* 输入区域 */}
+      {/* 输入区域（咨询会话开启「引用我的笔记」：显式选择暴露给专家的内容） */}
       <ChatInput
         onSend={sendMessage}
         onAbort={abort}
         isStreaming={isStreaming}
         disabled={!sessionId}
+        enableAttach={!!sessionData?.session.publicationId}
       />
     </div>
   );

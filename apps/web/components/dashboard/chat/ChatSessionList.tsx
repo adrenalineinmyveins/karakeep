@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { GraduationCap, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -73,10 +73,17 @@ export default function ChatSessionList({
                   )}
                 >
                   <button
-                    className="flex-1 truncate text-left"
+                    className="flex flex-1 items-center gap-1.5 truncate text-left"
                     onClick={() => onSelect(session.id)}
                   >
-                    {session.title}
+                    {/* 咨询会话徽标（绑定领域专家发布） */}
+                    {session.publicationId && (
+                      <GraduationCap
+                        size={13}
+                        className="shrink-0 text-primary"
+                      />
+                    )}
+                    <span className="truncate">{session.title}</span>
                   </button>
                   <button
                     className="opacity-0 transition-opacity group-hover:opacity-100"

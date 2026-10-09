@@ -7,11 +7,15 @@
 
 import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import serverConfig from "@saiye/shared/config";
+import { supportedLangs } from "@saiye/shared/langs";
+import { zNewFeedSchema } from "@saiye/shared/types/feeds";
 import { zUpdateUserSettingsSchema } from "@saiye/shared/types/users";
 import { zWidgetPermissionSchema } from "@saiye/shared/types/widgets";
 import type { ZWidgetPermission } from "@saiye/shared/types/widgets";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
+import { users } from "@saiye/db/schema";
 import { createCallerFactory } from "../../index";
 import type { Context } from "../../index";
 import type { ToolDefinition } from "./sdkAdapter";
@@ -720,6 +724,36 @@ export function buildBookmarkCanvasElements(
   ];
 }
 
+/** D4 记忆隔离：咨询会话中禁用的记忆工具名 */
+const CONSULTATION_DISABLED_TOOLS = new Set([
+  "save_memory",
+  "list_memories",
+  "delete_memory",
+]);
+
+const MEMORY_DISABLED_RESULT = JSON.stringify({
+  error: "长期记忆在咨询会话中不可用",
+});
+
+/**
+ * D4 记忆隔离：咨询会话中禁用记忆工具的读写。
+ *
+ * 咨询者与领域专家对话时，工具若读写咨询者的私人记忆，会让跨会话的
+ * 个人事实流经所有者配置的 LLM 端点；所有者侧记忆已在 D3 检索排除。
+ * 保留工具定义（默认系统提示词描述了记忆能力，直接移除会让 LLM
+ * 幻觉调用不存在的工具导致整轮失败），仅把执行器替换为固定错误，
+ * LLM 收到后会自然告知用户该能力不可用。
+ */
+export function disableMemoryToolsForConsultation(
+  tools: ToolDefinition[],
+): ToolDefinition[] {
+  return tools.map((t) =>
+    CONSULTATION_DISABLED_TOOLS.has(t.name)
+      ? { ...t, execute: async () => MEMORY_DISABLED_RESULT }
+      : t,
+  );
+}
+
 /**
  * 构建用户专属的 Agent 工具集。
  *
@@ -1245,24 +1279,120 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
 
     zodToToolSchema(
       "update_user_settings",
-      "修改用户的个人设置。只传需要修改的字段，未传字段保持不变。字段含义与取值范围见参数 schema；reader/AI 类字段为 null 时表示恢复默认。修改成功后返回各字段变更前后对比，需向用户复述确认。不支持修改 curatedTagIds。",
-      zUpdateUserSettingsSchema.omit({ curatedTagIds: true }),
+      "修改用户的个人设置。只传需要修改的字段，未传字段保持不变。字段含义与取值范围见参数 schema；reader/AI 类字段为 null 时表示恢复默认。分两类：① 账户级字段（timezone、备份、阅读器、AI 自动处理、tagStyle、curatedTagIds 等）写入数据库，跨设备生效，返回变更前后对比；② localSettings 是设备本地设置（界面语言、书签布局/列数、显示开关、图片填充），存浏览器 cookie，由前端在收到结果后应用，结果中回显 localSettings。两类都需向用户复述确认。curatedTagIds（精选标签）必须先用 list_tags 查询真实标签 ID 再填入，传 null 表示清空。",
+      zUpdateUserSettingsSchema.extend({
+        localSettings: z
+          .object({
+            lang: z
+              .enum(supportedLangs)
+              .describe("界面 UI 语言（设备本地，不落库）"),
+            bookmarkGridLayout: z
+              .enum(["grid", "list", "masonry", "compact"])
+              .describe("书签布局（设备本地）"),
+            gridColumns: z
+              .number()
+              .min(1)
+              .max(6)
+              .describe("网格布局列数 1-6（设备本地）"),
+            showNotes: z.boolean().describe("书签卡片显示笔记（设备本地）"),
+            showTags: z.boolean().describe("书签卡片显示标签（设备本地）"),
+            showTitle: z.boolean().describe("书签卡片显示标题（设备本地）"),
+            imageFit: z
+              .enum(["cover", "contain"])
+              .describe("封面图填充方式（设备本地）"),
+          })
+          .partial()
+          .describe("设备本地设置，由前端应用，不写数据库"),
+      }),
       async (args) => {
-        if (Object.keys(args).length === 0) {
+        const { localSettings, ...update } = args;
+        if (Object.keys(update).length === 0 && !localSettings) {
           return JSON.stringify({
             error: "至少提供要修改的一个设置字段",
           });
         }
-        const before = await caller.users.settings();
-        await caller.users.updateSettings(
-          args as Parameters<typeof caller.users.updateSettings>[0],
-        );
-        const changed = Object.keys(args).map((key) => ({
-          key,
-          before: before[key as keyof typeof before],
-          after: args[key],
-        }));
-        return JSON.stringify({ success: true, changed });
+        let changed: { key: string; before: unknown; after: unknown }[] = [];
+        if (Object.keys(update).length > 0) {
+          const before = await caller.users.settings();
+          await caller.users.updateSettings(
+            update as Parameters<typeof caller.users.updateSettings>[0],
+          );
+          changed = Object.keys(update).map((key) => ({
+            key,
+            before: before[key as keyof typeof before],
+            after: update[key],
+          }));
+        }
+        return JSON.stringify({
+          success: true,
+          ...(changed.length > 0 ? { changed } : {}),
+          ...(localSettings ? { localSettings } : {}),
+        });
+      },
+    ),
+
+    // ── RSS 订阅 ──────────────────────────────────────────
+    zodToToolSchema(
+      "subscribe_feed",
+      "订阅一个 RSS/Atom 源（作者的博客、专栏、播客等）。订阅后系统会自动定时拉取该源的新文章并存为书签，本工具会立即触发首次拉取。需要提供源的 feed 地址（RSS/Atom URL）；importTags 为 true 时会把源内文章自带的分类/标签一并导入。适合用户说『订阅某作者的博客/RSS』『关注这个专栏的更新』。",
+      zNewFeedSchema.extend({
+        enabled: z.boolean().optional().default(true),
+      }),
+      async (args) => {
+        try {
+          const feed = await caller.feeds.create({
+            name: args.name as string,
+            url: args.url as string,
+            enabled:
+              args.enabled === undefined ? true : (args.enabled as boolean),
+            importTags:
+              args.importTags === undefined
+                ? false
+                : (args.importTags as boolean),
+          });
+          // 立即触发首次拉取，无需等 worker 周期
+          await caller.feeds.fetchNow({ feedId: feed.id });
+          return JSON.stringify({
+            success: true,
+            feedId: feed.id,
+            name: feed.name,
+            url: feed.url,
+            enabled: feed.enabled,
+            firstFetchTriggered: true,
+          });
+        } catch (e) {
+          return JSON.stringify({
+            error: `订阅失败：${e instanceof Error ? e.message : String(e)}`,
+          });
+        }
+      },
+    ),
+
+    zodToToolSchema(
+      "list_feeds",
+      "列出用户当前的所有 RSS 订阅（含订阅地址、启用状态、最近拉取结果与时间）。退订或修改前先用它确认 feedId。",
+      z.object({}),
+      async () => {
+        const { feeds } = await caller.feeds.list();
+        return JSON.stringify({ feeds });
+      },
+    ),
+
+    zodToToolSchema(
+      "unsubscribe_feed",
+      "退订一个 RSS 源（按 feedId 删除订阅；feedId 可先用 list_feeds 查询，不要凭记忆编造）。",
+      z.object({
+        feedId: z.string().describe("要退订的订阅 ID，来自 list_feeds"),
+      }),
+      async (args) => {
+        try {
+          await caller.feeds.delete({ feedId: args.feedId as string });
+          return JSON.stringify({ success: true, feedId: args.feedId });
+        } catch (e) {
+          return JSON.stringify({
+            error: `退订失败：${e instanceof Error ? e.message : String(e)}`,
+          });
+        }
       },
     ),
   ];
@@ -1371,4 +1501,147 @@ export async function buildAgentTools(ctx: Context): Promise<ToolDefinition[]> {
   }
 
   return tools;
+}
+
+// ── 咨询会话工具集（owner 只读知识工具） ───────────────
+
+/**
+ * 咨询会话中禁用的工具：写操作 + 个人域数据。
+ * 写操作（create_bookmark 等）会把咨询内容写进专家库；
+ * 个人域（记忆/widget/设置/订阅）即使是 owner 的也属于隐私范围，
+ * 不应经咨询会话暴露。
+ */
+const CONSULTATION_BLOCKED_TOOLS = new Set([
+  // 写操作
+  "create_bookmark",
+  "add_to_list",
+  "attach_tag",
+  "create_canvas",
+  // 个人域（D4 记忆隔离的超集）
+  "save_memory",
+  "list_memories",
+  "delete_memory",
+  "save_widget",
+  "update_widget",
+  "list_widgets",
+  "delete_widget",
+  "rollback_widget",
+  "get_user_settings",
+  "update_user_settings",
+  "subscribe_feed",
+  "list_feeds",
+  "unsubscribe_feed",
+]);
+
+const CONSULTATION_BLOCKED_RESULT = JSON.stringify({
+  error: "该能力在专家咨询会话中不可用",
+});
+
+const CONSULTATION_SANITIZATION_ERROR = JSON.stringify({
+  error: "Failed to sanitize tool output",
+});
+
+/**
+ * 咨询工具输出脱敏：与 RAG 注入链路（knowledgeRetrieval 的 sanitize）
+ * 策略对齐——剥离来源元数据（title/url）与私有维度（note/highlights/
+ * 资产），来源对咨询者不可见，防止模型经工具调用复述私有内容。
+ */
+function sanitizeSearchOutput(raw: string): string {
+  try {
+    const items = JSON.parse(raw) as Record<string, unknown>[];
+    return JSON.stringify(
+      items.map((b) => ({
+        id: b.id,
+        summary: b.summary,
+        description: b.description,
+        sanitized: true,
+      })),
+    );
+  } catch {
+    return CONSULTATION_SANITIZATION_ERROR;
+  }
+}
+
+function sanitizeBookmarkDetailOutput(raw: string): string {
+  try {
+    const b = JSON.parse(raw) as {
+      id: string;
+      summary?: string | null;
+      content?: { type?: string; text?: string; description?: string };
+    };
+    const c = b.content ?? {};
+    const body = c.type === "text" ? c.text : c.description;
+    return JSON.stringify({
+      id: b.id,
+      summary: b.summary,
+      ...(body ? { content: body.slice(0, 4000) } : {}),
+      sanitized: true,
+    });
+  } catch {
+    return CONSULTATION_SANITIZATION_ERROR;
+  }
+}
+
+/**
+ * 咨询会话工具集：以领域专家所有者身份构建只读知识工具。
+ *
+ * 工具执行身份从咨询者切换为 owner——search_bookmarks /
+ * get_bookmark_detail / get_bookmark_tags / list_tags / list_lists
+ * 查询专家自己的知识库（咨询者的书签数据不出域）；写操作与
+ * 个人域工具保留定义（系统提示词描述了这些能力，直接移除会让
+ * LLM 幻觉调用不存在的工具导致整轮失败），执行器替换为固定
+ * 错误（复用 D4 记忆隔离模式）。search_bookmarks /
+ * get_bookmark_detail 的输出经脱敏（剥离 url/title/note/
+ * highlights/资产），与 RAG 注入链路的脱敏策略对齐。
+ *
+ * @param ctx 咨询者的 tRPC 上下文（借用 db 实例）
+ * @param ownerUserId 领域专家所有者
+ */
+export async function buildConsultationTools(
+  ctx: Context,
+  ownerUserId: string,
+): Promise<ToolDefinition[]> {
+  const [owner] = await ctx.db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+    })
+    .from(users)
+    .where(eq(users.id, ownerUserId))
+    .limit(1);
+  if (!owner) {
+    throw new Error(`Consultation owner not found: ${ownerUserId}`);
+  }
+
+  const ownerCtx: Context = { ...ctx, user: owner };
+  const tools = await buildAgentTools(ownerCtx);
+
+  return tools.map((t) => {
+    if (CONSULTATION_BLOCKED_TOOLS.has(t.name)) {
+      return { ...t, execute: async () => CONSULTATION_BLOCKED_RESULT };
+    }
+    if (t.name === "search_bookmarks") {
+      // 专家语义：明确这是专家自己的语料（工具身份已是 owner）；
+      // 输出脱敏剥离来源元数据（title/url）
+      return {
+        ...t,
+        description:
+          "搜索专家自己的书签知识库。支持全文和语义搜索。用于回答关于已保存内容的问题。",
+        execute: async (args) => sanitizeSearchOutput(await t.execute(args)),
+      };
+    }
+    if (t.name === "get_bookmark_detail") {
+      // 输出脱敏：剥离 url/title/note/highlights 与资产，仅保留摘要与截断正文
+      return {
+        ...t,
+        description:
+          "获取书签的摘要与正文片段（咨询模式下不含来源链接与私有笔记）。",
+        execute: async (args) =>
+          sanitizeBookmarkDetailOutput(await t.execute(args)),
+      };
+    }
+    return t;
+  });
 }

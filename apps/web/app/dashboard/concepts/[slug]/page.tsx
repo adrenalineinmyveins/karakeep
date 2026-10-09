@@ -23,5 +23,13 @@ export default async function ConceptDetailPage(props: {
   params: Promise<{ slug: string }>;
 }) {
   const params = await props.params;
-  return <ConceptPageView slug={params.slug} />;
+  // Next.js keeps dynamic params URL-encoded here (but decoded in
+  // generateMetadata), so non-ASCII slugs arrive percent-encoded.
+  let slug = params.slug;
+  try {
+    slug = decodeURIComponent(params.slug);
+  } catch {
+    // Slug contains a literal '%'; keep as-is
+  }
+  return <ConceptPageView slug={slug} />;
 }

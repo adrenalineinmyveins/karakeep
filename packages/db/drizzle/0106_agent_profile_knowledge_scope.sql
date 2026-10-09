@@ -1,0 +1,1 @@
+ALTER TABLE `agentProfiles` ADD `knowledge_scope` text;

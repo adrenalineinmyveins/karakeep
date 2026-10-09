@@ -32,7 +32,10 @@ import { z } from "zod";
 
 import serverConfig from "@saiye/shared/config";
 import logger from "@saiye/shared/logger";
-import type { AgentProfileType } from "@saiye/shared/types/agentProfiles";
+import type {
+  AgentProfileType,
+  KnowledgeScope,
+} from "@saiye/shared/types/agentProfiles";
 
 import { createCliAgent } from "./cliAdapter";
 /** 业务侧的工具定义（在 SDK 边界由 zodToToolSchema 构造） */
@@ -57,7 +60,12 @@ export type AgentEvent =
       result?: unknown;
     }
   | { type: "message_complete"; content: string }
-  | { type: "error"; message: string };
+  | { type: "error"; message: string }
+  /**
+   * D5 降级标记（orchestrator 合成，非 agent 原生事件）：咨询会话的
+   * 回复未获得预期的专家知识加持时，在流首告知咨询者。
+   */
+  | { type: "degradations"; degradations: string[] };
 
 export interface AgentInterface {
   prompt(text: string): Promise<void>;
@@ -194,6 +202,8 @@ export interface AgentProfileConfig {
   timeoutMinutes: number;
   systemPrompt: string | null;
   enableTools: boolean;
+  /** per-profile 语料隔离：咨询模式限定检索范围（null = 全部书签语料） */
+  knowledgeScope?: KnowledgeScope | null;
 }
 
 /** 档案指纹：任一字段变化即视为档案变更（用于会话缓存失效） */
@@ -209,6 +219,7 @@ export function profileFingerprint(p: AgentProfileConfig): string {
     p.timeoutMinutes,
     p.systemPrompt,
     p.enableTools,
+    p.knowledgeScope ?? null,
   ]);
 }
 

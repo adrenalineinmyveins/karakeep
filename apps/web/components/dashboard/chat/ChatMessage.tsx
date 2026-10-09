@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, User, Wrench } from "lucide-react";
+import { Bot, StickyNote, User, Wrench } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 import { cn } from "@/lib/utils";
@@ -28,6 +28,21 @@ export default function ChatMessage({ message }: { message: ChatMessageInfo }) {
 
       {/* 消息体 */}
       <div className={cn("flex max-w-[80%] flex-col gap-1")}>
+        {/* 引用的笔记（咨询会话 @引用） */}
+        {isUser && message.attachments && message.attachments.length > 0 && (
+          <div className="flex flex-wrap justify-end gap-1.5">
+            {message.attachments.map((a) => (
+              <span
+                key={a.id}
+                className="inline-flex max-w-[240px] items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                title={a.title}
+              >
+                <StickyNote size={12} className="shrink-0" />
+                <span className="truncate">{a.title}</span>
+              </span>
+            ))}
+          </div>
+        )}
         <div
           className={cn(
             "rounded-2xl px-4 py-2 text-sm",

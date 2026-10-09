@@ -4,6 +4,17 @@ import { z } from "zod";
 export const AGENT_PROFILE_TYPES = ["openai-compatible", "trae-cli"] as const;
 export type AgentProfileType = (typeof AGENT_PROFILE_TYPES)[number];
 
+/** 语料范围：绑定标签/清单；未设置或两者皆空 = 使用全部书签语料 */
+export interface KnowledgeScope {
+  tagIds: string[];
+  listIds: string[];
+}
+
+export const zKnowledgeScopeSchema = z.object({
+  tagIds: z.array(z.string()).max(20).default([]),
+  listIds: z.array(z.string()).max(20).default([]),
+});
+
 /**
  * 档案创建/更新入参（判别联合：按 type 分化必填字段）
  * - openai-compatible：baseUrl(url) + model 必填；apiKey 可选（更新时留空保持原值）
@@ -18,6 +29,7 @@ export const zAgentProfileInputSchema = z.discriminatedUnion("type", [
     model: z.string().min(1),
     systemPrompt: z.string().max(8000).nullable().optional(),
     enableTools: z.boolean().optional(),
+    knowledgeScope: zKnowledgeScopeSchema.nullable().optional(),
   }),
   z.object({
     type: z.literal("trae-cli"),
@@ -26,6 +38,7 @@ export const zAgentProfileInputSchema = z.discriminatedUnion("type", [
     timeoutMinutes: z.number().int().min(1).max(60).optional(),
     systemPrompt: z.string().max(8000).nullable().optional(),
     enableTools: z.boolean().optional(),
+    knowledgeScope: zKnowledgeScopeSchema.nullable().optional(),
   }),
 ]);
 
