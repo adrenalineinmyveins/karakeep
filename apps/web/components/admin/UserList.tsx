@@ -50,14 +50,14 @@ export default function UsersSection() {
     api.users.delete.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "User deleted",
+          description: t("admin.users.user_deleted"),
         });
         queryClient.invalidateQueries(api.users.list.pathFilter());
       },
       onError: (e) => {
         toast({
           variant: "destructive",
-          description: `Something went wrong: ${e.message}`,
+          description: `${t("common.something_went_wrong")}: ${e.message}`,
         });
       },
     }),
@@ -126,7 +126,7 @@ export default function UsersSection() {
                           setDialogOpen(false);
                         }}
                       >
-                        Delete
+                        {t("actions.delete")}
                       </ActionButton>
                     )}
                   >

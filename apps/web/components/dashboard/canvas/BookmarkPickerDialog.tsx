@@ -114,7 +114,7 @@ export default function BookmarkPickerDialog({
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm">
-                      {getBookmarkTitle(b) ?? "Untitled"}
+                      {getBookmarkTitle(b) ?? t("common.untitled")}
                     </div>
                     <div className="flex items-center gap-1 truncate text-xs text-gray-400">
                       <Globe className="size-3 shrink-0" />

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/sonner";
 import { useDragAndDrop } from "@/lib/drag-and-drop";
+import { useTranslation } from "@/lib/i18n/client";
 import { X } from "lucide-react";
 import Draggable from "react-draggable";
 
@@ -24,6 +25,7 @@ export const TagPill = React.memo(function TagPill({
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const draggableRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const handleMouseOver = () => setIsHovered(true);
   const handleMouseOut = () => setIsHovered(false);
@@ -31,7 +33,7 @@ export const TagPill = React.memo(function TagPill({
   const { mutate: mergeTag } = useMergeTag({
     onSuccess: () => {
       toast({
-        description: "Tags have been merged!",
+        description: t("actions.tags_merged"),
       });
     },
     onError: (e) => {
@@ -52,7 +54,7 @@ export const TagPill = React.memo(function TagPill({
       } else {
         toast({
           variant: "destructive",
-          title: "Something went wrong",
+          title: t("common.something_went_wrong"),
         });
       }
     },

@@ -2,6 +2,7 @@ import { router } from "../index";
 import { adminAppRouter } from "./admin";
 import { agentProfilesAppRouter } from "./agentProfiles";
 import { agentPublicationsAppRouter } from "./agentPublications";
+import { agentSkillsAppRouter } from "./agentSkills";
 import { apiKeysAppRouter } from "./apiKeys";
 import { assetsAppRouter } from "./assets";
 import { backupsAppRouter } from "./backups";
@@ -33,6 +34,7 @@ export const appRouter = router({
   memories: memoriesAppRouter,
   agentProfiles: agentProfilesAppRouter,
   agentPublications: agentPublicationsAppRouter,
+  agentSkills: agentSkillsAppRouter,
   canvases: canvasesAppRouter,
   widgets: widgetsAppRouter,
   apiKeys: apiKeysAppRouter,

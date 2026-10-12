@@ -16,6 +16,13 @@ services:
       MEILI_ADDR: http://meilisearch:7700
       BROWSER_WEB_URL: http://chrome:9222
       DATA_DIR: /data
+    # 覆盖镜像 healthcheck（镜像内无 wget），重建镜像前也保持状态准确
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
   chrome:
     image: gcr.io/zenika-hub/alpine-chrome:124
     restart: unless-stopped

@@ -53,6 +53,7 @@ import {
 } from "@plait/draw";
 import type { PlaitArrowLine, PlaitGeometry } from "@plait/draw";
 import { createEmptyMind, MindNodeComponent, PlaitMind } from "@plait/mind";
+import { i18n } from "@/lib/i18n/client";
 import type {
   BaseData as MindBaseData,
   MindElement as MindElementType,
@@ -687,7 +688,9 @@ class BookmarkCardGenerator extends Generator<BookmarkCardElement> {
       );
     }
 
-    const [line1, line2] = wrapTitle(element.title || "Untitled");
+    const [line1, line2] = wrapTitle(
+      element.title || i18n.t("common.untitled"),
+    );
     g.append(
       svgEl(
         "text",

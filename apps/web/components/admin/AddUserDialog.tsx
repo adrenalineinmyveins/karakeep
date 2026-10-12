@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/lib/i18n/client";
 import {
   Select,
   SelectContent,
@@ -45,6 +46,7 @@ export default function AddUserDialog({
 }) {
   const api = useTRPC();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [isOpen, onOpenChange] = useState(false);
   const form = useForm<AdminCreateUserSchema>({
     resolver: zodResolver(zAdminCreateUserSchema),
@@ -60,7 +62,7 @@ export default function AddUserDialog({
     api.admin.createUser.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "User created successfully",
+          description: t("admin.users_dialogs.user_created"),
         });
         onOpenChange(false);
         queryClient.invalidateQueries(api.users.list.pathFilter());
@@ -75,7 +77,7 @@ export default function AddUserDialog({
         } else {
           toast({
             variant: "destructive",
-            description: "Failed to create user",
+            description: t("admin.users_dialogs.user_create_failed"),
           });
         }
       },
@@ -93,7 +95,7 @@ export default function AddUserDialog({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add User</DialogTitle>
+          <DialogTitle>{t("admin.users_dialogs.add_user")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit((val) => mutate(val))}>
@@ -103,11 +105,11 @@ export default function AddUserDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>{t("common.name")}</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
-                        placeholder="Name"
+                        placeholder={t("common.name")}
                         {...field}
                         className="w-full rounded border p-2"
                       />
@@ -121,11 +123,11 @@ export default function AddUserDialog({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("common.email")}</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Email"
+                        placeholder={t("common.email")}
                         {...field}
                         className="w-full rounded border p-2"
                       />
@@ -139,11 +141,11 @@ export default function AddUserDialog({
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{t("common.password")}</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Password"
+                        placeholder={t("common.password")}
                         {...field}
                         className="w-full rounded border p-2"
                       />
@@ -157,11 +159,13 @@ export default function AddUserDialog({
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel>
+                      {t("admin.users_list.confirm_password")}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Confirm Password"
+                        placeholder={t("admin.users_list.confirm_password")}
                         {...field}
                         className="w-full rounded border p-2"
                       />
@@ -175,7 +179,7 @@ export default function AddUserDialog({
                 name="role"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Role</FormLabel>
+                    <FormLabel>{t("common.role")}</FormLabel>
                     <FormControl>
                       <Select
                         value={field.value}
@@ -185,8 +189,12 @@ export default function AddUserDialog({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="user">User</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="user">
+                            {t("common.roles.user")}
+                          </SelectItem>
+                          <SelectItem value="admin">
+                            {t("common.roles.admin")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -197,7 +205,7 @@ export default function AddUserDialog({
               <DialogFooter className="sm:justify-end">
                 <DialogClose asChild>
                   <Button type="button" variant="secondary">
-                    Close
+                    {t("actions.close")}
                   </Button>
                 </DialogClose>
                 <ActionButton
@@ -205,7 +213,7 @@ export default function AddUserDialog({
                   loading={isPending}
                   disabled={isPending}
                 >
-                  Create
+                  {t("actions.create")}
                 </ActionButton>
               </DialogFooter>
             </div>

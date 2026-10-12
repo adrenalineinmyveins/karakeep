@@ -1,4 +1,5 @@
 import { toast } from "@/components/ui/sonner";
+import { useTranslation } from "@/lib/i18n/client";
 
 import type { ZBookmark } from "@saiye/shared/types/bookmarks";
 import { useUpdateBookmarkTags } from "@saiye/shared-react/hooks/bookmarks";
@@ -12,17 +13,18 @@ export function BookmarkTagsEditor({
   bookmark: ZBookmark;
   disabled?: boolean;
 }) {
+  const { t } = useTranslation();
   const { mutate } = useUpdateBookmarkTags({
     onSuccess: () => {
       toast({
-        description: "Tags has been updated!",
+        description: t("toasts.tags.updated"),
       });
     },
     onError: () => {
       toast({
         variant: "destructive",
-        title: "Something went wrong",
-        description: "There was a problem with your request.",
+        title: t("common.something_went_wrong"),
+        description: t("common.request_problem"),
       });
     },
   });

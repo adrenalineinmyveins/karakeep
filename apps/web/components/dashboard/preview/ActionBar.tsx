@@ -27,14 +27,14 @@ export default function ActionBar({ bookmark }: { bookmark: ZBookmark }) {
   const onError = () => {
     toast({
       variant: "destructive",
-      title: "Something went wrong",
-      description: "There was a problem with your request.",
+      title: t("common.something_went_wrong"),
+      description: t("common.request_problem"),
     });
   };
   const { mutate: favBookmark, isPending: pendingFav } = useUpdateBookmark({
     onSuccess: () => {
       toast({
-        description: "The bookmark has been updated!",
+        description: t("actions.bookmark_updated"),
       });
     },
     onError,
@@ -43,7 +43,11 @@ export default function ActionBar({ bookmark }: { bookmark: ZBookmark }) {
     useUpdateBookmark({
       onSuccess: (resp) => {
         toast({
-          description: `The bookmark has been ${resp.archived ? "Archived" : "Un-archived"}!`,
+          description: t(
+            resp.archived
+              ? "actions.bookmark_archived"
+              : "actions.bookmark_unarchived",
+          ),
         });
       },
       onError,

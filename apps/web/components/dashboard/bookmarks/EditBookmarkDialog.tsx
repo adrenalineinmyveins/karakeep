@@ -122,7 +122,7 @@ export function EditBookmarkDialog({
   const { mutate: updateBookmarkMutate, isPending: isUpdatingBookmark } =
     useUpdateBookmark({
       onSuccess: (updatedBookmark) => {
-        toast({ description: "Bookmark details updated successfully!" });
+        toast({ description: t("toasts.bookmarks.updated") });
         // Close the dialog after successful detail update
         setOpen(false);
         // Reset form with potentially updated data
@@ -131,7 +131,7 @@ export function EditBookmarkDialog({
       onError: (error) => {
         toast({
           variant: "destructive",
-          title: "Failed to update bookmark",
+          title: t("toasts.bookmarks.update_failed"),
           description: error.message,
         });
       },
@@ -179,7 +179,7 @@ export function EditBookmarkDialog({
                   <FormLabel>{t("common.title")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Bookmark title"
+                      placeholder={t("bookmark_editor.placeholder_title")}
                       {...field}
                       value={field.value ?? ""}
                     />
@@ -214,7 +214,7 @@ export function EditBookmarkDialog({
                     <FormLabel>{t("common.note")}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Bookmark notes"
+                        placeholder={t("bookmark_editor.placeholder_notes")}
                         {...field}
                         value={field.value ?? ""}
                       />
@@ -234,7 +234,9 @@ export function EditBookmarkDialog({
                     <FormLabel>{t("common.description")}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Bookmark description"
+                        placeholder={t(
+                          "bookmark_editor.placeholder_description",
+                        )}
                         {...field}
                         value={field.value ?? ""}
                       />
@@ -254,7 +256,7 @@ export function EditBookmarkDialog({
                     <FormLabel>{t("common.summary")}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Bookmark summary"
+                        placeholder={t("bookmark_editor.placeholder_summary")}
                         {...field}
                         value={field.value ?? ""}
                       />
@@ -277,7 +279,9 @@ export function EditBookmarkDialog({
                     <FormControl>
                       <Textarea
                         disabled={isAssetContentLoading}
-                        placeholder="Extracted Content"
+                        placeholder={t(
+                          "bookmark_editor.placeholder_extracted_content",
+                        )}
                         {...field}
                         value={field.value ?? ""}
                       />
@@ -298,7 +302,7 @@ export function EditBookmarkDialog({
                       <FormLabel>{t("bookmark_editor.author")}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Author name"
+                          placeholder={t("bookmark_editor.placeholder_author")}
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -315,7 +319,9 @@ export function EditBookmarkDialog({
                       <FormLabel>{t("bookmark_editor.publisher")}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Publisher name"
+                          placeholder={t(
+                            "bookmark_editor.placeholder_publisher",
+                          )}
                           {...field}
                           value={field.value ?? ""}
                         />

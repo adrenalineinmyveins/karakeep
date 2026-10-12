@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signIn } from "@/lib/auth/client";
+import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
@@ -51,6 +52,7 @@ interface InviteAcceptFormProps {
 export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
   const api = useTRPC();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const form = useForm<z.infer<typeof inviteAcceptSchema>>({
     resolver: zodResolver(inviteAcceptSchema),
@@ -83,11 +85,9 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
       <Card className="w-full">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            Loading Invitation
+            {t("invite.loading_title")}
           </CardTitle>
-          <CardDescription>
-            Please wait while we verify your invitation...
-          </CardDescription>
+          <CardDescription>{t("invite.loading_description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-center">
@@ -103,11 +103,9 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
       <Card className="w-full">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            Invalid Invitation
+            {t("invite.invalid_title")}
           </CardTitle>
-          <CardDescription>
-            This invitation link is not valid or has been removed.
-          </CardDescription>
+          <CardDescription>{t("invite.invalid_description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-center">
@@ -122,7 +120,7 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
           )}
 
           <Button onClick={handleBackToSignIn} className="w-full">
-            Back to Sign In
+            {t("signin.back_to_signin")}
           </Button>
         </CardContent>
       </Card>
@@ -134,11 +132,9 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
       <Card className="w-full">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            Invitation Expired
+            {t("invite.expired_title")}
           </CardTitle>
-          <CardDescription>
-            This invitation link has expired and is no longer valid.
-          </CardDescription>
+          <CardDescription>{t("invite.expired_description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-center">
@@ -147,7 +143,7 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
 
           <div className="space-y-2 text-center">
             <p className="text-sm text-muted-foreground">
-              Please contact an administrator to request a new invitation.
+              {t("invite.expired_contact_admin")}
             </p>
           </div>
 
@@ -156,7 +152,7 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
             variant="outline"
             className="w-full"
           >
-            Back to Sign In
+            {t("signin.back_to_signin")}
           </Button>
         </CardContent>
       </Card>
@@ -167,11 +163,9 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
     <Card className="w-full">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">
-          Accept Your Invitation
+          {t("invite.accept_title")}
         </CardTitle>
-        <CardDescription>
-          Complete your account setup to join Saiye
-        </CardDescription>
+        <CardDescription>{t("invite.accept_description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center justify-center">
@@ -181,7 +175,9 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
         <div className="space-y-2 text-center">
           <div className="flex items-center justify-center space-x-2">
             <Mail className="h-4 w-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Invited email:</p>
+            <p className="text-sm text-muted-foreground">
+              {t("invite.invited_email")}
+            </p>
           </div>
           <p className="font-medium text-foreground">{inviteData.email}</p>
         </div>
@@ -205,8 +201,7 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
 
                 if (!resp || !resp.ok || resp.error) {
                   setErrorMessage(
-                    resp?.error ??
-                      "Account created but sign in failed. Please try signing in manually.",
+                    resp?.error ?? t("invite.account_created_signin_failed"),
                   );
                   return;
                 }
@@ -216,7 +211,7 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
                 if (e instanceof TRPCClientError) {
                   setErrorMessage(e.message);
                 } else {
-                  setErrorMessage("An unexpected error occurred");
+                  setErrorMessage(t("invite.unexpected_error"));
                 }
               }
             })}
@@ -234,11 +229,11 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>{t("signup.full_name")}</FormLabel>
                   <FormControl>
                     <Input
                       type="text"
-                      placeholder="Enter your full name"
+                      placeholder={t("signup.full_name_placeholder")}
                       {...field}
                     />
                   </FormControl>
@@ -252,11 +247,11 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t("signin.password")}</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Create a password"
+                      placeholder={t("signup.password_placeholder")}
                       {...field}
                     />
                   </FormControl>
@@ -270,11 +265,11 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>{t("signup.confirm_password")}</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Confirm your password"
+                      placeholder={t("signup.confirm_password_placeholder")}
                       {...field}
                     />
                   </FormControl>
@@ -293,10 +288,10 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
               {form.formState.isSubmitting || acceptInviteMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating Account...
+                  {t("invite.creating_account")}
                 </>
               ) : (
-                "Create Account & Sign In"
+                t("invite.create_and_signin")
               )}
             </ActionButton>
 
@@ -306,7 +301,7 @@ export default function InviteAcceptForm({ token }: InviteAcceptFormProps) {
               onClick={handleBackToSignIn}
               className="w-full"
             >
-              Back to Sign In
+              {t("signin.back_to_signin")}
             </Button>
           </form>
         </Form>

@@ -229,8 +229,13 @@ function JobCard({
               {actions.map((action, index) => (
                 <ActionConfirmingDialog
                   key={index}
-                  title="Confirm Action"
-                  description={`Are you sure you want to ${action.label.toLowerCase()}?`}
+                  title={t("admin.background_jobs.confirm_action")}
+                  description={t(
+                    "admin.background_jobs.confirm_action_description",
+                    {
+                      action: action.label,
+                    },
+                  )}
                   actionButton={(setDialogOpen) => (
                     <ActionButton
                       loading={action.loading}
@@ -264,7 +269,7 @@ function useJobActions() {
       api.admin.recrawlLinks.mutationOptions({
         onSuccess: () => {
           toast({
-            description: "Recrawl enqueued",
+            description: t("admin.background_jobs.recrawl_enqueued"),
           });
         },
         onError: (e) => {
@@ -281,7 +286,7 @@ function useJobActions() {
       api.admin.reindexAllBookmarks.mutationOptions({
         onSuccess: () => {
           toast({
-            description: "Reindex enqueued",
+            description: t("admin.background_jobs.reindex_enqueued"),
           });
         },
         onError: (e) => {
@@ -300,7 +305,7 @@ function useJobActions() {
     api.admin.regenerateAllBookmarkEmbeddings.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Embedding regeneration enqueued",
+          description: t("admin.background_jobs.embeddings_enqueued"),
         });
       },
       onError: (e) => {
@@ -319,7 +324,7 @@ function useJobActions() {
     api.admin.reprocessAssetsFixMode.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Reprocessing enqueued",
+          description: t("admin.background_jobs.reprocessing_enqueued"),
         });
       },
       onError: (e) => {
@@ -338,7 +343,7 @@ function useJobActions() {
     api.admin.reRunInferenceOnAllBookmarks.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Inference jobs enqueued",
+          description: t("admin.background_jobs.inference_enqueued"),
         });
       },
       onError: (e) => {
@@ -357,7 +362,7 @@ function useJobActions() {
     api.admin.runAdminMaintenanceTask.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Admin maintenance request has been enqueued!",
+          description: t("admin.background_jobs.admin_maintenance_enqueued"),
         });
       },
       onError: (e) => {

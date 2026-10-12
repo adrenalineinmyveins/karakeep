@@ -46,7 +46,7 @@ export default function AttachmentBox({
     useAttachBookmarkAsset({
       onSuccess: () => {
         toast({
-          description: "Attachment has been attached!",
+          description: t("preview.attachment_attached"),
         });
       },
       onError: (e) => {
@@ -61,7 +61,7 @@ export default function AttachmentBox({
     useReplaceBookmarkAsset({
       onSuccess: () => {
         toast({
-          description: "Attachment has been replaced!",
+          description: t("preview.attachment_replaced"),
         });
       },
       onError: (e) => {
@@ -76,7 +76,7 @@ export default function AttachmentBox({
     useDetachBookmarkAsset({
       onSuccess: () => {
         toast({
-          description: "Attachment has been detached!",
+          description: t("preview.attachment_detached"),
         });
       },
       onError: (e) => {
@@ -112,7 +112,7 @@ export default function AttachmentBox({
               ) &&
                 bookmark.content.type != BookmarkTypes.ASSET && (
                   <FilePickerButton
-                    title="Attach a Banner"
+                    title={t("actions.add_banner")}
                     loading={isAttaching}
                     accept=".jgp,.JPG,.jpeg,.png,.webp"
                     multiple={false}
@@ -137,7 +137,7 @@ export default function AttachmentBox({
                   </FilePickerButton>
                 )}
               <FilePickerButton
-                title="Upload File"
+                title={t("actions.upload_file")}
                 loading={isAttaching}
                 multiple={false}
                 variant="none"
@@ -186,7 +186,7 @@ export default function AttachmentBox({
             </Link>
             <div className="flex gap-1 text-muted-foreground">
               <Link
-                title="Download"
+                title={t("actions.download")}
                 target="_blank"
                 href={getAssetUrl(asset.id)}
                 className="flex items-center gap-1 rounded-md p-1 hover:text-foreground"
@@ -203,7 +203,7 @@ export default function AttachmentBox({
                 isAllowedToAttachAsset(asset.assetType) &&
                 asset.assetType !== "userUploaded" && (
                   <FilePickerButton
-                    title="Replace"
+                    title={t("actions.replace")}
                     loading={isReplacing}
                     accept=".jgp,.JPG,.jpeg,.png,.webp"
                     multiple={false}
@@ -227,8 +227,8 @@ export default function AttachmentBox({
                 )}
               {!readOnly && isAllowedToDetachAsset(asset.assetType) && (
                 <ActionConfirmingDialog
-                  title="Delete Attachment?"
-                  description={`Are you sure you want to delete the attachment of the bookmark?`}
+                  title={t("preview.delete_attachment_title")}
+                  description={t("preview.delete_attachment_confirm")}
                   actionButton={(setDialogOpen) => (
                     <ActionButton
                       loading={isDetaching}
@@ -241,14 +241,14 @@ export default function AttachmentBox({
                       }
                     >
                       <Trash2 className="mr-2 size-4" />
-                      Delete
+                      {t("actions.delete")}
                     </ActionButton>
                   )}
                 >
                   <Button
                     variant="none"
                     size="none"
-                    title="Delete"
+                    title={t("actions.delete")}
                     className="rounded-md p-1 hover:text-foreground"
                   >
                     <Trash2 className="size-3.5" strokeWidth={1.5} />
@@ -259,11 +259,13 @@ export default function AttachmentBox({
           </div>
         ))}
         {!hasAssets && readOnly && (
-          <p className="py-1 text-xs text-muted-foreground">No attachments</p>
+          <p className="py-1 text-xs text-muted-foreground">
+            {t("preview.no_attachments")}
+          </p>
         )}
         {!hasAssets && !readOnly && (
           <p className="py-1 text-xs text-muted-foreground">
-            No attachments yet
+            {t("preview.no_attachments_yet")}
           </p>
         )}
       </CollapsibleContent>

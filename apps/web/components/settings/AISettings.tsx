@@ -85,12 +85,12 @@ export function AIPreferences() {
   const { mutate: updateSettings, isPending } = useUpdateUserSettings({
     onSuccess: () => {
       toast({
-        description: "Settings updated successfully!",
+        description: t("settings.ai.settings_updated"),
       });
     },
     onError: () => {
       toast({
-        description: "Failed to update settings",
+        description: t("settings.ai.settings_update_failed"),
         variant: "destructive",
       });
     },
@@ -116,7 +116,7 @@ export function AIPreferences() {
   };
 
   return (
-    <SettingsSection title="AI preferences">
+    <SettingsSection title={t("settings.ai.ai_preferences")}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup className="gap-3">
           <Controller
@@ -145,7 +145,9 @@ export function AIPreferences() {
                     )
                   }
                   aria-invalid={fieldState.invalid}
-                  placeholder={`Default (${clientConfig.inference.inferredTagLang})`}
+                  placeholder={t("settings.ai.inference_language_default", {
+                    lang: clientConfig.inference.inferredTagLang,
+                  })}
                   type="text"
                 />
                 {fieldState.invalid && (
@@ -407,12 +409,12 @@ export function TagStyleSelector() {
     useUpdateUserSettings({
       onSuccess: () => {
         toast({
-          description: "Tag style updated successfully!",
+          description: t("settings.ai.tag_style_updated"),
         });
       },
       onError: () => {
         toast({
-          description: "Failed to update tag style",
+          description: t("settings.ai.tag_style_update_failed"),
           variant: "destructive",
         });
       },
@@ -614,7 +616,7 @@ export function CuratedTagsSelector() {
     >
       <TagsEditor
         tags={selectedTags}
-        placeholder="Select curated tags..."
+        placeholder={t("settings.ai.select_curated_tags")}
         onAttach={(tag) => {
           const tagId = tag.tagId;
           if (tagId) {
@@ -655,7 +657,7 @@ export function PromptEditor() {
     api.prompts.create.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Prompt has been created!",
+          description: t("settings.ai.prompt_created"),
         });
         queryClient.invalidateQueries(api.prompts.list.pathFilter());
       },
@@ -698,7 +700,7 @@ export function PromptEditor() {
               <FormItem className="flex-1">
                 <FormControl>
                   <Input
-                    placeholder="Add a custom prompt"
+                    placeholder={t("settings.ai.add_custom_prompt")}
                     type="text"
                     {...field}
                   />
@@ -721,7 +723,7 @@ export function PromptEditor() {
                     defaultValue={field.value}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Applies To" />
+                      <SelectValue placeholder={t("settings.ai.applies_to")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
@@ -791,7 +793,7 @@ export function PromptRow({ prompt }: { prompt: ZPrompt }) {
     api.prompts.update.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Prompt has been updated!",
+          description: t("settings.ai.prompt_updated"),
         });
         queryClient.invalidateQueries(api.prompts.list.pathFilter());
       },
@@ -801,7 +803,7 @@ export function PromptRow({ prompt }: { prompt: ZPrompt }) {
     api.prompts.delete.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Prompt has been deleted!",
+          description: t("settings.ai.prompt_deleted"),
         });
         queryClient.invalidateQueries(api.prompts.list.pathFilter());
       },
@@ -857,7 +859,7 @@ export function PromptRow({ prompt }: { prompt: ZPrompt }) {
               <FormItem className="flex-1">
                 <FormControl>
                   <Input
-                    placeholder="Add a custom prompt"
+                    placeholder={t("settings.ai.add_custom_prompt")}
                     type="text"
                     {...field}
                   />
@@ -880,7 +882,7 @@ export function PromptRow({ prompt }: { prompt: ZPrompt }) {
                     defaultValue={field.value}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Applies To" />
+                      <SelectValue placeholder={t("settings.ai.applies_to")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
@@ -955,7 +957,7 @@ export function TaggingRules() {
       {prompts && prompts.length == 0 && (
         <div className="flex items-start gap-2 rounded-md bg-muted p-4 text-sm text-muted-foreground">
           <Info className="size-4 flex-shrink-0" />
-          <p>You don&apos;t have any custom prompts yet.</p>
+          <p>{t("settings.ai.no_custom_prompts")}</p>
         </div>
       )}
       <div className="flex flex-col gap-2">
@@ -1054,7 +1056,7 @@ export function PromptDemo() {
   return (
     <SettingsSection
       title={t("settings.ai.prompt_preview")}
-      description="Preview the actual prompts sent to AI based on your settings"
+      description={t("settings.ai.prompt_preview_description")}
     >
       <div className="space-y-4">
         <div>

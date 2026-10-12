@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { FullPageSpinner } from "@/components/ui/full-page-spinner";
 import { Separator } from "@/components/ui/separator";
 import { useSession } from "@/lib/auth/client";
+import { useTranslation } from "@/lib/i18n/client";
 import { useReaderSettings } from "@/lib/readerSettings";
 import { useQuery } from "@tanstack/react-query";
 import { HighlighterIcon as Highlight, Printer, X } from "lucide-react";
@@ -35,6 +36,7 @@ export default function ReaderViewPage() {
 
   const { data: session } = useSession();
   const router = useRouter();
+  const { t } = useTranslation();
   const { settings } = useReaderSettings();
   const [showHighlights, setShowHighlights] = useState(false);
   const isOwner = session?.user?.id === bookmark?.userId;
@@ -60,7 +62,9 @@ export default function ReaderViewPage() {
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="h-4 w-4" />
             </Button>
-            <span className="text-sm text-muted-foreground">Reader View</span>
+            <span className="text-sm text-muted-foreground">
+              {t("reader.reader_view")}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -92,13 +96,13 @@ export default function ReaderViewPage() {
                 setShowHighlights(false);
               }
             }}
-            aria-label="Close highlights sidebar"
+            aria-label={t("reader.close_highlights")}
           />
         )}
 
         {/* Main Content */}
         <main
-          className={`flex-1 overflow-x-hidden transition-all duration-300 ${showHighlights ? "lg:mr-80" : ""}`}
+          className={`flex-1 overflow-x-hidden transition-all duration-300 ${showHighlights ? "lg:me-80" : ""}`}
         >
           <article className="mx-auto max-w-3xl overflow-x-hidden px-4 py-8 sm:px-6">
             {bookmark ? (
@@ -117,10 +121,14 @@ export default function ReaderViewPage() {
                   </h1>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     {bookmark.content.type == BookmarkTypes.LINK && (
-                      <span>By {bookmark.content.author}</span>
+                      <span>
+                        {t("reader.by_author", {
+                          author: bookmark.content.author,
+                        })}
+                      </span>
                     )}
                     <Separator orientation="vertical" className="h-4" />
-                    <span>8 min</span>
+                    <span>{t("reader.reading_time", { count: 8 })}</span>
                   </div>
                 </header>
 
@@ -148,14 +156,16 @@ export default function ReaderViewPage() {
 
         {/* Highlights Sidebar */}
         {showHighlights && highlights && (
-          <aside className="fixed right-0 top-14 z-50 h-[calc(100vh-3.5rem)] w-full border-l bg-background sm:w-80 lg:z-auto lg:bg-background/95 lg:backdrop-blur lg:supports-[backdrop-filter]:bg-background/60 print:hidden">
+          <aside className="fixed end-0 top-14 z-50 h-[calc(100vh-3.5rem)] w-full border-s bg-background sm:w-80 lg:z-auto lg:bg-background/95 lg:backdrop-blur lg:supports-[backdrop-filter]:bg-background/60 print:hidden">
             <div className="flex h-full flex-col">
               <div className="border-b p-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold">Highlights</h2>
+                  <h2 className="font-semibold">{t("common.highlights")}</h2>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
-                      {highlights.highlights.length} saved
+                      {t("reader.saved_count", {
+                        count: highlights.highlights.length,
+                      })}
                     </span>
                     <Button
                       variant="ghost"

@@ -74,6 +74,7 @@ function CreationTime({ createdAt }: { createdAt: Date }) {
 }
 
 function BookmarkMetadata({ bookmark }: { bookmark: ZBookmark }) {
+  const { t } = useTranslation();
   let { author, publisher, datePublished } =
     bookmark.content.type !== BookmarkTypes.LINK
       ? {
@@ -89,7 +90,7 @@ function BookmarkMetadata({ bookmark }: { bookmark: ZBookmark }) {
       {author && (
         <div className="flex w-fit items-center gap-2 text-sm text-muted-foreground">
           <User size={16} />
-          <span>By {author}</span>
+          <span>{t("preview.by_author", { author })}</span>
         </div>
       )}
       {publisher && (
@@ -104,7 +105,7 @@ function BookmarkMetadata({ bookmark }: { bookmark: ZBookmark }) {
 }
 
 function PublishedDate({ datePublished }: { datePublished: Date }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { fromNow, localCreatedAt } = useRelativeTime(
     datePublished,
     i18n.language,
@@ -114,7 +115,7 @@ function PublishedDate({ datePublished }: { datePublished: Date }) {
       <TooltipTrigger asChild>
         <div className="flex w-fit items-center gap-2 text-sm text-muted-foreground">
           <CalendarDays size={16} />
-          <span>Published {fromNow}</span>
+          <span>{t("preview.published", { time: fromNow })}</span>
         </div>
       </TooltipTrigger>
       <TooltipPortal>
@@ -193,7 +194,7 @@ export default function BookmarkPreview({
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
         <p className="line-clamp-2 text-ellipsis break-words text-lg font-medium">
-          {!title ? "Untitled" : title}
+          {!title ? t("common.untitled") : title}
         </p>
         {sourceUrl && (
           <Link

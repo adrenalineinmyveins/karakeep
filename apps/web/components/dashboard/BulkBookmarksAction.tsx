@@ -41,8 +41,8 @@ export default function BulkBookmarksAction() {
   const onError = () => {
     toast({
       variant: "destructive",
-      title: "Something went wrong",
-      description: "There was a problem with your request.",
+      title: t("common.something_went_wrong"),
+      description: t("common.request_problem"),
     });
   };
   const bulkActionsStore = useBulkActionsStore();
@@ -85,7 +85,9 @@ export default function BulkBookmarksAction() {
   const recrawlBookmarks = async (archiveFullPage: boolean) => {
     const links = await recrawlSelectedLinkBookmarks(archiveFullPage);
     toast({
-      description: `${links.length} bookmarks will be ${archiveFullPage ? "re-crawled and archived!" : "refreshed!"}`,
+      description: archiveFullPage
+        ? t("actions.bulk_recrawl_scheduled", { count: links.length })
+        : t("actions.bulk_refresh_scheduled", { count: links.length }),
     });
   };
 
@@ -99,14 +101,16 @@ export default function BulkBookmarksAction() {
   const copyLinks = async () => {
     if (!isClipboardAvailable()) {
       toast({
-        description: `Copying is only available over https`,
+        description: t("actions.copy_only_https"),
       });
       return;
     }
     await navigator.clipboard.writeText(selectedBookmarkLinksText());
 
     toast({
-      description: `Added ${selectedBookmarks.length} bookmark links into the clipboard!`,
+      description: t("actions.links_copied", {
+        count: selectedBookmarks.length,
+      }),
     });
   };
 
@@ -117,14 +121,18 @@ export default function BulkBookmarksAction() {
     await updateSelectedBookmarks({ favourited, archived });
     setIsBulkEditEnabled(false);
     toast({
-      description: `${selectedBookmarks.length} bookmarks have been updated!`,
+      description: t("actions.bulk_updated", {
+        count: selectedBookmarks.length,
+      }),
     });
   };
 
   const deleteBookmarks = async () => {
     await deleteSelectedBookmarks();
     toast({
-      description: `${selectedBookmarks.length} bookmarks have been deleted!`,
+      description: t("actions.bulk_deleted", {
+        count: selectedBookmarks.length,
+      }),
     });
     setIsDeleteDialogOpen(false);
   };
@@ -137,7 +145,9 @@ export default function BulkBookmarksAction() {
     const successes = results.filter((r) => r.status === "fulfilled").length;
     if (successes > 0) {
       toast({
-        description: `${successes} bookmarks have been removed from the list!`,
+        description: t("actions.bulk_removed_from_list", {
+          count: successes,
+        }),
       });
     }
     setIsRemoveFromListDialogOpen(false);
@@ -155,7 +165,7 @@ export default function BulkBookmarksAction() {
     {
       name: isClipboardAvailable()
         ? t("actions.copy_link")
-        : "Copying is only available over https",
+        : t("actions.copy_only_https"),
       icon: <Link size={18} />,
       action: () => copyLinks(),
       isPending: false,
@@ -249,8 +259,8 @@ export default function BulkBookmarksAction() {
       <ActionConfirmingDialog
         open={isDeleteDialogOpen}
         setOpen={setIsDeleteDialogOpen}
-        title={"Delete Bookmarks"}
-        description={<p>Are you sure you want to delete these bookmarks?</p>}
+        title={t("actions.delete_bookmarks")}
+        description={<p>{t("actions.confirm_delete_bookmarks")}</p>}
         actionButton={() => (
           <ActionButton
             type="button"
@@ -265,11 +275,12 @@ export default function BulkBookmarksAction() {
       <ActionConfirmingDialog
         open={isRemoveFromListDialogOpen}
         setOpen={setIsRemoveFromListDialogOpen}
-        title={"Remove Bookmarks from List"}
+        title={t("actions.remove_bookmarks_from_list")}
         description={
           <p>
-            Are you sure you want to remove {selectedBookmarks.length} bookmarks
-            from this list?
+            {t("actions.confirm_remove_from_list", {
+              count: selectedBookmarks.length,
+            })}
           </p>
         }
         actionButton={() => (

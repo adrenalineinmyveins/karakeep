@@ -56,7 +56,9 @@ export function EventSelector({ value, onChange }: EventSelectorProps) {
         <div className="flex gap-4">
           <Select value={value.type} onValueChange={handleTypeChange}>
             <SelectTrigger id="event-type">
-              <SelectValue placeholder="Select event type" />
+              <SelectValue
+                placeholder={t("settings.rules.select_event_type")}
+              />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="bookmarkAdded">

@@ -152,6 +152,7 @@ function DragHandle({
   className?: string;
 }) {
   const { isBulkEditEnabled } = useBulkActionsStore();
+  const { t } = useTranslation();
   const handleDragStart = useCallback(
     (e: React.DragEvent) => {
       e.stopPropagation();
@@ -160,7 +161,7 @@ function DragHandle({
 
       // Create a small pill element as the drag preview
       const pill = document.createElement("div");
-      const title = getBookmarkTitle(bookmark) ?? "Untitled";
+      const title = getBookmarkTitle(bookmark) ?? t("common.untitled");
       pill.textContent =
         title.length > 40 ? title.substring(0, 40) + "\u2026" : title;
       Object.assign(pill.style, {
@@ -184,7 +185,7 @@ function DragHandle({
       e.dataTransfer.setDragImage(pill, 0, 0);
       requestAnimationFrame(() => pill.remove());
     },
-    [bookmark],
+    [bookmark, t],
   );
 
   if (isBulkEditEnabled) return null;
@@ -436,6 +437,7 @@ function CompactView({
   className,
   bookmarkIndex,
 }: Props) {
+  const { t } = useTranslation();
   const { showTitle } = useBookmarkDisplaySettings();
   const isBulkEditEnabled = useBulkActionsStore(
     (state) => state.isBulkEditEnabled,
@@ -472,7 +474,7 @@ function CompactView({
           )}
           {showTitle && (
             <div className="shrink-1 text-md line-clamp-1 overflow-hidden text-ellipsis break-words">
-              {title ?? "Untitled"}
+              {title ?? t("common.untitled")}
             </div>
           )}
           {footer && (

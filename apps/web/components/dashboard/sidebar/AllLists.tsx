@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import SidebarItem from "@/components/shared/sidebar/SidebarItem";
-import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTriggerChevron,
 } from "@/components/ui/collapsible";
+import { SidebarMenuSubButton } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { BOOKMARK_DRAG_MIME } from "@/lib/bookmark-drag";
 import { useTranslation } from "@/lib/i18n/client";
@@ -88,6 +88,65 @@ function useDropTarget(listId: string, listName: string) {
   return { dropHighlight, onDragOver, onDragEnter, onDragLeave, onDrop };
 }
 
+function SidebarListRow({
+  icon,
+  name,
+  path,
+  right = null,
+  collapseButton,
+  indent = 0,
+  className,
+  dropHighlight = false,
+  onDrop,
+  onDragOver,
+  onDragEnter,
+  onDragLeave,
+}: {
+  icon: React.ReactNode;
+  name: string;
+  path: string;
+  right?: React.ReactNode;
+  collapseButton?: React.ReactNode;
+  indent?: number;
+  className?: string;
+  dropHighlight?: boolean;
+  onDrop?: React.DragEventHandler;
+  onDragOver?: React.DragEventHandler;
+  onDragEnter?: React.DragEventHandler;
+  onDragLeave?: React.DragEventHandler;
+}) {
+  const pathname = usePathname();
+  return (
+    <div
+      className={cn(
+        "relative flex items-center rounded-md pr-0.5 transition-colors group-data-[collapsible=icon]:hidden",
+        dropHighlight && "bg-sidebar-accent ring-2 ring-primary",
+        className,
+      )}
+      style={indent ? { marginInlineStart: `${indent * 0.75}rem` } : undefined}
+      onDrop={onDrop}
+      onDragOver={onDragOver}
+      onDragEnter={onDragEnter}
+      onDragLeave={onDragLeave}
+    >
+      {collapseButton ?? <span className="size-4 shrink-0" />}
+      <SidebarMenuSubButton
+        asChild
+        isActive={path === pathname}
+        className="flex-1 px-2"
+      >
+        <Link href={path}>
+          {icon}
+          <span title={name} className="line-clamp-1 break-all">
+            {name}
+          </span>
+        </Link>
+      </SidebarMenuSubButton>
+      {right}
+    </div>
+  );
+}
+
 function DroppableListSidebarItem({
   node,
   level,
@@ -110,22 +169,16 @@ function DroppableListSidebarItem({
     useDropTarget(node.item.id, node.item.name);
 
   return (
-    <SidebarItem
+    <SidebarListRow
       collapseButton={
         node.children.length > 0 ? (
-          <CollapsibleTriggerChevron className="size-4" open={open} />
-        ) : (
-          <span className="size-4" />
-        )
+          <CollapsibleTriggerChevron className="size-4 shrink-0" open={open} />
+        ) : undefined
       }
-      logo={
-        <span className="flex">
-          <span className="text-lg"> {node.item.icon}</span>
-        </span>
-      }
+      icon={<span className="text-lg">{node.item.icon}</span>}
       name={node.item.name}
       path={`/dashboard/lists/${node.item.id}`}
-      className="group"
+      className="group/list"
       right={
         <ListOptions
           onOpenChange={(isOpen) => {
@@ -140,13 +193,13 @@ function DroppableListSidebarItem({
           <Button size="none" variant="ghost" className="relative">
             <MoreHorizontal
               className={cn(
-                "absolute inset-0 m-auto size-4 opacity-0 transition-opacity duration-100 group-hover:opacity-100",
+                "absolute inset-0 m-auto size-4 opacity-0 transition-opacity duration-100 group-hover/list:opacity-100",
                 selectedListId == node.item.id ? "opacity-100" : "opacity-0",
               )}
             />
             <span
               className={cn(
-                "px-2.5 text-xs font-light text-muted-foreground opacity-100 transition-opacity duration-100 group-hover:opacity-0",
+                "px-2.5 text-xs font-light text-muted-foreground opacity-100 transition-opacity duration-100 group-hover/list:opacity-0",
                 selectedListId == node.item.id || numBookmarks === undefined
                   ? "opacity-0"
                   : "opacity-100",
@@ -157,8 +210,7 @@ function DroppableListSidebarItem({
           </Button>
         </ListOptions>
       }
-      linkClassName="py-0.5 px-1"
-      style={{ marginLeft: `${level * 1}rem` }}
+      indent={level}
       dropHighlight={canDrop && dropHighlight}
       onDragOver={canDrop ? onDragOver : undefined}
       onDragEnter={canDrop ? onDragEnter : undefined}
@@ -213,9 +265,9 @@ export default function AllLists({
   }, [isViewingSharedList, sharedListsOpen]);
 
   return (
-    <ul className="sidebar-scrollbar max-h-full gap-y-2 overflow-auto text-sm">
-      <li className="flex justify-between pb-3">
-        <p className="pl-2 text-xs uppercase tracking-wider text-muted-foreground">
+    <div className="flex flex-col gap-1">
+      <div className="flex h-8 items-center justify-between px-2 group-data-[collapsible=icon]:hidden">
+        <p className="text-xs font-medium uppercase tracking-wider text-sidebar-foreground/70">
           Lists
         </p>
         <EditListModal>
@@ -226,21 +278,17 @@ export default function AllLists({
             />
           </Link>
         </EditListModal>
-      </li>
-      <SidebarItem
-        collapseButton={<span className="size-4" />}
-        logo={<span className="text-lg">📋</span>}
+      </div>
+      <SidebarListRow
+        icon={<span className="text-lg">📋</span>}
         name={t("lists.all_lists")}
         path={`/dashboard/lists`}
-        linkClassName="py-0.5 px-1"
         right={<InvitationNotificationBadge />}
       />
-      <SidebarItem
-        collapseButton={<span className="size-4" />}
-        logo={<span className="text-lg">⭐️</span>}
+      <SidebarListRow
+        icon={<span className="text-lg">⭐️</span>}
         name={t("lists.favourites")}
         path={`/dashboard/favourites`}
-        linkClassName="py-0.5 px-1"
       />
 
       {/* Owned Lists */}
@@ -263,17 +311,16 @@ export default function AllLists({
       {/* Shared Lists */}
       {hasSharedLists && (
         <Collapsible open={sharedListsOpen} onOpenChange={setSharedListsOpen}>
-          <SidebarItem
+          <SidebarListRow
             collapseButton={
               <CollapsibleTriggerChevron
-                className="size-4"
+                className="size-4 shrink-0"
                 open={sharedListsOpen}
               />
             }
-            logo={<span className="text-lg">👥</span>}
+            icon={<span className="text-lg">👥</span>}
             name={t("lists.shared_lists")}
             path="#"
-            linkClassName="py-0.5 px-1"
           />
           <CollapsibleContent>
             <CollapsibleBookmarkLists
@@ -295,6 +342,6 @@ export default function AllLists({
           </CollapsibleContent>
         </Collapsible>
       )}
-    </ul>
+    </div>
   );
 }

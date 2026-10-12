@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
-import { FullPageSpinner } from "@/components/ui/full-page-spinner";
+import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { useBookmarkLists } from "@saiye/shared-react/hooks/lists";
@@ -116,7 +116,13 @@ export function CollapsibleBookmarkLists({
   );
 
   if (!data) {
-    return <FullPageSpinner />;
+    return (
+      <div className="flex flex-col gap-1">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <SidebarMenuSkeleton key={i} showIcon />
+        ))}
+      </div>
+    );
   }
 
   const rootNodes = Object.values(data.root);

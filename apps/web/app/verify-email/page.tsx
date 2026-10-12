@@ -14,6 +14,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
 
+import { useTranslation } from "@/lib/i18n/client";
 import { useTRPC } from "@saiye/shared-react/trpc";
 import {
   isMobileAppRedirect,
@@ -21,6 +22,7 @@ import {
 } from "@saiye/shared/utils/redirectUrl";
 
 export default function VerifyEmailPage() {
+  const { t } = useTranslation();
   const api = useTRPC();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -39,25 +41,18 @@ export default function VerifyEmailPage() {
       onSuccess: () => {
         setStatus("success");
         if (isMobileAppRedirect(redirectUrl)) {
-          setMessage(
-            "Your email has been successfully verified! Redirecting to the app...",
-          );
+          setMessage(t("email_verification.verified_redirect"));
           // Redirect to mobile app after a brief delay
           setTimeout(() => {
             window.location.href = redirectUrl;
           }, 1500);
         } else {
-          setMessage(
-            "Your email has been successfully verified! You can now sign in.",
-          );
+          setMessage(t("email_verification.verified_signin"));
         }
       },
       onError: (error) => {
         setStatus("error");
-        setMessage(
-          error.message ||
-            "Failed to verify email. The link may be invalid or expired.",
-        );
+        setMessage(error.message || t("email_verification.verify_failed"));
       },
     }),
   );
@@ -65,12 +60,10 @@ export default function VerifyEmailPage() {
   const resendEmailMutation = useMutation(
     api.users.resendVerificationEmail.mutationOptions({
       onSuccess: () => {
-        setMessage(
-          "A new verification email has been sent to your email address.",
-        );
+        setMessage(t("email_verification.resend_sent"));
       },
       onError: (error) => {
-        setMessage(error.message || "Failed to resend verification email.");
+        setMessage(error.message || t("email_verification.resend_failed"));
       },
     }),
   );
@@ -82,7 +75,7 @@ export default function VerifyEmailPage() {
       verifyEmailMutation.mutate({ token, email });
     } else {
       setStatus("error");
-      setMessage("Invalid verification link. Missing token or email.");
+      setMessage(t("email_verification.invalid_link"));
     }
   }, [token, email]);
 
@@ -107,12 +100,12 @@ export default function VerifyEmailPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            Email Verification
+            {t("email_verification.email_verification")}
           </CardTitle>
           <CardDescription>
-            {status === "loading" && "Verifying your email address..."}
-            {status === "success" && "Email verified successfully!"}
-            {status === "error" && "Verification failed"}
+            {status === "loading" && t("email_verification.verifying")}
+            {status === "success" && t("email_verification.verified")}
+            {status === "error" && t("email_verification.verification_failed")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -133,7 +126,9 @@ export default function VerifyEmailPage() {
                 </AlertDescription>
               </Alert>
               <Button onClick={handleSignIn} className="w-full">
-                {isMobileRedirect ? "Open App" : "Sign In"}
+                {isMobileRedirect
+                  ? t("email_verification.open_app")
+                  : t("email_verification.sign_in")}
               </Button>
             </>
           )}
@@ -159,10 +154,10 @@ export default function VerifyEmailPage() {
                     {resendEmailMutation.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Sending...
+                        {t("email_verification.sending")}
                       </>
                     ) : (
-                      "Resend Verification Email"
+                      t("email_verification.resend_verification_email")
                     )}
                   </Button>
                   <Button
@@ -170,7 +165,7 @@ export default function VerifyEmailPage() {
                     variant="ghost"
                     className="w-full"
                   >
-                    Back to Sign In
+                    {t("email_verification.back_to_sign_in")}
                   </Button>
                 </div>
               )}

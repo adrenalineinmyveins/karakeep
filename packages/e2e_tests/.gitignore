@@ -1,2 +1,7 @@
 # Docker logs captured during test runs
 setup/docker-logs/
+
+# Playwright UI tests
+test-results/
+playwright-report/
+tests/ui/.auth/

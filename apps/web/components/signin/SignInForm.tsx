@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { authOptions } from "@/server/auth";
+import { useTranslation } from "@/lib/i18n/server";
 import { Info } from "lucide-react";
 
 import serverConfig from "@saiye/shared/config";
@@ -16,6 +17,8 @@ import OAuthAutoRedirect from "./OAuthAutoRedirect";
 import SignInProviderButton from "./SignInProviderButton";
 
 export default async function SignInForm() {
+  // oxlint-disable-next-line rules-of-hooks
+  const { t } = await useTranslation();
   const providers = authOptions.providers;
   let providerValues;
   if (providers) {
@@ -36,8 +39,10 @@ export default async function SignInForm() {
       )}
       <Card className="w-full">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-          <CardDescription>Sign in to your Saiye account</CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            {t("signin.welcome_back")}
+          </CardTitle>
+          <CardDescription>{t("signin.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {serverConfig.demoMode && (
@@ -45,9 +50,13 @@ export default async function SignInForm() {
               <Info className="h-4 w-4" />
               <AlertDescription>
                 <div className="space-y-1">
-                  <p className="font-semibold">Demo Mode</p>
-                  <p>Email: {serverConfig.demoMode.email}</p>
-                  <p>Password: {serverConfig.demoMode.password}</p>
+                  <p className="font-semibold">{t("signin.demo_mode")}</p>
+                  <p>
+                    {t("signin.email")}: {serverConfig.demoMode.email}
+                  </p>
+                  <p>
+                    {t("signin.password")}: {serverConfig.demoMode.password}
+                  </p>
                 </div>
               </AlertDescription>
             </Alert>
@@ -57,13 +66,13 @@ export default async function SignInForm() {
             <>
               <SignInProviderButton
                 provider={{ id: wechatProvider.id, name: wechatProvider.name }}
-                label="微信扫码登录"
+                label={t("signin.wechat_login")}
                 className="h-12 bg-[#07C160] text-lg hover:bg-[#06AD56]"
               />
               <div className="flex w-full items-center">
                 <div className="flex-1 grow border-t border-gray-200"></div>
                 <span className="bg-white px-3 text-sm text-gray-500">
-                  或使用邮箱密码
+                  {t("signin.or_email_password")}
                 </span>
                 <div className="flex-1 grow border-t border-gray-200"></div>
               </div>
@@ -76,7 +85,9 @@ export default async function SignInForm() {
             <>
               <div className="flex w-full items-center">
                 <div className="flex-1 grow border-t border-gray-200"></div>
-                <span className="bg-white px-3 text-sm text-gray-500">Or</span>
+                <span className="bg-white px-3 text-sm text-gray-500">
+                  {t("signin.or")}
+                </span>
                 <div className="flex-1 grow border-t border-gray-200"></div>
               </div>
               <div className="space-y-2">

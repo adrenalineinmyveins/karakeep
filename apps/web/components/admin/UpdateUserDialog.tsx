@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/lib/i18n/client";
 import {
   Select,
   SelectContent,
@@ -54,6 +55,7 @@ export default function UpdateUserDialog({
 }: UpdateUserDialogProps) {
   const api = useTRPC();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [isOpen, onOpenChange] = useState(false);
   const defaultValues = {
     userId,
@@ -69,7 +71,7 @@ export default function UpdateUserDialog({
     api.admin.updateUser.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "User updated successfully",
+          description: t("admin.users_dialogs.user_updated"),
         });
         queryClient.invalidateQueries(api.users.list.pathFilter());
         onOpenChange(false);
@@ -83,7 +85,7 @@ export default function UpdateUserDialog({
         } else {
           toast({
             variant: "destructive",
-            description: "Failed to update user",
+            description: t("admin.users_dialogs.user_update_failed"),
           });
         }
       },
@@ -102,7 +104,7 @@ export default function UpdateUserDialog({
       <DialogContent>
         <DialogTrigger asChild></DialogTrigger>
         <DialogHeader>
-          <DialogTitle>Edit User</DialogTitle>
+          <DialogTitle>{t("admin.users_dialogs.edit_user")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit((val) => mutate(val))}>
@@ -112,7 +114,7 @@ export default function UpdateUserDialog({
                 name="role"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Role</FormLabel>
+                    <FormLabel>{t("common.role")}</FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
@@ -122,8 +124,12 @@ export default function UpdateUserDialog({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="user">User</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="user">
+                            {t("common.roles.user")}
+                          </SelectItem>
+                          <SelectItem value="admin">
+                            {t("common.roles.admin")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -136,12 +142,16 @@ export default function UpdateUserDialog({
                 name="bookmarkQuota"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bookmark Quota</FormLabel>
+                    <FormLabel>
+                      {t("admin.users_dialogs.bookmark_quota")}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         min="0"
-                        placeholder="Unlimited (leave empty)"
+                        placeholder={t(
+                          "admin.users_dialogs.unlimited_placeholder",
+                        )}
                         {...field}
                         value={field.value ?? ""}
                         onChange={(e) => {
@@ -159,12 +169,16 @@ export default function UpdateUserDialog({
                 name="storageQuota"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Storage Quota (bytes)</FormLabel>
+                    <FormLabel>
+                      {t("admin.users_dialogs.storage_quota")}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         min="0"
-                        placeholder="Unlimited (leave empty)"
+                        placeholder={t(
+                          "admin.users_dialogs.unlimited_placeholder",
+                        )}
                         {...field}
                         value={field.value ?? ""}
                         onChange={(e) => {
@@ -191,7 +205,7 @@ export default function UpdateUserDialog({
               <DialogFooter className="sm:justify-end">
                 <DialogClose asChild>
                   <Button type="button" variant="secondary">
-                    Close
+                    {t("actions.close")}
                   </Button>
                 </DialogClose>
                 <ActionButton
@@ -199,7 +213,7 @@ export default function UpdateUserDialog({
                   loading={isPending}
                   disabled={isPending}
                 >
-                  Update
+                  {t("actions.update")}
                 </ActionButton>
               </DialogFooter>
             </div>

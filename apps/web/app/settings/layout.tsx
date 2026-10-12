@@ -1,12 +1,4 @@
-import { redirect } from "next/navigation";
-import MobileSidebar from "@/components/shared/sidebar/MobileSidebar";
-import Sidebar from "@/components/shared/sidebar/Sidebar";
-import SidebarLayout from "@/components/shared/sidebar/SidebarLayout";
-import { ReaderSettingsProvider } from "@/lib/readerSettings";
-import { UserSettingsContextProvider } from "@/lib/userSettings";
-import { api } from "@/server/api/client";
-import { getServerAuthSession } from "@/server/auth";
-import { TRPCError } from "@trpc/server";
+import AppShell from "@/components/shared/app-shell/AppShell";
 import { TFunction } from "i18next";
 import {
   ArrowLeft,
@@ -28,7 +20,6 @@ import {
 } from "lucide-react";
 
 import serverConfig from "@saiye/shared/config";
-import { tryCatch } from "@saiye/shared/tryCatch";
 
 const settingsSidebarItems = (
   t: TFunction,
@@ -138,35 +129,5 @@ export default async function SettingsLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerAuthSession();
-  if (!session) {
-    redirect("/");
-  }
-
-  const userSettings = await tryCatch(api.users.settings());
-
-  if (userSettings.error) {
-    if (userSettings.error instanceof TRPCError) {
-      if (
-        userSettings.error.code === "NOT_FOUND" ||
-        userSettings.error.code === "UNAUTHORIZED"
-      ) {
-        redirect("/logout");
-      }
-    }
-    throw userSettings.error;
-  }
-
-  return (
-    <UserSettingsContextProvider userSettings={userSettings.data}>
-      <ReaderSettingsProvider>
-        <SidebarLayout
-          sidebar={<Sidebar items={settingsSidebarItems} />}
-          mobileSidebar={<MobileSidebar items={settingsSidebarItems} />}
-        >
-          {children}
-        </SidebarLayout>
-      </ReaderSettingsProvider>
-    </UserSettingsContextProvider>
-  );
+  return <AppShell items={settingsSidebarItems}>{children}</AppShell>;
 }

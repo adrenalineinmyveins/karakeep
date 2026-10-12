@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { signIn } from "@/lib/auth/client";
 import { useClientConfig } from "@/lib/clientConfig";
+import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { useMutation } from "@tanstack/react-query";
@@ -45,6 +46,7 @@ interface SignUpFormProps {
 
 export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
   const api = useTRPC();
+  const { t } = useTranslation();
   const form = useForm<z.infer<typeof zSignUpSchema>>({
     resolver: zodResolver(zSignUpSchema),
     defaultValues: {
@@ -71,23 +73,20 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
       <Card className="w-full">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            Sign Up Unavailable
+            {t("signup.sign_up_unavailable")}
           </CardTitle>
-          <CardDescription>
-            Account registration is currently disabled
-          </CardDescription>
+          <CardDescription>{t("signup.registration_disabled")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
             <Alert>
               <UserX className="h-4 w-4" />
               <AlertDescription>
-                Signups are currently disabled. Please contact an administrator
-                for access.
+                {t("signup.signups_disabled_description")}
               </AlertDescription>
             </Alert>
             <Button asChild className="w-full">
-              <Link href="/signin">Back to Sign In</Link>
+              <Link href="/signin">{t("signin.back_to_signin")}</Link>
             </Button>
           </div>
         </CardContent>
@@ -99,11 +98,9 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
     <Card className="w-full">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">
-          Create Your Account
+          {t("signup.title")}
         </CardTitle>
-        <CardDescription>
-          Join Saiye to start organizing your bookmarks
-        </CardDescription>
+        <CardDescription>{t("signup.subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <Form {...form}>
@@ -112,7 +109,7 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
               if (turnstileSiteKey && !value.turnstileToken) {
                 form.setError("turnstileToken", {
                   type: "manual",
-                  message: "Please complete the verification challenge",
+                  message: t("signup.turnstile_required"),
                 });
                 return;
               }
@@ -145,7 +142,7 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
                   );
                 } else {
                   setErrorMessage(
-                    resp?.error ?? "Hit an unexpected error while signing in",
+                    resp?.error ?? t("signup.unexpected_signin_error"),
                   );
                 }
                 // Reset turnstile widget on error to get a new token
@@ -175,11 +172,11 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>{t("signup.full_name")}</FormLabel>
                   <FormControl>
                     <Input
                       type="text"
-                      placeholder="Enter your full name"
+                      placeholder={t("signup.full_name_placeholder")}
                       {...field}
                     />
                   </FormControl>
@@ -193,11 +190,11 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("signin.email")}</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder={t("signin.email_placeholder")}
                       {...field}
                     />
                   </FormControl>
@@ -211,11 +208,11 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t("signin.password")}</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Create a password"
+                      placeholder={t("signup.password_placeholder")}
                       {...field}
                     />
                   </FormControl>
@@ -229,11 +226,11 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>{t("signup.confirm_password")}</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Confirm your password"
+                      placeholder={t("signup.confirm_password_placeholder")}
                       {...field}
                     />
                   </FormControl>
@@ -248,7 +245,7 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
                 name="turnstileToken"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Verification</FormLabel>
+                    <FormLabel>{t("signup.verification")}</FormLabel>
                     <FormControl>
                       <Turnstile
                         ref={turnstileRef}
@@ -262,8 +259,7 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
                           field.onChange("");
                           form.setError("turnstileToken", {
                             type: "manual",
-                            message:
-                              "Verification failed, please reload the challenge",
+                            message: t("signup.turnstile_failed"),
                           });
                         }}
                       />
@@ -281,14 +277,13 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
               }
               className="w-full"
             >
-              Sign up
+              {t("signup.submit")}
             </ActionButton>
 
             {(clientConfig.legal.termsOfServiceUrl ||
               clientConfig.legal.privacyPolicyUrl) && (
               <p className="text-center text-xs text-muted-foreground">
-                By clicking on &apos;Sign up&apos; above, you are agreeing to
-                the{" "}
+                {t("signup.legal_notice")}{" "}
                 {clientConfig.legal.termsOfServiceUrl && (
                   <Link
                     href={clientConfig.legal.termsOfServiceUrl}
@@ -296,12 +291,12 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
                     rel="noopener noreferrer"
                     className="underline hover:text-foreground"
                   >
-                    Terms of Service
+                    {t("signup.terms_of_service")}
                   </Link>
                 )}
                 {clientConfig.legal.termsOfServiceUrl &&
                   clientConfig.legal.privacyPolicyUrl &&
-                  " and "}
+                  t("signup.legal_and")}
                 {clientConfig.legal.privacyPolicyUrl && (
                   <Link
                     href={clientConfig.legal.privacyPolicyUrl}
@@ -309,7 +304,7 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
                     rel="noopener noreferrer"
                     className="underline hover:text-foreground"
                   >
-                    Privacy Policy
+                    {t("signup.privacy_policy")}
                   </Link>
                 )}
                 .
@@ -320,12 +315,12 @@ export default function SignUpForm({ redirectUrl }: SignUpFormProps) {
 
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Already have an account?{" "}
+            {t("signup.already_have_account")}{" "}
             <Link
               href="/signin"
               className="font-medium text-blue-600 hover:text-blue-500"
             >
-              Sign in
+              {t("signin.sign_in")}
             </Link>
           </p>
         </div>

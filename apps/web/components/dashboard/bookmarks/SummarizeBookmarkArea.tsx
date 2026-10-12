@@ -23,12 +23,13 @@ function AISummary({
   summary: string;
   readOnly?: boolean;
 }) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = React.useState(false);
   const { mutate: resummarize, isPending: isResummarizing } =
     useSummarizeBookmark({
       onError: () => {
         toast({
-          description: "Something went wrong",
+          description: t("common.something_went_wrong"),
           variant: "destructive",
         });
       },
@@ -37,7 +38,7 @@ function AISummary({
     useUpdateBookmark({
       onError: () => {
         toast({
-          description: "Something went wrong",
+          description: t("common.something_went_wrong"),
           variant: "destructive",
         });
       },
@@ -64,7 +65,9 @@ function AISummary({
                     size="none"
                     spinner={<LoadingSpinner className="size-4" />}
                     className="rounded-full bg-gray-200 p-1 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-                    aria-label={isExpanded ? "Collapse" : "Expand"}
+                    aria-label={
+                      isExpanded ? t("actions.collapse") : t("actions.expand")
+                    }
                     loading={isResummarizing}
                     onClick={() => resummarize({ bookmarkId })}
                   >
@@ -75,7 +78,9 @@ function AISummary({
                     variant="none"
                     spinner={<LoadingSpinner className="size-4" />}
                     className="rounded-full bg-gray-200 p-1 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-                    aria-label={isExpanded ? "Collapse" : "Expand"}
+                    aria-label={
+                      isExpanded ? t("actions.collapse") : t("actions.expand")
+                    }
                     loading={isUpdatingBookmark}
                     onClick={() =>
                       updateBookmark({ bookmarkId, summary: null })
@@ -87,7 +92,7 @@ function AISummary({
               )}
               <button
                 className="rounded-full bg-gray-200 p-1 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-                aria-label="Collapse"
+                aria-label={t("actions.collapse")}
                 onClick={() => setIsExpanded(false)}
               >
                 <ChevronUp size={16} />
@@ -111,7 +116,7 @@ export default function SummarizeBookmarkArea({
   const { mutate, isPending } = useSummarizeBookmark({
     onError: () => {
       toast({
-        description: "Something went wrong",
+        description: t("common.something_went_wrong"),
         variant: "destructive",
       });
     },

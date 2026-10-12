@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "@/components/ui/sonner";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 import { useUpdateTag } from "@saiye/shared-react/hooks/tags";
@@ -17,10 +18,11 @@ export default function EditableTagName({
 }) {
   const router = useRouter();
   const currentPath = usePathname();
+  const { t } = useTranslation();
   const { mutate: updateTag, isPending } = useUpdateTag({
     onSuccess: () => {
       toast({
-        description: "Tag updated!",
+        description: t("actions.tag_updated"),
       });
       if (currentPath.includes(tag.id)) {
         router.refresh();
@@ -35,7 +37,7 @@ export default function EditableTagName({
       onSave={(newName) => {
         if (!newName || newName == "") {
           toast({
-            description: "You must set a name for the tag!",
+            description: t("actions.tag_name_required"),
             variant: "destructive",
           });
           return;

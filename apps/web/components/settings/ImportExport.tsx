@@ -58,7 +58,7 @@ function ExportButton() {
       const res = await fetch(`/api/bookmarks/export?format=${format}`);
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error?.error || "Failed to export bookmarks");
+        throw new Error(error?.error || t("settings.import.export_failed"));
       }
       const match = res.headers
         .get("Content-Disposition")
@@ -100,18 +100,24 @@ function ExportButton() {
           <Upload className="h-5 w-5 text-primary" />
         </div>
         <div className="flex-1">
-          <h3 className="font-medium">Export File</h3>
+          <h3 className="font-medium">{t("settings.import.export_file")}</h3>
           <p>{t("settings.import.export_links_and_notes")}</p>
           <Select
             value={format}
             onValueChange={(value) => setFormat(value as "json" | "netscape")}
           >
             <SelectTrigger className="mt-2 w-[180px]">
-              <SelectValue placeholder="Format" />
+              <SelectValue
+                placeholder={t("settings.import.format_placeholder")}
+              />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="json">JSON (Saiye format)</SelectItem>
-              <SelectItem value="netscape">HTML (Netscape format)</SelectItem>
+              <SelectItem value="json">
+                {t("settings.import.format_json")}
+              </SelectItem>
+              <SelectItem value="netscape">
+                {t("settings.import.format_netscape")}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -124,7 +130,7 @@ function ExportButton() {
           disabled={isFetching}
         >
           {isFetching && <Loader2 className="mr-2 animate-spin" />}
-          <p>Export</p>
+          <p>{t("assets.export")}</p>
         </Button>
       </CardContent>
     </Card>
@@ -141,13 +147,13 @@ export function ImportExportRow() {
       {quotaError && (
         <Alert variant="destructive" className="relative">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Import Quota Exceeded</AlertTitle>
+          <AlertTitle>{t("settings.import.quota_exceeded")}</AlertTitle>
           <AlertDescription>{quotaError}</AlertDescription>
         </Alert>
       )}
       <div className="grid gap-4 md:grid-cols-2">
         <ImportCard
-          text="HTML File"
+          text={t("settings.import.html_file")}
           description={t("settings.import.import_bookmarks_from_html_file")}
         >
           <FilePickerButton
@@ -160,7 +166,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "html" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ImportCard
@@ -177,7 +183,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "pocket" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ImportCard
@@ -194,7 +200,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "matter" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ImportCard
@@ -213,7 +219,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "omnivore" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ImportCard
@@ -232,7 +238,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "linkwarden" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ImportCard
@@ -251,7 +257,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "tab-session-manager" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ImportCard
@@ -268,7 +274,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "mymind" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ImportCard
@@ -287,7 +293,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "instapaper" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ImportCard
@@ -306,7 +312,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "saiye" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ImportCard
@@ -325,7 +331,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "readwise-reader" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ImportCard
@@ -342,7 +348,7 @@ export function ImportExportRow() {
               runUploadBookmarkFile({ file, source: "onetab" })
             }
           >
-            <p>Import</p>
+            <p>{t("assets.import")}</p>
           </FilePickerButton>
         </ImportCard>
         <ExportButton />
@@ -351,7 +357,10 @@ export function ImportExportRow() {
         return (
           <div key={id} className="flex flex-col gap-2">
             <p className="shrink-0 text-sm">
-              Processed {progress.done} of {progress.total} bookmarks
+              {t("settings.import.processed_progress", {
+                done: progress.done,
+                total: progress.total,
+              })}
             </p>
             <div className="w-full">
               <Progress value={(progress.done * 100) / progress.total} />

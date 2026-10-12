@@ -30,6 +30,7 @@ function useLatestRelease() {
 }
 
 function ReleaseInfo() {
+  const { t } = useTranslation();
   const currentRelease = useClientConfig().serverVersion ?? "NA";
   const latestRelease = useLatestRelease();
 
@@ -42,7 +43,7 @@ function ReleaseInfo() {
         target="_blank"
         className="text-blue-500"
         rel="noreferrer"
-        title="Update available"
+        title={t("admin.server_stats.update_available")}
       >
         ({latestRelease}⬆️)
       </a>

@@ -67,12 +67,18 @@ const SYSTEM_PROMPT = `你是 Saiye 的 AI 助手，帮助用户管理他们的�
  * D3 咨询会话系统提示词：以专家身份自述 + 只读咨询职责。
  * 档案自定义 systemPrompt 作为领域设定追加（不再 fallback 到
  * 通用助手提示，避免自称 Saiye 助手及描述已禁用的能力）。
+ * P1：追加专家技能清单（仅名称+描述），让专家知晓自己可被点选
+ * 的技能；模板正文只在被点选的当轮注入 prompt。
  */
 function buildConsultationSystemPrompt(
   profile: AgentProfileConfig | null | undefined,
+  skills?: { name: string; description: string }[],
 ): string {
   const name = profile?.name?.trim() || "领域专家";
   const custom = profile?.systemPrompt?.trim();
+  const skillList = (skills ?? [])
+    .map((s) => `- ${s.name}：${s.description}`)
+    .join("\n");
   return `你是领域专家「${name}」，正通过 Saiye 专家咨询平台为用户提供咨询。
 
 身份规范：
@@ -83,7 +89,7 @@ function buildConsultationSystemPrompt(
 - 回答领域问题前，先用 search_bookmarks 检索你的专业知识库（书签与概念页），基于检索内容回答并引用来源
 - 检索结果不足以回答时如实说明；涉及外部最新信息时可用 web_search
 - 本会话为只读咨询：不能修改书签、标签、清单或保存任何内容，不要承诺这类能力
-- 使用中文回复${custom ? `\n\n专家领域设定：\n${custom}` : ""}`;
+- 使用中文回复${skillList ? `\n\n可被选用的专家技能（用户点选后，消息中会出现 <skill_directive> 指令块，按其要求处理该轮咨询）：\n${skillList}` : ""}${custom ? `\n\n专家领域设定：\n${custom}` : ""}`;
 }
 
 /**
@@ -182,6 +188,8 @@ export class AgentOrchestrator {
      * （null 或两者皆空 = owner 全部书签语料）。
      */
     knowledgeScope?: KnowledgeScope | null;
+    /** P1 咨询技能清单：注入咨询版系统提示词（名称+描述） */
+    consultationSkills?: { name: string; description: string }[];
   }): AsyncGenerator<AgentEvent> {
     let handle: SessionHandle;
     console.log(
@@ -422,6 +430,8 @@ export class AgentOrchestrator {
     profile?: AgentProfileConfig | null;
     /** 咨询会话标志：非空时使用专家身份系统提示词 */
     knowledgeOwnerUserId?: string | null;
+    /** P1 咨询技能清单：注入系统提示词（名称+描述） */
+    consultationSkills?: { name: string; description: string }[];
   }): Promise<SessionHandle> {
     // 顺带做周期性过期清理
     const now = Date.now();
@@ -434,9 +444,13 @@ export class AgentOrchestrator {
     }
 
     const key = `${params.userId}:${params.sessionId}`;
-    // 缓存指纹 = 工具集 + 档案指纹：档案切换/编辑后自动重建 agent
+    // 缓存指纹 = 工具集 + 档案指纹 + 技能清单指纹：
+    // 档案切换/编辑、技能增删改后自动重建 agent
     const profile = params.profile ?? null;
-    const agentKey = `${params.tools.map((t) => t.name).join(",")}|${profile ? profileFingerprint(profile) : "default"}`;
+    const skillsFingerprint = (params.consultationSkills ?? [])
+      .map((s) => s.name)
+      .join(",");
+    const agentKey = `${params.tools.map((t) => t.name).join(",")}|${profile ? profileFingerprint(profile) : "default"}|${skillsFingerprint}`;
 
     const existing = this.sessions.get(key);
     if (existing && existing.agentKey === agentKey) {
@@ -455,9 +469,10 @@ export class AgentOrchestrator {
 
     const handle: SessionHandle = {
       agent: createAgent({
-        // 档案可覆盖系统提示词；咨询会话用专家身份提示词，档案关闭工具时传空工具集
+        // 档案可覆盖系统提示词；咨询会话用专家身份提示词（含技能清单），
+        // 档案关闭工具时传空工具集
         systemPrompt: params.knowledgeOwnerUserId
-          ? buildConsultationSystemPrompt(profile)
+          ? buildConsultationSystemPrompt(profile, params.consultationSkills)
           : profile?.systemPrompt?.trim() || SYSTEM_PROMPT,
         tools: profile && !profile.enableTools ? [] : params.tools,
         history,

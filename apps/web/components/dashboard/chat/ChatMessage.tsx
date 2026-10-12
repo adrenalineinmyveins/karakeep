@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, StickyNote, User, Wrench } from "lucide-react";
+import { Bot, StickyNote, User, Wrench, Zap } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 import { cn } from "@/lib/utils";
@@ -41,6 +41,40 @@ export default function ChatMessage({ message }: { message: ChatMessageInfo }) {
                 <span className="truncate">{a.title}</span>
               </span>
             ))}
+          </div>
+        )}
+        {/* 点选的专家技能（咨询会话；P3 参数摘要 / P4 授权工具标识，悬浮看全量） */}
+        {isUser && message.skill && (
+          <div className="flex justify-end">
+            <span
+              className="inline-flex max-w-[240px] items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs text-primary"
+              title={[
+                message.skill.name,
+                ...(message.skill.params
+                  ? Object.entries(message.skill.params).map(
+                      ([k, v]) => `${k} = ${v}`,
+                    )
+                  : []),
+                ...(message.skill.tools
+                  ? [`已授权工具：${message.skill.tools.join(", ")}`]
+                  : []),
+              ].join("\n")}
+            >
+              <Zap size={12} className="shrink-0" />
+              <span className="truncate">
+                {message.skill.name}
+                {message.skill.params
+                  ? ` · ${Object.entries(message.skill.params)
+                      .map(([k, v]) => `${k}=${v}`)
+                      .join(" ")}`
+                  : ""}
+              </span>
+              {message.skill.tools && message.skill.tools.length > 0 && (
+                <span className="shrink-0 text-amber-600 dark:text-amber-400">
+                  · 工具
+                </span>
+              )}
+            </span>
           </div>
         )}
         <div

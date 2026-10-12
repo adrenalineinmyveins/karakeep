@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
@@ -46,6 +47,7 @@ interface ResetPasswordFormProps {
 
 export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const api = useTRPC();
+  const { t } = useTranslation();
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
@@ -70,7 +72,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       if (error instanceof TRPCClientError) {
         setErrorMessage(error.message);
       } else {
-        setErrorMessage("An unexpected error occurred. Please try again.");
+        setErrorMessage(t("signin.reset_password.unexpected_error"));
       }
     }
   };
@@ -79,12 +81,14 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     <Card className="w-full">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">
-          {isSuccess ? "Password reset successful" : "Reset your password"}
+          {isSuccess
+            ? t("signin.reset_password.success_title")
+            : t("signin.reset_password.title")}
         </CardTitle>
         <CardDescription>
           {isSuccess
-            ? "Your password has been successfully reset. You can now sign in with your new password."
-            : "Enter your new password below."}
+            ? t("signin.reset_password.success_description")
+            : t("signin.reset_password.subtitle")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -95,8 +99,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
             </div>
             <Alert>
               <AlertDescription className="text-center">
-                Your password has been successfully reset. You can now sign in
-                with your new password.
+                {t("signin.reset_password.success_description")}
               </AlertDescription>
             </Alert>
             <ActionButton
@@ -104,7 +107,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
               onClick={() => router.push("/signin")}
               className="w-full"
             >
-              Go to Sign In
+              {t("signin.reset_password.go_to_signin")}
             </ActionButton>
           </>
         ) : (
@@ -126,11 +129,15 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   name="newPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>New Password</FormLabel>
+                      <FormLabel>
+                        {t("signin.reset_password.new_password")}
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Enter your new password"
+                          placeholder={t(
+                            "signin.reset_password.new_password_placeholder",
+                          )}
                           {...field}
                         />
                       </FormControl>
@@ -144,11 +151,15 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
+                      <FormLabel>
+                        {t("signin.reset_password.confirm_password")}
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Confirm your new password"
+                          placeholder={t(
+                            "signin.reset_password.confirm_password_placeholder",
+                          )}
                           {...field}
                         />
                       </FormControl>
@@ -162,7 +173,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   loading={form.formState.isSubmitting}
                   className="w-full"
                 >
-                  Reset Password
+                  {t("signin.reset_password.submit")}
                 </ActionButton>
               </form>
             </Form>
@@ -174,7 +185,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                 onClick={() => router.push("/signin")}
                 className="w-full"
               >
-                Back to Sign In
+                {t("signin.back_to_signin")}
               </ActionButton>
             </div>
           </>

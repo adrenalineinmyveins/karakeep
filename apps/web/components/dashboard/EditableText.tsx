@@ -105,7 +105,7 @@ function ViewMode({
           {originalText ? (
             <p className={viewClassName}>{originalText}</p>
           ) : (
-            <p className={untitledClassName}>Untitled</p>
+            <p className={untitledClassName}>{t("common.untitled")}</p>
           )}
         </TooltipTrigger>
         <ButtonWithTooltip

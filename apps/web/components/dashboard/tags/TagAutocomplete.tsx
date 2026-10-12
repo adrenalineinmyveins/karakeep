@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import LoadingSpinner from "@/components/ui/spinner";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown, X } from "lucide-react";
@@ -34,6 +35,7 @@ export function TagAutocomplete({
   className,
 }: TagAutocompleteProps) {
   const api = useTRPC();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchQueryDebounced = useDebounce(searchQuery, 500);
@@ -92,7 +94,7 @@ export function TagAutocomplete({
               />
             </div>
           ) : (
-            "Select a tag..."
+            t("actions.select_tag")
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -100,13 +102,13 @@ export function TagAutocomplete({
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="Search tags..."
+            placeholder={t("actions.search_tags")}
             value={searchQuery}
             onValueChange={setSearchQuery}
             className={cn("h-9", className)}
           />
           <CommandList>
-            <CommandEmpty>No tags found.</CommandEmpty>
+            <CommandEmpty>{t("actions.no_tags_found")}</CommandEmpty>
             <CommandGroup className="max-h-60 overflow-y-auto">
               {tags.map((tag) => (
                 <CommandItem

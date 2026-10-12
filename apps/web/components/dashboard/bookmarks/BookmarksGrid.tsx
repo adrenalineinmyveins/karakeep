@@ -9,7 +9,6 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useInBookmarkGridStore } from "@/lib/store/useInBookmarkGridStore";
 import { useKeyboardNavigationStore } from "@/lib/store/useKeyboardNavigationStore";
 import {
-  bookmarkLayoutSwitch,
   useBookmarkLayout,
   useGridColumns,
 } from "@/lib/userLocalSettings/bookmarksLayout";
@@ -74,41 +73,48 @@ const BookmarkGridItem = memo(function BookmarkGridItem({
   );
 });
 
-function getBreakpointConfig(userColumns: number) {
-  const fullConfig = resolveConfig(tailwindConfig);
-
-  const breakpointColumnsObj: { [key: number]: number; default: number } = {
-    default: userColumns,
+const screenBreakpoints = (() => {
+  const screens = resolveConfig(tailwindConfig).theme.screens;
+  return {
+    sm: parseInt(screens.sm),
+    md: parseInt(screens.md),
+    lg: parseInt(screens.lg),
   };
+})();
 
-  // Responsive behavior: reduce columns on smaller screens
-  const lgColumns = Math.max(1, Math.min(userColumns, userColumns - 1));
-  const mdColumns = Math.max(1, Math.min(userColumns, 2));
-  const smColumns = 1;
-
-  breakpointColumnsObj[parseInt(fullConfig.theme.screens.lg)] = lgColumns;
-  breakpointColumnsObj[parseInt(fullConfig.theme.screens.md)] = mdColumns;
-  breakpointColumnsObj[parseInt(fullConfig.theme.screens.sm)] = smColumns;
-  return breakpointColumnsObj;
-}
-
+// Single source of truth for the responsive column count at a given viewport
+// width. Used both by the masonry breakpoint config and the keyboard
+// navigation column calculation.
 function getColumnsForViewport(userColumns: number, viewportWidth: number) {
-  const fullConfig = resolveConfig(tailwindConfig);
-  const screens = fullConfig.theme.screens;
-  const lg = parseInt(screens.lg);
-  const md = parseInt(screens.md);
-  const sm = parseInt(screens.sm);
-
-  if (viewportWidth <= sm) {
+  if (viewportWidth <= screenBreakpoints.sm) {
     return 1;
   }
-  if (viewportWidth <= md) {
+  if (viewportWidth <= screenBreakpoints.md) {
     return Math.max(1, Math.min(userColumns, 2));
   }
-  if (viewportWidth <= lg) {
+  if (viewportWidth <= screenBreakpoints.lg) {
     return Math.max(1, userColumns - 1);
   }
   return userColumns;
+}
+
+function getBreakpointConfig(userColumns: number) {
+  const breakpointColumnsObj: { [key: number]: number; default: number } = {
+    default: getColumnsForViewport(userColumns, Number.MAX_SAFE_INTEGER),
+  };
+  breakpointColumnsObj[screenBreakpoints.lg] = getColumnsForViewport(
+    userColumns,
+    screenBreakpoints.lg,
+  );
+  breakpointColumnsObj[screenBreakpoints.md] = getColumnsForViewport(
+    userColumns,
+    screenBreakpoints.md,
+  );
+  breakpointColumnsObj[screenBreakpoints.sm] = getColumnsForViewport(
+    userColumns,
+    screenBreakpoints.sm,
+  );
+  return breakpointColumnsObj;
 }
 
 function useActiveGridColumns(userColumns: number) {
@@ -242,28 +248,17 @@ export default function BookmarksGrid({
   ];
   return (
     <>
-      {bookmarkLayoutSwitch(layout, {
-        masonry: (
-          <Masonry
-            className="-ml-4 flex w-auto"
-            columnClassName="pl-4"
-            breakpointCols={breakpointConfig}
-          >
-            {children}
-          </Masonry>
-        ),
-        grid: (
-          <Masonry
-            className="-ml-4 flex w-auto"
-            columnClassName="pl-4"
-            breakpointCols={breakpointConfig}
-          >
-            {children}
-          </Masonry>
-        ),
-        list: <div className="grid grid-cols-1">{children}</div>,
-        compact: <div className="grid grid-cols-1">{children}</div>,
-      })}
+      {isListLayout ? (
+        <div className="grid grid-cols-1">{children}</div>
+      ) : (
+        <Masonry
+          className="-ml-4 flex w-auto"
+          columnClassName="pl-4"
+          breakpointCols={breakpointConfig}
+        >
+          {children}
+        </Masonry>
+      )}
       {hasNextPage && (
         <div className="flex justify-center">
           <ActionButton
@@ -273,7 +268,7 @@ export default function BookmarksGrid({
             onClick={() => fetchNextPage()}
             variant="ghost"
           >
-            Load More
+            {t("actions.load_more")}
           </ActionButton>
         </div>
       )}

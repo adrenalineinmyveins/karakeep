@@ -35,7 +35,7 @@ export default function DeleteBookmarkConfirmationDialog({
     onError: () => {
       toast({
         variant: "destructive",
-        description: `Something went wrong`,
+        description: t("common.something_went_wrong"),
       });
     },
   });
@@ -53,7 +53,7 @@ export default function DeleteBookmarkConfirmationDialog({
           loading={isPending}
           onClick={() => deleteBoomark({ bookmarkId: bookmark.id })}
         >
-          Delete
+          {t("actions.delete")}
         </ActionButton>
       )}
     >

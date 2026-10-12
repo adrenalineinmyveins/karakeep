@@ -134,6 +134,7 @@ export async function getSessionBillingCap(
  * D6 计量记账：咨询会话每条成功回复记一笔，amount 取发布当前单价快照
  * （调价不影响已记条目）。P0 只记账不结算；记账是增强而非依赖，
  * 失败静默（logger.warn），不影响回复本身。
+ * P2：skillId 记录该轮点选的技能（使用统计）。
  */
 export async function recordConsultationUsage(
   db: DB,
@@ -141,6 +142,7 @@ export async function recordConsultationUsage(
     typeof chatSessions.$inferSelect,
     "id" | "userId" | "publicationId"
   >,
+  skillId?: string | null,
 ): Promise<void> {
   try {
     if (!session.publicationId) return;
@@ -155,6 +157,7 @@ export async function recordConsultationUsage(
       consulteeUserId: session.userId,
       sessionId: session.id,
       amount: pub.pricePerCall,
+      ...(skillId ? { skillId } : {}),
     });
   } catch (e) {
     logger.warn(

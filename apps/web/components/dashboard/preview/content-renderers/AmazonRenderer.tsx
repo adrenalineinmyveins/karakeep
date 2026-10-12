@@ -1,5 +1,7 @@
 import { ShoppingCart } from "lucide-react";
 
+import { useTranslation } from "@/lib/i18n/client";
+
 import { BookmarkTypes, ZBookmark } from "@saiye/shared/types/bookmarks";
 
 import { ContentRenderer } from "./types";
@@ -41,6 +43,7 @@ function canRenderAmazon(bookmark: ZBookmark): boolean {
 }
 
 function AmazonRendererComponent({ bookmark }: { bookmark: ZBookmark }) {
+  const { t } = useTranslation();
   if (bookmark.content.type !== BookmarkTypes.LINK) {
     return null;
   }
@@ -90,7 +93,7 @@ function AmazonRendererComponent({ bookmark }: { bookmark: ZBookmark }) {
               </span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium">Domain:</span>
+              <span className="font-medium">{t("preview.domain")}:</span>
               <span className="text-muted-foreground">
                 amazon.{productInfo.domain}
               </span>
@@ -107,7 +110,7 @@ function AmazonRendererComponent({ bookmark }: { bookmark: ZBookmark }) {
               className="flex flex-1 items-center justify-center gap-2 rounded-md bg-[#FF9900] px-4 py-2 text-center font-medium text-white transition-colors hover:bg-[#FF9900]/90"
             >
               <ShoppingCart size={16} />
-              View on Amazon
+              {t("preview.view_on_amazon")}
             </a>
             {/* oxlint-disable-next-line no-html-link-for-pages */}
             <a
@@ -116,13 +119,13 @@ function AmazonRendererComponent({ bookmark }: { bookmark: ZBookmark }) {
               rel="noopener noreferrer"
               className="rounded-md border border-border px-4 py-2 text-sm transition-colors hover:bg-accent"
             >
-              Direct Link
+              {t("preview.direct_link")}
             </a>
           </div>
 
           {/* Amazon Disclaimer */}
           <p className="mt-4 text-center text-xs text-muted-foreground">
-            Product information from Amazon. Prices and availability may vary.
+            {t("preview.amazon_disclaimer")}
           </p>
         </div>
       </div>
@@ -132,7 +135,7 @@ function AmazonRendererComponent({ bookmark }: { bookmark: ZBookmark }) {
 
 export const amazonRenderer: ContentRenderer = {
   id: "amazon",
-  name: "Amazon Product",
+  name: (t) => t("preview.amazon_product"),
   icon: ShoppingCart,
   canRender: canRenderAmazon,
   component: AmazonRendererComponent,

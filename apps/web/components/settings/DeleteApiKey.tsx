@@ -24,7 +24,7 @@ export default function DeleteApiKey({
   const mutator = useMutation(
     api.apiKeys.revoke.mutationOptions({
       onSuccess: () => {
-        toast.success("Key was successfully deleted");
+        toast.success(t("settings.api_keys.key_deleted"));
         router.refresh();
       },
     }),

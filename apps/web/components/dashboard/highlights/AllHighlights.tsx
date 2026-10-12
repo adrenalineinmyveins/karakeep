@@ -103,7 +103,7 @@ export default function AllHighlights({
       <div className="relative">
         <Input
           type="text"
-          placeholder="Search highlights..."
+          placeholder={t("highlights.search_placeholder")}
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           startIcon={<Search className="size-4 text-muted-foreground" />}

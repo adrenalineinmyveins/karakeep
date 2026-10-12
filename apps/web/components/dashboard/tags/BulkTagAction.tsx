@@ -39,7 +39,7 @@ export default function BulkTagAction() {
     toast({
       variant: "destructive",
       title: t("common.something_went_wrong"),
-      description: "There was a problem with your request.",
+      description: t("common.request_problem"),
     });
   };
 
@@ -60,7 +60,9 @@ export default function BulkTagAction() {
       ),
     );
     toast({
-      description: `${selectedTagIds.length} tags have been deleted!`,
+      description: t("actions.tags_deleted", {
+        count: selectedTagIds.length,
+      }),
     });
     setIsDeleteDialogOpen(false);
   };
@@ -97,8 +99,8 @@ export default function BulkTagAction() {
       <ActionConfirmingDialog
         open={isDeleteDialogOpen}
         setOpen={setIsDeleteDialogOpen}
-        title={"Delete Tags"}
-        description={<p>Are you sure you want to delete these tags?</p>}
+        title={t("actions.delete_tags")}
+        description={<p>{t("actions.confirm_delete_tags")}</p>}
         actionButton={() => (
           <ActionButton
             type="button"
@@ -115,7 +117,7 @@ export default function BulkTagAction() {
         <Toggle
           variant="outline"
           className="bg-background"
-          aria-label="Toggle bulk edit"
+          aria-label={t("actions.toggle_bulk_edit")}
           pressed={isBulkEditEnabled}
           onPressedChange={setIsBulkEditEnabled}
         >

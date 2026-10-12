@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import LoadingSpinner from "@/components/ui/spinner";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 
@@ -15,7 +16,7 @@ import { useTRPC } from "@saiye/shared-react/trpc";
 export function FeedSelector({
   value,
   onChange,
-  placeholder = "Select a feed",
+  placeholder,
   className,
 }: {
   className?: string;
@@ -24,6 +25,7 @@ export function FeedSelector({
   placeholder?: string;
 }) {
   const api = useTRPC();
+  const { t } = useTranslation();
   const { data, isPending } = useQuery(
     api.feeds.list.queryOptions(undefined, {
       select: (data) => data.feeds,
@@ -37,7 +39,7 @@ export function FeedSelector({
   return (
     <Select onValueChange={onChange} value={value ?? ""}>
       <SelectTrigger className={cn("w-full", className)}>
-        <SelectValue placeholder={placeholder} />
+        <SelectValue placeholder={placeholder || t("actions.select_feed")} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
@@ -48,7 +50,7 @@ export function FeedSelector({
           ))}
           {(data ?? []).length == 0 && (
             <SelectItem value="nofeed" disabled>
-              You don&apos;t currently have any feeds.
+              {t("actions.no_feeds_yet")}
             </SelectItem>
           )}
         </SelectGroup>

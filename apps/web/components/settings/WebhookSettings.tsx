@@ -82,7 +82,7 @@ export function WebhooksEditorDialog() {
     api.webhooks.create.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Webhook has been created!",
+          description: t("settings.webhooks.webhook_created"),
         });
         queryClient.invalidateQueries(api.webhooks.list.pathFilter());
         setOpen(false);
@@ -117,9 +117,15 @@ export function WebhooksEditorDialog() {
               render={({ field }) => {
                 return (
                   <FormItem className="flex-1">
-                    <FormLabel>URL</FormLabel>
+                    <FormLabel>{t("common.url")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Webhook URL" type="text" {...field} />
+                      <Input
+                        placeholder={t(
+                          "settings.webhooks.webhook_url_placeholder",
+                        )}
+                        type="text"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -135,7 +141,9 @@ export function WebhooksEditorDialog() {
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Authentication token"
+                      placeholder={t(
+                        "settings.webhooks.auth_token_placeholder",
+                      )}
                       {...field}
                     />
                   </FormControl>
@@ -148,7 +156,7 @@ export function WebhooksEditorDialog() {
               name="events"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Events</FormLabel>
+                  <FormLabel>{t("settings.webhooks.events.title")}</FormLabel>
                   <WebhookEventSelector
                     value={field.value}
                     onChange={field.onChange}
@@ -162,7 +170,7 @@ export function WebhooksEditorDialog() {
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="secondary">
-              Close
+              {t("actions.close")}
             </Button>
           </DialogClose>
           <ActionButton
@@ -174,7 +182,7 @@ export function WebhooksEditorDialog() {
             className="items-center"
           >
             <Plus className="mr-2 size-4" />
-            Add
+            {t("actions.add")}
           </ActionButton>
         </DialogFooter>
       </DialogContent>
@@ -200,7 +208,7 @@ export function EditWebhookDialog({ webhook }: { webhook: ZWebhook }) {
     api.webhooks.update.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Webhook has been updated!",
+          description: t("settings.webhooks.webhook_updated"),
         });
         setOpen(false);
         queryClient.invalidateQueries(api.webhooks.list.pathFilter());
@@ -261,7 +269,13 @@ export function EditWebhookDialog({ webhook }: { webhook: ZWebhook }) {
                   <FormItem className="flex-1">
                     <FormLabel>{t("common.url")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Webhook URL" type="text" {...field} />
+                      <Input
+                        placeholder={t(
+                          "settings.webhooks.webhook_url_placeholder",
+                        )}
+                        type="text"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -342,7 +356,7 @@ export function EditTokenDialog({ webhook }: { webhook: ZWebhook }) {
     api.webhooks.update.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Webhook token has been updated!",
+          description: t("settings.webhooks.webhook_token_updated"),
         });
         setOpen(false);
         queryClient.invalidateQueries(api.webhooks.list.pathFilter());
@@ -391,7 +405,9 @@ export function EditTokenDialog({ webhook }: { webhook: ZWebhook }) {
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Authentication token"
+                      placeholder={t(
+                        "settings.webhooks.auth_token_placeholder",
+                      )}
                       {...field}
                       value={field.value ?? ""}
                     />
@@ -447,7 +463,7 @@ export function WebhookRow({ webhook }: { webhook: ZWebhook }) {
     api.webhooks.delete.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Webhook has been deleted!",
+          description: t("settings.webhooks.webhook_deleted"),
         });
         queryClient.invalidateQueries(api.webhooks.list.pathFilter());
       },
@@ -504,7 +520,7 @@ export default function WebhookSettings() {
         {isLoading && <FullPageSpinner />}
         {webhooks && webhooks.webhooks.length == 0 && (
           <p className="rounded-md bg-muted p-3 text-center text-sm text-muted-foreground">
-            You don&apos;t have any webhooks configured yet.
+            {t("settings.webhooks.no_webhooks")}
           </p>
         )}
         {webhooks && webhooks.webhooks.length > 0 && (

@@ -15,8 +15,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/sonner";
+import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle, Eye, EyeOff, Trash2 } from "lucide-react";
+import { TFunction } from "i18next";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -25,14 +27,15 @@ import { useDeleteAccount, useWhoAmI } from "@saiye/shared-react/hooks/users";
 import { Button } from "../ui/button";
 import { SettingsSection } from "./SettingsPage";
 
-const createDeleteAccountSchema = (isLocalUser: boolean) =>
+const createDeleteAccountSchema = (isLocalUser: boolean, t: TFunction) =>
   z.object({
     password: isLocalUser
-      ? z.string().min(1, "Password is required")
+      ? z.string().min(1, t("settings.delete_account.password_required"))
       : z.string().optional(),
   });
 
 export function DeleteAccount() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -40,7 +43,7 @@ export function DeleteAccount() {
   const { data: user } = useWhoAmI();
 
   const isLocalUser = user?.localUser ?? false;
-  const deleteAccountSchema = createDeleteAccountSchema(isLocalUser);
+  const deleteAccountSchema = createDeleteAccountSchema(isLocalUser, t);
 
   const form = useForm<z.infer<typeof deleteAccountSchema>>({
     resolver: zodResolver(deleteAccountSchema),
@@ -53,7 +56,7 @@ export function DeleteAccount() {
     onSuccess: () => {
       setServerError(null);
       toast({
-        description: "Your account has been successfully deleted.",
+        description: t("settings.delete_account.success"),
       });
       // Redirect to home page after successful deletion
       router.push("/");
@@ -63,7 +66,7 @@ export function DeleteAccount() {
       if (error.data?.code === "UNAUTHORIZED") {
         form.setError("password", {
           type: "server",
-          message: "Invalid password. Please try again.",
+          message: t("settings.delete_account.invalid_password"),
         });
         setServerError(null);
         return;
@@ -75,7 +78,7 @@ export function DeleteAccount() {
       }
 
       toast({
-        description: "Failed to delete account. Please try again.",
+        description: t("settings.delete_account.failed"),
         variant: "destructive",
       });
     },
@@ -96,30 +99,30 @@ export function DeleteAccount() {
   };
 
   return (
-    <SettingsSection title="Danger Zone" variant="danger">
+    <SettingsSection title={t("settings.danger_zone")} variant="danger">
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">Delete Account</h3>
+        <h3 className="text-lg font-medium">
+          {t("settings.delete_account.delete_account")}
+        </h3>
         <p className="text-sm text-muted-foreground">
-          Permanently delete your account and all associated data. This action
-          cannot be undone.
+          {t("settings.delete_account.description")}
         </p>
       </div>
 
       <ActionConfirmingDialog
         open={isDialogOpen}
         setOpen={handleDialogOpenChange}
-        title="Delete Account"
+        title={t("settings.delete_account.delete_account")}
         description={
           <div className="space-y-4">
             <div className="flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive/5 p-4">
               <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-destructive" />
               <div className="space-y-2">
                 <p className="font-medium text-destructive">
-                  This action is irreversible
+                  {t("settings.delete_account.irreversible")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  All your bookmarks, lists, tags, highlights, and other data
-                  will be permanently deleted. This cannot be undone.
+                  {t("settings.delete_account.irreversible_description")}
                 </p>
               </div>
             </div>
@@ -142,13 +145,15 @@ export function DeleteAccount() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Enter your password to confirm deletion
+                          {t("settings.delete_account.enter_password_label")}
                         </FormLabel>
                         <div className="relative">
                           <FormControl>
                             <Input
                               type={showPassword ? "text" : "password"}
-                              placeholder="Enter your password"
+                              placeholder={t(
+                                "settings.delete_account.enter_password_placeholder",
+                              )}
                               className="pr-10"
                               {...field}
                             />
@@ -183,13 +188,13 @@ export function DeleteAccount() {
             onClick={form.handleSubmit(onSubmit)}
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete Account
+            {t("settings.delete_account.delete_account")}
           </ActionButton>
         )}
       >
         <Button variant="destructive" className="w-full">
           <Trash2 className="mr-2 h-4 w-4" />
-          Delete Account
+          {t("settings.delete_account.delete_account")}
         </Button>
       </ActionConfirmingDialog>
     </SettingsSection>

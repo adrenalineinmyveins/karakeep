@@ -137,7 +137,7 @@ export function ConditionBuilder({
             <Input
               value={value.str}
               onChange={(e) => onChange({ ...value, str: e.target.value })}
-              placeholder="URL contains..."
+              placeholder={t("settings.rules.enter_url_contains")}
               className="w-full"
             />
           </div>
@@ -149,7 +149,7 @@ export function ConditionBuilder({
             <Input
               value={value.str}
               onChange={(e) => onChange({ ...value, str: e.target.value })}
-              placeholder="URL does not contain..."
+              placeholder={t("settings.rules.enter_url_does_not_contain")}
               className="w-full"
             />
           </div>
@@ -161,7 +161,7 @@ export function ConditionBuilder({
             <Input
               value={value.str}
               onChange={(e) => onChange({ ...value, str: e.target.value })}
-              placeholder="Title contains..."
+              placeholder={t("settings.rules.enter_title_contains")}
               className="w-full"
             />
           </div>
@@ -173,7 +173,7 @@ export function ConditionBuilder({
             <Input
               value={value.str}
               onChange={(e) => onChange({ ...value, str: e.target.value })}
-              placeholder="Title does not contain..."
+              placeholder={t("settings.rules.enter_title_does_not_contain")}
               className="w-full"
             />
           </div>
@@ -203,7 +203,9 @@ export function ConditionBuilder({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select bookmark type" />
+                <SelectValue
+                  placeholder={t("settings.rules.select_bookmark_type")}
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="link">
@@ -234,7 +236,9 @@ export function ConditionBuilder({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select bookmark source" />
+                <SelectValue
+                  placeholder={t("settings.rules.select_bookmark_source")}
+                />
               </SelectTrigger>
               <SelectContent>
                 {zBookmarkSourceSchema.options.map((source) => (
@@ -296,7 +300,7 @@ export function ConditionBuilder({
               }}
             >
               <PlusCircle className="mr-2 h-4 w-4" />
-              Add Condition
+              {t("settings.rules.add_condition")}
             </Button>
           </div>
         );
@@ -383,8 +387,9 @@ export function ConditionBuilder({
                 </CollapsibleTrigger>
                 <ConditionSelector />
                 <span className="ml-1 text-sm text-muted-foreground">
-                  {value.conditions.length} condition
-                  {value.conditions.length !== 1 ? "s" : ""}
+                  {t("settings.rules.conditions_count", {
+                    count: value.conditions.length,
+                  })}
                 </span>
               </div>
 

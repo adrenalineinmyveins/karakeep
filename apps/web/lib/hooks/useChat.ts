@@ -31,12 +31,21 @@ export interface ChatAttachment {
   title: string;
 }
 
+/** 咨询会话中点选的专家技能（P1 提示词模板型；P3 含参数；P4 含授权工具） */
+export interface ChatSkillInfo {
+  id: string;
+  name: string;
+  params?: Record<string, string | number | boolean>;
+  tools?: string[];
+}
+
 export interface ChatMessageInfo {
   id: string;
   role: "user" | "assistant";
   content: string;
   toolCalls?: ToolCallInfo[];
   attachments?: ChatAttachment[];
+  skill?: ChatSkillInfo;
   pending?: boolean;
   /** 标记为失败的回复（用于下次输入时本地清理） */
   isError?: boolean;
@@ -87,6 +96,8 @@ export function useChat(
   const [pendingAttachments, setPendingAttachments] = useState<
     ChatAttachment[] | null
   >(null);
+  // 待发送的点选技能（与 pendingInput 同生命周期；每轮至多一个）
+  const [pendingSkill, setPendingSkill] = useState<ChatSkillInfo | null>(null);
   const msgIdCounter = useRef(0);
 
   const invalidateSessions = useCallback(() => {
@@ -111,6 +122,7 @@ export function useChat(
       setIsStreaming(false);
       setPendingInput(null);
       setPendingAttachments(null);
+      setPendingSkill(null);
       setMessages((prev) =>
         prev.map((m, i) =>
           i === prev.length - 1 && m.role === "assistant"
@@ -133,7 +145,7 @@ export function useChat(
   // ── 发送消息 ──────────────────────────────────────
 
   const sendMessage = useCallback(
-    (content: string, attached?: ChatAttachment[]) => {
+    (content: string, attached?: ChatAttachment[], skill?: ChatSkillInfo) => {
       if (!sessionId || !content.trim()) return;
 
       // 立即追加用户消息到 UI
@@ -142,6 +154,7 @@ export function useChat(
         role: "user",
         content,
         ...(attached && attached.length > 0 ? { attachments: attached } : {}),
+        ...(skill ? { skill } : {}),
       };
       // 预占 assistant 消息位
       const assistantMsg: ChatMessageInfo = {
@@ -166,6 +179,7 @@ export function useChat(
       setIsStreaming(true);
       setPendingInput(content);
       setPendingAttachments(attached && attached.length > 0 ? attached : null);
+      setPendingSkill(skill ?? null);
       armStreamTimer();
     },
     [sessionId, armStreamTimer],
@@ -179,6 +193,7 @@ export function useChat(
         setIsStreaming(false);
         setPendingInput(null);
         setPendingAttachments(null);
+        setPendingSkill(null);
       },
     }),
   );
@@ -191,6 +206,7 @@ export function useChat(
     setIsStreaming(false);
     setPendingInput(null);
     setPendingAttachments(null);
+    setPendingSkill(null);
     setMessages((prev) =>
       prev.map((m) =>
         m.pending
@@ -210,6 +226,15 @@ export function useChat(
         ...(pendingAttachments
           ? {
               attachedBookmarkIds: pendingAttachments.map((a) => a.id),
+            }
+          : {}),
+        ...(pendingSkill
+          ? {
+              skillId: pendingSkill.id,
+              // P3 带参技能：填写的参数值随消息提交
+              ...(pendingSkill.params
+                ? { skillParams: pendingSkill.params }
+                : {}),
             }
           : {}),
       },
@@ -293,6 +318,7 @@ export function useChat(
               setIsStreaming(false);
               setPendingInput(null);
               setPendingAttachments(null);
+              setPendingSkill(null);
               setMessages((prev) =>
                 prev.map((m) => (m.pending ? { ...m, pending: false } : m)),
               );
@@ -324,19 +350,21 @@ export function useChat(
     );
     setMessages(
       data.messages.map((m) => {
-        // 从 metadata 恢复工具调用记录（widget 预览卡等）与引用笔记
+        // 从 metadata 恢复工具调用记录（widget 预览卡等）、引用笔记与点选技能
         const toolCalls = (
           m.metadata as { toolCalls?: ChatMessageInfo["toolCalls"] } | null
         )?.toolCalls;
         const attachments = (
           m.metadata as { attachments?: ChatAttachment[] } | null
         )?.attachments;
+        const skill = (m.metadata as { skill?: ChatSkillInfo } | null)?.skill;
         return {
           id: m.id,
           role: m.role as "user" | "assistant",
           content: m.content,
           ...(toolCalls && toolCalls.length > 0 ? { toolCalls } : {}),
           ...(attachments && attachments.length > 0 ? { attachments } : {}),
+          ...(skill ? { skill } : {}),
         };
       }),
     );

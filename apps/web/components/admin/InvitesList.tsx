@@ -2,6 +2,7 @@
 
 import { ActionButton } from "@/components/ui/action-button";
 import { ButtonWithTooltip } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n/client";
 import { toast } from "@/components/ui/sonner";
 import {
   Table,
@@ -28,20 +29,23 @@ import CreateInviteDialog from "./CreateInviteDialog";
 export default function InvitesList() {
   const api = useTRPC();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const { data: invites } = useSuspenseQuery(api.invites.list.queryOptions());
 
   const { mutateAsync: revokeInvite, isPending: isRevokePending } = useMutation(
     api.invites.revoke.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Invite revoked successfully",
+          description: t("admin.invites.invite_revoked"),
         });
         queryClient.invalidateQueries(api.invites.list.pathFilter());
       },
       onError: (e) => {
         toast({
           variant: "destructive",
-          description: `Failed to revoke invite: ${e.message}`,
+          description: t("admin.invites.revoke_failed", {
+            message: e.message,
+          }),
         });
       },
     }),
@@ -51,14 +55,16 @@ export default function InvitesList() {
     api.invites.resend.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Invite resent successfully",
+          description: t("admin.invites.invite_resent"),
         });
         queryClient.invalidateQueries(api.invites.list.pathFilter());
       },
       onError: (e) => {
         toast({
           variant: "destructive",
-          description: `Failed to resend invite: ${e.message}`,
+          description: t("admin.invites.resend_failed", {
+            message: e.message,
+          }),
         });
       },
     }),
@@ -68,23 +74,19 @@ export default function InvitesList() {
 
   const InviteTable = ({
     invites: inviteList,
-    title,
   }: {
     invites: NonNullable<typeof invites>["invites"];
-    title: string;
   }) => (
     <div className="mb-6">
       {inviteList.length === 0 ? (
-        <p className="text-sm text-gray-500">
-          No {title.toLowerCase()} invites
-        </p>
+        <p className="text-sm text-gray-500">{t("admin.invites.no_invites")}</p>
       ) : (
         <Table>
           <TableHeader className="bg-gray-200">
-            <TableHead>Email</TableHead>
-            <TableHead>Invited By</TableHead>
-            <TableHead>Created</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>{t("common.email")}</TableHead>
+            <TableHead>{t("admin.invites.invited_by")}</TableHead>
+            <TableHead>{t("admin.invites.created")}</TableHead>
+            <TableHead>{t("common.actions")}</TableHead>
           </TableHeader>
           <TableBody>
             {inviteList.map((invite) => (
@@ -100,7 +102,7 @@ export default function InvitesList() {
                   {
                     <>
                       <ButtonWithTooltip
-                        tooltip="Resend Invite"
+                        tooltip={t("admin.invites.resend_invite")}
                         variant="outline"
                         size="sm"
                         onClick={() => resendInvite({ inviteId: invite.id })}
@@ -109,8 +111,10 @@ export default function InvitesList() {
                         <Mail size={14} />
                       </ButtonWithTooltip>
                       <ActionConfirmingDialog
-                        title="Revoke Invite"
-                        description={`Are you sure you want to revoke the invite for ${invite.email}? This action cannot be undone.`}
+                        title={t("admin.invites.revoke_invite")}
+                        description={t("admin.invites.revoke_confirm", {
+                          email: invite.email,
+                        })}
                         actionButton={(setDialogOpen) => (
                           <ActionButton
                             variant="destructive"
@@ -120,12 +124,12 @@ export default function InvitesList() {
                               setDialogOpen(false);
                             }}
                           >
-                            Revoke
+                            {t("admin.invites.revoke")}
                           </ActionButton>
                         )}
                       >
                         <ButtonWithTooltip
-                          tooltip="Revoke Invite"
+                          tooltip={t("admin.invites.revoke_invite")}
                           variant="outline"
                           size="sm"
                         >
@@ -147,15 +151,22 @@ export default function InvitesList() {
     <AdminCard>
       <div className="flex flex-col gap-4">
         <div className="mb-2 flex items-center justify-between text-xl font-medium">
-          <span>User Invitations ({activeInvites.length})</span>
+          <span>
+            {t("admin.invites.user_invitations", {
+              count: activeInvites.length,
+            })}
+          </span>
           <CreateInviteDialog>
-            <ButtonWithTooltip tooltip="Send Invite" variant="outline">
+            <ButtonWithTooltip
+              tooltip={t("admin.invites.send_invite")}
+              variant="outline"
+            >
               <UserPlus size={16} />
             </ButtonWithTooltip>
           </CreateInviteDialog>
         </div>
 
-        <InviteTable invites={activeInvites} title="Invites" />
+        <InviteTable invites={activeInvites} />
       </div>
     </AdminCard>
   );

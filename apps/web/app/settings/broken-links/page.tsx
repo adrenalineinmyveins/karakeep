@@ -74,7 +74,7 @@ export default function BrokenLinksPage() {
         {isPending && <FullPageSpinner />}
         {!isPending && data && data.bookmarks.length == 0 && (
           <p className="rounded-md bg-muted p-3 text-center text-sm text-muted-foreground">
-            No broken links found
+            {t("settings.broken_links.no_broken_links")}
           </p>
         )}
         {!isPending && data && data.bookmarks.length > 0 && (
@@ -104,7 +104,9 @@ export default function BrokenLinksPage() {
                   </TableCell>
                   <TableCell>
                     {b.isCrawlingFailure ? (
-                      <span className="text-red-500">Failed</span>
+                      <span className="text-red-500">
+                        {t("settings.broken_links.failed")}
+                      </span>
                     ) : (
                       b.statusCode
                     )}

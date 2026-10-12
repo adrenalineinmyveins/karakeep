@@ -220,7 +220,7 @@ export default function StatsPage() {
   return (
     <SettingsPage
       title={t("settings.stats.usage_statistics")}
-      description="Insights into your bookmarking habits and collection"
+      description={t("settings.stats.description")}
     >
       {/* Overview Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

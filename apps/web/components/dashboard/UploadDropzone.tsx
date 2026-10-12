@@ -3,6 +3,7 @@
 import React, { useCallback, useState } from "react";
 import { toast } from "@/components/ui/sonner";
 import { BOOKMARK_DRAG_MIME } from "@/lib/bookmark-drag";
+import { useTranslation } from "@/lib/i18n/client";
 import useUpload from "@/lib/hooks/upload-file";
 import { cn } from "@/lib/utils";
 import { TRPCClientError } from "@trpc/client";
@@ -15,6 +16,7 @@ import LoadingSpinner from "../ui/spinner";
 import BookmarkSavedToast from "../utils/BookmarkSavedToast";
 
 export function useUploadAsset() {
+  const { t } = useTranslation();
   const { mutateAsync: createBookmark } = useCreateBookmarkWithPostHook({
     onSuccess: (resp) => {
       if (resp.alreadyExists) {
@@ -23,11 +25,14 @@ export function useUploadAsset() {
           variant: "default",
         });
       } else {
-        toast({ description: "Bookmark uploaded" });
+        toast({ description: t("common.bookmark_uploaded") });
       }
     },
     onError: () => {
-      toast({ description: "Something went wrong", variant: "destructive" });
+      toast({
+        description: t("common.something_went_wrong"),
+        variant: "destructive",
+      });
     },
   });
 
@@ -64,7 +69,9 @@ export function useUploadAsset() {
           });
         } catch {
           toast({
-            description: `${file.name}: Failed to read markdown file`,
+            description: t("common.markdown_read_failed", {
+              name: file.name,
+            }),
             variant: "destructive",
           });
         }
@@ -110,6 +117,7 @@ export default function UploadDropzone({
 }: {
   children: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   const [numUploading, setNumUploading] = useState(0);
   const [numUploaded, setNumUploaded] = useState(0);
   const uploadAssets = useUploadAssets({
@@ -157,13 +165,16 @@ export default function UploadDropzone({
             {numUploading > 0 ? (
               <div className="flex items-center justify-center gap-2">
                 <p className="text-2xl font-bold text-gray-700">
-                  Uploading {numUploaded} / {numUploading}
+                  {t("common.uploading_progress", {
+                    uploaded: numUploaded,
+                    total: numUploading,
+                  })}
                 </p>
                 <LoadingSpinner />
               </div>
             ) : (
               <p className="text-2xl font-bold text-gray-700">
-                Drop Your Image / Audio / PDF / Markdown file
+                {t("common.drop_files_hint")}
               </p>
             )}
           </div>

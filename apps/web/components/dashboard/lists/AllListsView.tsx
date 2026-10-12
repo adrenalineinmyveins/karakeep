@@ -47,6 +47,7 @@ function ListItem({
   description?: string;
   style?: React.CSSProperties;
 }) {
+  const { t } = useTranslation();
   const accentColors = [
     "bg-sky-500",
     "bg-slate-400",
@@ -125,7 +126,7 @@ function ListItem({
         )}
         {!list && formattedItemCount !== undefined && (
           <span className="hidden items-center gap-2 sm:flex">
-            {formattedItemCount} items
+            {t("lists.items_count", { count: itemCount })}
           </span>
         )}
       </div>
@@ -180,13 +181,13 @@ export default function AllListsView({
 
   return (
     <div className="space-y-8">
-      <Section title="Pinned">
+      <Section title={t("lists.pinned")}>
         <ul className="divide-y">
           <ListItem
             collapsible={false}
             name={t("lists.favourites")}
             icon="⭐️"
-            description="Things I keep coming back to."
+            description={t("lists.favourites_desc")}
             itemCount={favoritesCount}
             path={`/dashboard/favourites`}
             pinned
@@ -195,7 +196,7 @@ export default function AllListsView({
             collapsible={false}
             name={t("common.archive")}
             icon="🗄️"
-            description="Cold storage, out of the way."
+            description={t("lists.archive_desc")}
             itemCount={archivedCount}
             path={`/dashboard/archive`}
             pinned
@@ -204,7 +205,7 @@ export default function AllListsView({
       </Section>
 
       {hasOwnedLists && (
-        <Section title="All">
+        <Section title={t("lists.all")}>
           <CollapsibleBookmarkLists
             className="border-b last:border-b-0"
             listsData={lists}

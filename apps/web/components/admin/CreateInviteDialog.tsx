@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/lib/i18n/client";
 import { toast } from "@/components/ui/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -27,10 +28,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { useTRPC } from "@saiye/shared-react/trpc";
-
-const createInviteSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-});
 
 interface CreateInviteDialogProps {
   children: React.ReactNode;
@@ -41,8 +38,13 @@ export default function CreateInviteDialog({
 }: CreateInviteDialogProps) {
   const api = useTRPC();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const createInviteSchema = z.object({
+    email: z.string().email(t("admin.invites.invalid_email")),
+  });
 
   const form = useForm<z.infer<typeof createInviteSchema>>({
     resolver: zodResolver(createInviteSchema),
@@ -55,7 +57,7 @@ export default function CreateInviteDialog({
     api.invites.create.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Invite sent successfully",
+          description: t("admin.invites.invite_sent"),
         });
         queryClient.invalidateQueries(api.invites.list.pathFilter());
         setOpen(false);
@@ -66,7 +68,7 @@ export default function CreateInviteDialog({
         if (e instanceof TRPCClientError) {
           setErrorMessage(e.message);
         } else {
-          setErrorMessage("Failed to send invite");
+          setErrorMessage(t("admin.invites.send_failed"));
         }
       },
     }),
@@ -77,11 +79,9 @@ export default function CreateInviteDialog({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Send User Invitation</DialogTitle>
+          <DialogTitle>{t("admin.invites.send_user_invitation")}</DialogTitle>
           <DialogDescription>
-            Send an invitation to a new user to join Saiye. They&apos;ll receive
-            an email with instructions to create their account and will be
-            assigned the &quot;user&quot; role.
+            {t("admin.invites.invitation_description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -102,7 +102,7 @@ export default function CreateInviteDialog({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email Address</FormLabel>
+                  <FormLabel>{t("admin.invites.email_address")}</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -122,13 +122,13 @@ export default function CreateInviteDialog({
                 loading={false}
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {t("actions.cancel")}
               </ActionButton>
               <ActionButton
                 type="submit"
                 loading={createInviteMutation.isPending}
               >
-                Send Invitation
+                {t("admin.invites.send_invitation")}
               </ActionButton>
             </div>
           </form>

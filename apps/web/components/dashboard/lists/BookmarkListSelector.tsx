@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import LoadingSpinner from "@/components/ui/spinner";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 
@@ -72,6 +73,7 @@ function ListSelectorComponent({
   allPaths,
   disabled,
 }: ListSelectorComponentProps) {
+  const { t } = useTranslation();
   if (isPending) {
     return <LoadingSpinner />;
   }
@@ -91,12 +93,12 @@ function ListSelectorComponent({
         onWheel={(e) => e.stopPropagation()}
       >
         <Command>
-          <CommandInput placeholder="Search lists..." />
+          <CommandInput placeholder={t("lists.search_lists")} />
           <CommandList>
             <CommandEmpty>
               {allPaths && allPaths.length === 0
-                ? "You don't currently have any lists."
-                : "No lists found."}
+                ? t("lists.no_lists_yet")
+                : t("lists.no_lists_found")}
             </CommandEmpty>
             <CommandGroup className="max-h-60 overflow-y-auto">
               {allPaths?.map((path) => {
@@ -129,7 +131,7 @@ function ListSelectorComponent({
 }
 
 function BookmarkListSingleSelector({
-  placeholder = "Select a list",
+  placeholder,
   className,
   onChange,
   value,
@@ -137,6 +139,7 @@ function BookmarkListSingleSelector({
   allPaths,
   disabled,
 }: SingleSelectionProps & DataProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const onSelect = (currentValue: string) => {
     onChange(currentValue);
@@ -169,7 +172,7 @@ function BookmarkListSingleSelector({
         className={cn("w-full justify-between", className)}
         disabled={disabled}
       >
-        {selectedListName || placeholder}
+        {selectedListName || placeholder || t("lists.select_list")}
         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </Button>
     </ListSelectorComponent>
@@ -177,7 +180,7 @@ function BookmarkListSingleSelector({
 }
 
 function BookmarkListMultiSelector({
-  placeholder = "Select lists",
+  placeholder,
   onChange,
   value,
   isPending,
@@ -185,6 +188,7 @@ function BookmarkListMultiSelector({
   className,
   disabled,
 }: MultiSelectionProps & DataProps & { disabled?: boolean }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const onSelect = (currentValue: string) => {
     if (disabled) {
@@ -258,7 +262,9 @@ function BookmarkListMultiSelector({
                       }}
                     >
                       <X className="h-3 w-3" />
-                      <span className="sr-only">Remove {listName}</span>
+                      <span className="sr-only">
+                        {t("lists.remove_list_item", { name: listName })}
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -266,7 +272,7 @@ function BookmarkListMultiSelector({
             })}
           </>
         ) : (
-          placeholder
+          placeholder || t("lists.select_lists")
         )}
       </div>
     </ListSelectorComponent>

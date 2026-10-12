@@ -1,5 +1,6 @@
 import React from "react";
 import { ActionButton, ActionButtonProps } from "@/components/ui/action-button";
+import { useTranslation } from "@/lib/i18n/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 
@@ -18,6 +19,7 @@ const ArchiveBookmarkButton = React.forwardRef<
   HTMLButtonElement,
   ArchiveBookmarkButtonProps
 >(({ bookmarkId, onDone, ...props }, ref) => {
+  const { t } = useTranslation();
   const api = useTRPC();
   const { data } = useQuery(
     api.bookmarks.getBookmark.queryOptions(
@@ -33,14 +35,14 @@ const ArchiveBookmarkButton = React.forwardRef<
   const { mutate: updateBookmark, isPending: isArchivingBookmark } =
     useUpdateBookmark({
       onSuccess: () => {
-        toast.success("Bookmark has been archived!");
+        toast.success(t("toasts.bookmarks.archived"));
         onDone?.();
       },
       onError: (e) => {
         if (e.data?.code == "BAD_REQUEST") {
           toast.error(e.message);
         } else {
-          toast.error("Something went wrong");
+          toast.error(t("common.something_went_wrong"));
         }
       },
     });

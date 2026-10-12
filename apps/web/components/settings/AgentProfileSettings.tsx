@@ -13,6 +13,7 @@ import {
   Trash2,
   Undo2,
   Upload,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -57,6 +58,11 @@ import type {
   AgentProfileType,
   KnowledgeScope,
 } from "@saiye/shared/types/agentProfiles";
+import type {
+  SkillParam,
+  SkillToolGrant,
+} from "@saiye/shared/types/agentSkills";
+import { SKILL_GRANTABLE_TOOLS } from "@saiye/shared/types/agentSkills";
 import { Badge } from "@/components/ui/badge";
 
 /** list 返回的安全档案（无 apiKey，只有 hasApiKey 布尔） */
@@ -622,6 +628,784 @@ function PublishDialog({
   );
 }
 
+/** list 返回的技能行 */
+interface AgentSkillRow {
+  id: string;
+  name: string;
+  description: string;
+  promptTemplate: string;
+  outputHint: string | null;
+  knowledgeScope: KnowledgeScope | null;
+  paramsSchema: SkillParam[] | null;
+  toolGrant: SkillToolGrant | null;
+  enabled: boolean;
+  usageCount: number;
+}
+
+/** P3 参数编辑行（options 逗号分隔、default 统一文本编辑，提交时按类型转换） */
+interface SkillParamFormRow {
+  name: string;
+  label: string;
+  type: SkillParam["type"];
+  required: boolean;
+  options: string;
+  defaultValue: string;
+}
+
+const emptyParamRow: SkillParamFormRow = {
+  name: "",
+  label: "",
+  type: "string",
+  required: false,
+  options: "",
+  defaultValue: "",
+};
+
+/** 技能表单状态 */
+interface SkillFormState {
+  name: string;
+  description: string;
+  promptTemplate: string;
+  outputHint: string;
+  scopeTagIds: string[];
+  scopeListIds: string[];
+  params: SkillParamFormRow[];
+  grantedTools: string[];
+  enabled: boolean;
+}
+
+const emptySkillForm: SkillFormState = {
+  name: "",
+  description: "",
+  promptTemplate: "",
+  outputHint: "",
+  scopeTagIds: [],
+  scopeListIds: [],
+  params: [],
+  grantedTools: [],
+  enabled: true,
+};
+
+/** 参数编辑行 → 参数定义（default 按 type 转换；enum default 须命中 options） */
+function buildSkillParam(
+  row: SkillParamFormRow,
+): Omit<SkillParam, "default"> & { default?: string | number | boolean } {
+  const options =
+    row.type === "enum"
+      ? row.options
+          .split(/[,，]/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : undefined;
+  let defaultValue: string | number | boolean | undefined;
+  const raw = row.defaultValue.trim();
+  if (raw) {
+    if (row.type === "number") {
+      const n = Number(raw);
+      if (!Number.isNaN(n)) defaultValue = n;
+    } else if (row.type === "boolean") {
+      defaultValue = raw === "true" || raw === "是";
+    } else if (row.type === "enum") {
+      if (options?.includes(raw)) defaultValue = raw;
+    } else {
+      defaultValue = raw;
+    }
+  }
+  return {
+    name: row.name.trim(),
+    label: row.label.trim(),
+    type: row.type,
+    ...(row.required ? { required: true } : {}),
+    ...(options ? { options } : {}),
+    ...(defaultValue !== undefined ? { default: defaultValue } : {}),
+  };
+}
+
+/**
+ * P1 技能管理对话框：同一 Dialog 内 list ↔ form 两视图切换（避免嵌套 Dialog）。
+ * editingSkill === null 显示列表；"new" 或技能行显示表单。
+ */
+function SkillsDialog({
+  profile,
+  open,
+  onOpenChange,
+}: {
+  profile: AgentProfileRow | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const api = useTRPC();
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+  const tp = "settings.agent_profiles";
+
+  const [editingSkill, setEditingSkill] = useState<
+    AgentSkillRow | "new" | null
+  >(null);
+  const [form, setForm] = useState<SkillFormState>(emptySkillForm);
+  const skillFileInputRef = useRef<HTMLInputElement>(null);
+
+  const skillsQuery = useQuery(
+    api.agentSkills.list.queryOptions(
+      { profileId: profile?.id ?? "" },
+      { enabled: open && !!profile },
+    ),
+  );
+
+  // 标签/清单（技能语料范围选择用；对话框打开时才拉取）
+  const tagsQuery = useQuery({
+    ...api.tags.list.queryOptions(),
+    enabled: open,
+  });
+  const listsQuery = useQuery({
+    ...api.lists.list.queryOptions(),
+    enabled: open,
+  });
+
+  // 打开时重置到列表视图
+  useEffect(() => {
+    if (open) {
+      setEditingSkill(null);
+    }
+  }, [open]);
+
+  // 进入表单视图时初始化
+  useEffect(() => {
+    if (editingSkill === "new") {
+      setForm(emptySkillForm);
+    } else if (editingSkill) {
+      setForm({
+        name: editingSkill.name,
+        description: editingSkill.description,
+        promptTemplate: editingSkill.promptTemplate,
+        outputHint: editingSkill.outputHint ?? "",
+        scopeTagIds: editingSkill.knowledgeScope?.tagIds ?? [],
+        scopeListIds: editingSkill.knowledgeScope?.listIds ?? [],
+        params: (editingSkill.paramsSchema ?? []).map((p) => ({
+          name: p.name,
+          label: p.label,
+          type: p.type,
+          required: p.required ?? false,
+          options: p.options?.join(", ") ?? "",
+          defaultValue: p.default !== undefined ? String(p.default) : "",
+        })),
+        grantedTools: editingSkill.toolGrant?.tools ?? [],
+        enabled: editingSkill.enabled,
+      });
+    }
+  }, [editingSkill]);
+
+  const invalidateSkills = () =>
+    queryClient.invalidateQueries(api.agentSkills.list.pathFilter());
+
+  const createMutation = useMutation(
+    api.agentSkills.create.mutationOptions({
+      onSuccess: () => {
+        toast.success(t(`${tp}.skill_has_been_created`));
+        invalidateSkills();
+        setEditingSkill(null);
+      },
+      onError: (e) => toast.error(e.message),
+    }),
+  );
+  const updateMutation = useMutation(
+    api.agentSkills.update.mutationOptions({
+      onSuccess: () => {
+        toast.success(t(`${tp}.skill_has_been_updated`));
+        invalidateSkills();
+        setEditingSkill(null);
+      },
+      onError: (e) => toast.error(e.message),
+    }),
+  );
+  const deleteMutation = useMutation(
+    api.agentSkills.delete.mutationOptions({
+      onSuccess: () => invalidateSkills(),
+      onError: (e) => toast.error(e.message),
+    }),
+  );
+
+  // P2 导出：脱敏 JSON 下载（scope 以名称迁移）
+  const exportMutation = useMutation(
+    api.agentSkills.exportSkill.mutationOptions({
+      onSuccess: ({ asset }, variables) => {
+        const skill = skillsQuery.data?.skills.find(
+          (s) => s.id === variables.id,
+        );
+        downloadJsonFile(
+          `saiye-agentSkill-${safeFilenamePart(skill?.name ?? variables.id)}.json`,
+          asset,
+        );
+      },
+      onError: (e) => toast.error(e.message),
+    }),
+  );
+  // P2 导入：挂到当前档案；scope 按名称重匹配
+  const importMutation = useMutation(
+    api.agentSkills.importSkill.mutationOptions({
+      onSuccess: () => {
+        toast.success(t(`${tp}.skill_has_been_imported`));
+        invalidateSkills();
+      },
+      onError: (e) => toast.error(e.message),
+    }),
+  );
+
+  const onSkillImportFile = async (file: File) => {
+    try {
+      const asset = await readJsonFile(file);
+      importMutation.mutate({ profileId: profile!.id, asset: asset as never });
+    } catch {
+      toast.error(t("assets.invalid_file"));
+    }
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile) return;
+    // scope 两者皆空 → null（不收窄）
+    const scope =
+      form.scopeTagIds.length > 0 || form.scopeListIds.length > 0
+        ? { tagIds: form.scopeTagIds, listIds: form.scopeListIds }
+        : null;
+    // P3 参数定义：空行丢弃；enum 必须给出选项；name 不可重复
+    const params = form.params.map(buildSkillParam).filter((p) => p.name);
+    for (const p of params) {
+      if (!p.label) {
+        toast.error(t(`${tp}.skill_param_missing_label`, { name: p.name }));
+        return;
+      }
+      if (p.type === "enum" && (p.options?.length ?? 0) === 0) {
+        toast.error(
+          t(`${tp}.skill_param_enum_requires_options`, { name: p.name }),
+        );
+        return;
+      }
+    }
+    if (new Set(params.map((p) => p.name)).size !== params.length) {
+      toast.error(t(`${tp}.skill_param_duplicate_name`));
+      return;
+    }
+    const base = {
+      name: form.name.trim(),
+      description: form.description.trim(),
+      promptTemplate: form.promptTemplate.trim(),
+      outputHint: form.outputHint.trim() || null,
+      knowledgeScope: scope,
+      paramsSchema: params.length > 0 ? params : null,
+      // P4 工具授权：勾选白名单工具（服务端 zod 再校验）
+      toolGrant:
+        form.grantedTools.length > 0
+          ? {
+              tools: form.grantedTools.filter((t) =>
+                (SKILL_GRANTABLE_TOOLS as readonly string[]).includes(t),
+              ) as SkillToolGrant["tools"],
+              confirmRequired: true,
+            }
+          : null,
+      enabled: form.enabled,
+    };
+    if (editingSkill === "new") {
+      createMutation.mutate({ ...base, profileId: profile.id });
+    } else if (editingSkill) {
+      updateMutation.mutate({ ...base, id: editingSkill.id });
+    }
+  };
+
+  const isFormView = editingSkill !== null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>
+            {isFormView
+              ? editingSkill === "new"
+                ? t(`${tp}.skill_create`)
+                : t(`${tp}.skill_edit`)
+              : `${t(`${tp}.skills`)} · ${profile?.name ?? ""}`}
+          </DialogTitle>
+        </DialogHeader>
+
+        {!isFormView ? (
+          /* ── 列表视图 ── */
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              {t(`${tp}.skills_hint`)}
+            </p>
+            {(skillsQuery.data?.skills.length ?? 0) === 0 ? (
+              <p className="py-4 text-center text-sm text-muted-foreground">
+                {t(`${tp}.skill_empty`)}
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {skillsQuery.data?.skills.map((s) => (
+                  <div
+                    key={s.id}
+                    className="flex items-center gap-2 rounded-lg border p-2.5"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="flex items-center gap-1.5 truncate text-sm font-medium">
+                        <span className="truncate">{s.name}</span>
+                        {s.usageCount > 0 && (
+                          <Badge
+                            variant="secondary"
+                            className="shrink-0 px-1.5 text-[10px]"
+                            title={t(`${tp}.skill_usage_count_hint`)}
+                          >
+                            {s.usageCount}
+                          </Badge>
+                        )}
+                      </p>
+                      <p
+                        className="truncate text-xs text-muted-foreground"
+                        title={s.description}
+                      >
+                        {s.description}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={s.enabled}
+                      disabled={updateMutation.isPending}
+                      onCheckedChange={(v) =>
+                        updateMutation.mutate({
+                          id: s.id,
+                          name: s.name,
+                          description: s.description,
+                          promptTemplate: s.promptTemplate,
+                          outputHint: s.outputHint,
+                          knowledgeScope: s.knowledgeScope,
+                          paramsSchema: s.paramsSchema,
+                          toolGrant: s.toolGrant,
+                          enabled: v,
+                        })
+                      }
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      title={t(`${tp}.skill_export`)}
+                      disabled={exportMutation.isPending}
+                      onClick={() => exportMutation.mutate({ id: s.id })}
+                    >
+                      <Download size={16} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      title={t("actions.edit")}
+                      onClick={() => setEditingSkill(s)}
+                    >
+                      <Pencil size={16} />
+                    </Button>
+                    <ActionConfirmingDialog
+                      title={t("actions.delete")}
+                      description={t(`${tp}.skill_delete_confirm`)}
+                      actionButton={(setOpen) => (
+                        <Button
+                          variant="destructive"
+                          onClick={() => {
+                            deleteMutation.mutate({ id: s.id });
+                            setOpen(false);
+                          }}
+                        >
+                          {t("actions.delete")}
+                        </Button>
+                      )}
+                    >
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </ActionConfirmingDialog>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2">
+              <Button onClick={() => setEditingSkill("new")}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                {t(`${tp}.skill_create`)}
+              </Button>
+              <Button
+                variant="outline"
+                disabled={importMutation.isPending}
+                onClick={() => skillFileInputRef.current?.click()}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                {t(`${tp}.skill_import`)}
+              </Button>
+              <input
+                ref={skillFileInputRef}
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    void onSkillImportFile(file);
+                  }
+                  e.target.value = "";
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          /* ── 表单视图 ── */
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="skill-name">{t(`${tp}.skill_name`)}</Label>
+              <Input
+                id="skill-name"
+                value={form.name}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, name: e.target.value }))
+                }
+                required
+                maxLength={100}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="skill-description">
+                {t(`${tp}.skill_description`)}
+              </Label>
+              <Input
+                id="skill-description"
+                value={form.description}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, description: e.target.value }))
+                }
+                required
+                maxLength={500}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t(`${tp}.skill_description_hint`)}
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="skill-template">
+                {t(`${tp}.skill_template`)}
+              </Label>
+              <Textarea
+                id="skill-template"
+                rows={6}
+                value={form.promptTemplate}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, promptTemplate: e.target.value }))
+                }
+                required
+                maxLength={4000}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t(`${tp}.skill_template_hint`)}
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="skill-output-hint">
+                {t(`${tp}.skill_output_hint`)}
+              </Label>
+              <Input
+                id="skill-output-hint"
+                value={form.outputHint}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, outputHint: e.target.value }))
+                }
+                maxLength={500}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t(`${tp}.skill_output_hint_hint`)}
+              </p>
+            </div>
+            {/* P2 技能级语料范围：点选该技能的当轮与档案范围取交集 */}
+            <div className="space-y-2 rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label>{t(`${tp}.knowledge_scope`)}</Label>
+                <p className="text-xs text-muted-foreground">
+                  {t(`${tp}.skill_scope_hint`)}
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-muted-foreground">
+                  {t(`${tp}.knowledge_scope_tags`)}
+                </p>
+                <div className="flex max-h-28 flex-wrap gap-1.5 overflow-y-auto">
+                  {tagsQuery.data?.tags.length ? (
+                    tagsQuery.data.tags.map((tag) => (
+                      <Badge
+                        key={tag.id}
+                        variant={
+                          form.scopeTagIds.includes(tag.id)
+                            ? "default"
+                            : "outline"
+                        }
+                        className="cursor-pointer select-none"
+                        onClick={() =>
+                          setForm((f) => ({
+                            ...f,
+                            scopeTagIds: f.scopeTagIds.includes(tag.id)
+                              ? f.scopeTagIds.filter((id) => id !== tag.id)
+                              : [...f.scopeTagIds, tag.id],
+                          }))
+                        }
+                      >
+                        {tag.name}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-xs text-muted-foreground">
+                      {t(`${tp}.knowledge_scope_no_tags`)}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-muted-foreground">
+                  {t(`${tp}.knowledge_scope_lists`)}
+                </p>
+                <div className="flex max-h-28 flex-wrap gap-1.5 overflow-y-auto">
+                  {listsQuery.data?.lists.length ? (
+                    listsQuery.data.lists.map((list) => (
+                      <Badge
+                        key={list.id}
+                        variant={
+                          form.scopeListIds.includes(list.id)
+                            ? "default"
+                            : "outline"
+                        }
+                        className="cursor-pointer select-none"
+                        onClick={() =>
+                          setForm((f) => ({
+                            ...f,
+                            scopeListIds: f.scopeListIds.includes(list.id)
+                              ? f.scopeListIds.filter((id) => id !== list.id)
+                              : [...f.scopeListIds, list.id],
+                          }))
+                        }
+                      >
+                        {list.name}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-xs text-muted-foreground">
+                      {t(`${tp}.knowledge_scope_no_lists`)}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            {/* P3 参数定义：模板 {{参数名}} 占位，咨询者点选技能时填写 */}
+            <div className="space-y-2 rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label>{t(`${tp}.skill_params`)}</Label>
+                <p className="text-xs text-muted-foreground">
+                  {t(`${tp}.skill_params_hint`)}
+                </p>
+              </div>
+              {form.params.map((row, idx) => (
+                <div key={idx} className="space-y-1.5 rounded-md border p-2">
+                  <div className="flex items-center gap-1.5">
+                    <Input
+                      placeholder={t(`${tp}.skill_param_name`)}
+                      value={row.name}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          params: f.params.map((r, i) =>
+                            i === idx ? { ...r, name: e.target.value } : r,
+                          ),
+                        }))
+                      }
+                      maxLength={50}
+                      className="h-8"
+                    />
+                    <Input
+                      placeholder={t(`${tp}.skill_param_label`)}
+                      value={row.label}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          params: f.params.map((r, i) =>
+                            i === idx ? { ...r, label: e.target.value } : r,
+                          ),
+                        }))
+                      }
+                      maxLength={100}
+                      className="h-8"
+                    />
+                    <Select
+                      value={row.type}
+                      onValueChange={(v) =>
+                        setForm((f) => ({
+                          ...f,
+                          params: f.params.map((r, i) =>
+                            i === idx
+                              ? { ...r, type: v as SkillParam["type"] }
+                              : r,
+                          ),
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="h-8 w-24 shrink-0">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="string">string</SelectItem>
+                        <SelectItem value="number">number</SelectItem>
+                        <SelectItem value="boolean">boolean</SelectItem>
+                        <SelectItem value="enum">enum</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <label
+                      className="flex shrink-0 cursor-pointer items-center gap-1 text-xs text-muted-foreground"
+                      title={t(`${tp}.skill_param_required`)}
+                    >
+                      <Switch
+                        checked={row.required}
+                        onCheckedChange={(v) =>
+                          setForm((f) => ({
+                            ...f,
+                            params: f.params.map((r, i) =>
+                              i === idx ? { ...r, required: v } : r,
+                            ),
+                          }))
+                        }
+                      />
+                      {t(`${tp}.skill_param_required`)}
+                    </label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      onClick={() =>
+                        setForm((f) => ({
+                          ...f,
+                          params: f.params.filter((_, i) => i !== idx),
+                        }))
+                      }
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {row.type === "enum" && (
+                      <Input
+                        placeholder={t(`${tp}.skill_param_options`)}
+                        value={row.options}
+                        onChange={(e) =>
+                          setForm((f) => ({
+                            ...f,
+                            params: f.params.map((r, i) =>
+                              i === idx ? { ...r, options: e.target.value } : r,
+                            ),
+                          }))
+                        }
+                        className="h-8 flex-1"
+                      />
+                    )}
+                    <Input
+                      placeholder={t(`${tp}.skill_param_default`)}
+                      value={row.defaultValue}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          params: f.params.map((r, i) =>
+                            i === idx
+                              ? { ...r, defaultValue: e.target.value }
+                              : r,
+                          ),
+                        }))
+                      }
+                      className="h-8 flex-1"
+                    />
+                  </div>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={form.params.length >= 10}
+                onClick={() =>
+                  setForm((f) => ({
+                    ...f,
+                    params: [...f.params, emptyParamRow],
+                  }))
+                }
+              >
+                <PlusCircle className="mr-1 h-3.5 w-3.5" />
+                {t(`${tp}.skill_param_add`)}
+              </Button>
+            </div>
+            {/* P4 工具授权：白名单工具勾选，点选技能的当轮临时解锁 */}
+            <div className="space-y-2 rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label>{t(`${tp}.skill_tools`)}</Label>
+                <p className="text-xs text-muted-foreground">
+                  {t(`${tp}.skill_tools_hint`)}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {SKILL_GRANTABLE_TOOLS.map((tool) => (
+                  <Badge
+                    key={tool}
+                    variant={
+                      form.grantedTools.includes(tool) ? "default" : "outline"
+                    }
+                    className="cursor-pointer select-none"
+                    onClick={() =>
+                      setForm((f) => ({
+                        ...f,
+                        grantedTools: f.grantedTools.includes(tool)
+                          ? f.grantedTools.filter((t) => t !== tool)
+                          : [...f.grantedTools, tool],
+                      }))
+                    }
+                  >
+                    {t(`${tp}.skill_tool_${tool}`)}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label>{t(`${tp}.skill_enabled`)}</Label>
+                <p className="text-xs text-muted-foreground">
+                  {t(`${tp}.skill_enabled_hint`)}
+                </p>
+              </div>
+              <Switch
+                checked={form.enabled}
+                onCheckedChange={(v) => setForm((f) => ({ ...f, enabled: v }))}
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setEditingSkill(null)}
+              >
+                {t(`${tp}.skill_back`)}
+              </Button>
+              <Button
+                type="submit"
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
+                {t("actions.save")}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function AgentProfileSettings() {
   const api = useTRPC();
   const queryClient = useQueryClient();
@@ -641,6 +1425,9 @@ export default function AgentProfileSettings() {
   const [editing, setEditing] = useState<AgentProfileRow | null>(null);
   const [publishingProfile, setPublishingProfile] =
     useState<AgentProfileRow | null>(null);
+  const [skillsProfile, setSkillsProfile] = useState<AgentProfileRow | null>(
+    null,
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const invalidatePublications = () =>
@@ -816,6 +1603,15 @@ export default function AgentProfileSettings() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
+                        title={t(`${tp}.skills`)}
+                        onClick={() => setSkillsProfile(p)}
+                      >
+                        <Zap size={16} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
                         onClick={() => {
                           setEditing(p);
                           setDialogOpen(true);
@@ -909,6 +1705,14 @@ export default function AgentProfileSettings() {
         open={!!publishingProfile}
         onOpenChange={(o) => {
           if (!o) setPublishingProfile(null);
+        }}
+      />
+
+      <SkillsDialog
+        profile={skillsProfile}
+        open={!!skillsProfile}
+        onOpenChange={(o) => {
+          if (!o) setSkillsProfile(null);
         }}
       />
     </>

@@ -54,7 +54,7 @@ export default function ChatPageClient() {
   }, []);
 
   return (
-    <div className="flex h-[calc(100vh-64px)]">
+    <div className="flex h-[calc(100vh-var(--header-height))]">
       <ChatSessionList currentSessionId={sessionId} onSelect={setSessionId} />
       <div className="flex-1">
         <ChatPanel sessionId={sessionId} onSessionCreated={setSessionId} />

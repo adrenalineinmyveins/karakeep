@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { signIn } from "@/lib/auth/client";
 import { useClientConfig } from "@/lib/clientConfig";
+import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, Lock } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -26,9 +27,6 @@ const signInSchema = z.object({
   password: z.string(),
 });
 
-const SIGNIN_FAILED = "Incorrect email or password";
-const OAUTH_FAILED = "OAuth login failed: ";
-
 const VERIFY_EMAIL_ERROR = "Please verify your email address before signing in";
 
 export default function CredentialsForm() {
@@ -36,10 +34,11 @@ export default function CredentialsForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const clientConfig = useClientConfig();
+  const { t } = useTranslation();
 
   const oAuthError = searchParams.get("error");
   if (oAuthError && !signinError) {
-    setSigninError(`${OAUTH_FAILED} ${oAuthError}`);
+    setSigninError(t("signin.oauth_failed", { error: oAuthError }));
   }
 
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -61,9 +60,7 @@ export default function CredentialsForm() {
         )}
         <Alert>
           <Lock className="h-4 w-4" />
-          <AlertTitle>
-            Password authentication is currently disabled.
-          </AlertTitle>
+          <AlertTitle>{t("signin.password_auth_disabled")}</AlertTitle>
         </Alert>
       </div>
     );
@@ -80,14 +77,15 @@ export default function CredentialsForm() {
               password: value.password,
             });
             if (!resp || !resp?.ok || resp.error) {
+              const signinFailed = t("signin.incorrect_credentials");
               if (resp?.error === "CredentialsSignin") {
-                setSigninError(SIGNIN_FAILED);
+                setSigninError(signinFailed);
               } else if (resp?.error === VERIFY_EMAIL_ERROR) {
                 router.replace(
                   `/check-email?email=${encodeURIComponent(value.email.trim())}`,
                 );
               } else {
-                setSigninError(resp?.error ?? SIGNIN_FAILED);
+                setSigninError(resp?.error ?? signinFailed);
               }
               return;
             }
@@ -107,13 +105,13 @@ export default function CredentialsForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("signin.email")}</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
                     autoComplete="email"
                     spellCheck={false}
-                    placeholder="Enter your email"
+                    placeholder={t("signin.email_placeholder")}
                     {...field}
                   />
                 </FormControl>
@@ -127,12 +125,12 @@ export default function CredentialsForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t("signin.password")}</FormLabel>
                 <FormControl>
                   <Input
                     type="password"
                     autoComplete="current-password"
-                    placeholder="Enter your password"
+                    placeholder={t("signin.password_placeholder")}
                     {...field}
                   />
                 </FormControl>
@@ -147,7 +145,7 @@ export default function CredentialsForm() {
             loading={form.formState.isSubmitting}
             className="w-full"
           >
-            Sign In
+            {t("signin.sign_in")}
           </ActionButton>
 
           <div className="text-center">
@@ -155,7 +153,7 @@ export default function CredentialsForm() {
               href="/forgot-password"
               className="text-sm text-muted-foreground underline hover:text-primary"
             >
-              Forgot your password?
+              {t("signin.forgot_password_title")}
             </Link>
           </div>
         </form>
@@ -163,12 +161,12 @@ export default function CredentialsForm() {
 
       <div className="text-center">
         <p className="text-sm text-gray-600">
-          Don&apos;t have an account?{" "}
+          {t("signin.no_account")}{" "}
           <Link
             href="/signup"
             className="font-medium text-blue-600 hover:text-blue-500"
           >
-            Sign up
+            {t("signup.submit")}
           </Link>
         </p>
       </div>

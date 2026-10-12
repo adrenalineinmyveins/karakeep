@@ -1,4 +1,4 @@
-﻿################# Monolith Builder ##############
+################# Monolith Builder ##############
 FROM rust:1-bookworm AS monolith_builder
 
 # Use USTC apt mirror for reliable downloads in China
@@ -80,12 +80,11 @@ RUN cd packages/db && \
 
 
 # Compile the web app
-# next build 需拉 Google Fonts：当前容器直连 fonts.googleapis.com 可达（实测 200），
-# 不再内联代理——宿主 Clash(7897) 已不在线，指向死代理反而构建失败。
-# 若日后直连又失败：在本 RUN 内联回 HTTP_PROXY/HTTPS_PROXY=http://host.docker.internal:7897
-# + NODE_USE_ENV_PROXY=1（Node 24 fetch 需显式启用 env 代理）；
+# next build 需拉 Google Fonts：容器直连 fonts.googleapis.com 已不可达，
+# 宿主 Clash(7897) 在线，故在本 RUN 内联代理（Node 24 fetch 需 NODE_USE_ENV_PROXY=1）；
 # 不可用 --build-arg 传代理（预定义代理 build-arg 会注入所有 RUN，污染 install 层）。
-RUN (cd apps/web && pnpm --config.verify-deps-before-run=false exec next build --experimental-build-mode compile)
+# 若宿主 Clash 下线：删掉内联的 HTTP_PROXY/HTTPS_PROXY/NODE_USE_ENV_PROXY 再构建。
+RUN (cd apps/web && HTTP_PROXY=http://host.docker.internal:7897 HTTPS_PROXY=http://host.docker.internal:7897 NODE_USE_ENV_PROXY=1 pnpm --config.verify-deps-before-run=false exec next build --experimental-build-mode compile)
 
 # Build the worker code
 RUN (cd apps/workers && pnpm --config.verify-deps-before-run=false build)
@@ -226,7 +225,8 @@ RUN find /etc/s6-overlay -type f -exec sed -i 's/\r$//' {} + \
     /etc/s6-overlay/s6-rc.d/user/contents.d/svc-web \
     /etc/s6-overlay/s6-rc.d/user/contents.d/svc-workers
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD wget --no-verbose --tries=1 --spider "http://127.0.0.1:${PORT:-3000}/api/health" || exit 1
+# 镜像内只有 curl 没有 wget（node:slim），用 curl 做 healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/health" || exit 1
 
 ################# The web container ##############
 
@@ -236,7 +236,7 @@ RUN touch /etc/s6-overlay/s6-rc.d/user/contents.d/init-db-migration \
     /etc/s6-overlay/s6-rc.d/user/contents.d/svc-web
 ENV USING_LEGACY_SEPARATE_CONTAINERS=true
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD wget --no-verbose --tries=1 --spider "http://127.0.0.1:${PORT:-3000}/api/health" || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/health" || exit 1
 
 ################# The workers container ##############
 

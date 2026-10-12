@@ -82,7 +82,7 @@ function ApplyAllButton({ suggestions }: { suggestions: Suggestion[] }) {
     await Promise.all(promises)
       .then(() => {
         toast({
-          description: "All suggestions has been applied!",
+          description: t("cleanups.duplicate_tags.all_applied"),
         });
       })
       .catch(() => ({}))
@@ -95,7 +95,9 @@ function ApplyAllButton({ suggestions }: { suggestions: Suggestion[] }) {
   return (
     <ActionConfirmingDialog
       title={t("cleanups.duplicate_tags.merge_all_suggestions")}
-      description={`Are you sure you want to apply all ${suggestions.length} suggestions?`}
+      description={t("cleanups.duplicate_tags.apply_all_confirm", {
+        count: suggestions.length,
+      })}
       actionButton={(setDialogOpen) => (
         <ActionButton
           loading={applying}
@@ -128,7 +130,7 @@ function SuggestionRow({
   const { mutate, isPending } = useMergeTag({
     onSuccess: () => {
       toast({
-        description: "Tags have been merged!",
+        description: t("cleanups.duplicate_tags.tags_merged"),
       });
     },
     onError: (e) => {

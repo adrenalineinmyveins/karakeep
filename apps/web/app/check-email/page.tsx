@@ -14,10 +14,12 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, Mail } from "lucide-react";
 
+import { useTranslation } from "@/lib/i18n/client";
 import { useTRPC } from "@saiye/shared-react/trpc";
 import { validateRedirectUrl } from "@saiye/shared/utils/redirectUrl";
 
 export default function CheckEmailPage() {
+  const { t } = useTranslation();
   const api = useTRPC();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -30,12 +32,10 @@ export default function CheckEmailPage() {
   const resendEmailMutation = useMutation(
     api.users.resendVerificationEmail.mutationOptions({
       onSuccess: () => {
-        setMessage(
-          "A new verification email has been sent to your email address.",
-        );
+        setMessage(t("email_verification.resend_sent"));
       },
       onError: (error) => {
-        setMessage(error.message || "Failed to resend verification email.");
+        setMessage(error.message || t("email_verification.resend_failed"));
       },
     }),
   );
@@ -56,15 +56,15 @@ export default function CheckEmailPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">
-              Invalid Request
+              {t("email_verification.invalid_request")}
             </CardTitle>
             <CardDescription>
-              No email address provided. Please try signing up again.
+              {t("email_verification.no_email_provided")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={handleBackToSignIn} className="w-full">
-              Back to Sign In
+              {t("email_verification.back_to_sign_in")}
             </Button>
           </CardContent>
         </Card>
@@ -76,10 +76,10 @@ export default function CheckEmailPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Check Your Email</CardTitle>
-          <CardDescription>
-            We&apos;ve sent a verification link to your email address
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            {t("email_verification.check_your_email")}
+          </CardTitle>
+          <CardDescription>{t("email_verification.sent_link")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-center">
@@ -88,12 +88,11 @@ export default function CheckEmailPage() {
 
           <div className="space-y-2 text-center">
             <p className="text-sm text-muted-foreground">
-              We&apos;ve sent a verification email to:
+              {t("email_verification.sent_to")}
             </p>
             <p className="font-medium text-foreground">{email}</p>
             <p className="text-sm text-muted-foreground">
-              Click the link in the email to verify your account and complete
-              your registration.
+              {t("email_verification.click_link_instructions")}
             </p>
           </div>
 
@@ -115,10 +114,10 @@ export default function CheckEmailPage() {
               {resendEmailMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sending...
+                  {t("email_verification.sending")}
                 </>
               ) : (
-                "Resend Verification Email"
+                t("email_verification.resend_verification_email")
               )}
             </Button>
             <Button
@@ -126,7 +125,7 @@ export default function CheckEmailPage() {
               variant="ghost"
               className="w-full"
             >
-              Back to Sign In
+              {t("email_verification.back_to_sign_in")}
             </Button>
           </div>
         </CardContent>

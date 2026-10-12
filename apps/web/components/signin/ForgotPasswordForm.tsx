@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
@@ -35,6 +36,7 @@ const forgotPasswordSchema = z.object({
 
 export default function ForgotPasswordForm() {
   const api = useTRPC();
+  const { t } = useTranslation();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
@@ -56,7 +58,7 @@ export default function ForgotPasswordForm() {
       if (error instanceof TRPCClientError) {
         setErrorMessage(error.message);
       } else {
-        setErrorMessage("An unexpected error occurred. Please try again.");
+        setErrorMessage(t("signin.forgot_password.unexpected_error"));
       }
     }
   };
@@ -65,12 +67,14 @@ export default function ForgotPasswordForm() {
     <Card className="w-full">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">
-          {isSubmitted ? "Check your email" : "Forgot your password?"}
+          {isSubmitted
+            ? t("signin.forgot_password.check_email_title")
+            : t("signin.forgot_password_title")}
         </CardTitle>
         <CardDescription>
           {isSubmitted
-            ? "If an account with that email exists, we've sent you a password reset link."
-            : "Enter your email address and we'll send you a link to reset your password."}
+            ? t("signin.forgot_password.submitted_description")
+            : t("signin.forgot_password.description")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -81,8 +85,7 @@ export default function ForgotPasswordForm() {
             </div>
             <Alert>
               <AlertDescription className="text-center">
-                If an account with that email exists, we&apos;ve sent you a
-                password reset link.
+                {t("signin.forgot_password.submitted_description")}
               </AlertDescription>
             </Alert>
             <ActionButton
@@ -91,7 +94,7 @@ export default function ForgotPasswordForm() {
               onClick={() => router.push("/signin")}
               className="w-full"
             >
-              Back to Sign In
+              {t("signin.back_to_signin")}
             </ActionButton>
           </>
         ) : (
@@ -113,11 +116,11 @@ export default function ForgotPasswordForm() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("signin.email")}</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="Enter your email address"
+                          placeholder={t("signin.email_placeholder")}
                           {...field}
                         />
                       </FormControl>
@@ -131,7 +134,7 @@ export default function ForgotPasswordForm() {
                   loading={form.formState.isSubmitting}
                   className="w-full"
                 >
-                  Send Reset Link
+                  {t("signin.forgot_password.send_reset_link")}
                 </ActionButton>
               </form>
             </Form>
@@ -143,7 +146,7 @@ export default function ForgotPasswordForm() {
                 onClick={() => router.push("/signin")}
                 className="w-full"
               >
-                Back to Sign In
+                {t("signin.back_to_signin")}
               </ActionButton>
             </div>
           </>

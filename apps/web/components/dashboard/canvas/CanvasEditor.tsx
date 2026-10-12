@@ -240,7 +240,7 @@ export default function CanvasEditor({
       className={
         embedded
           ? "flex h-screen flex-col"
-          : "flex h-[calc(100vh-64px)] flex-col"
+          : "flex h-[calc(100vh-var(--header-height))] flex-col"
       }
     >
       <div className="flex items-center gap-3 border-b px-4 py-2">

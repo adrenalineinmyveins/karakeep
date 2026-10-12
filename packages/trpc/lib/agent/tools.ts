@@ -12,6 +12,7 @@ import { zNewFeedSchema } from "@saiye/shared/types/feeds";
 import { zUpdateUserSettingsSchema } from "@saiye/shared/types/users";
 import { zWidgetPermissionSchema } from "@saiye/shared/types/widgets";
 import type { ZWidgetPermission } from "@saiye/shared/types/widgets";
+import { SKILL_GRANTABLE_TOOLS } from "@saiye/shared/types/agentSkills";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -1643,5 +1644,70 @@ export async function buildConsultationTools(
       };
     }
     return t;
+  });
+}
+
+// ── P4 技能授权工具（咨询会话内受控写权限） ───────────
+
+/**
+ * P4 技能授权：点选带 toolGrant 的技能后，当轮把咨询工具集中的
+ * 白名单工具从「黑名单错误执行器」替换为以**咨询者** caller 身份
+ * 构建的真实执行器——产物（widget 等）自然归属咨询者名下，而非
+ * 专家（专家提供能力，不提供存储）。
+ *
+ * 白名单双保险：入参在 zod 层已限定 SKILL_GRANTABLE_TOOLS 枚举，
+ * 此处再做一次过滤，防调用方绕过 schema 直接传任意工具名。
+ *
+ * @param ctx 咨询者的 tRPC 上下文（借用 db 实例）
+ * @param consulteeUserId 咨询者（工具执行身份与产物归属）
+ * @param consultationTools 咨询工具集（buildConsultationTools 产物）
+ * @param grantedTools 技能声明的授权工具名
+ */
+export async function withSkillGrantedTools(
+  ctx: Context,
+  consulteeUserId: string,
+  consultationTools: ToolDefinition[],
+  grantedTools: string[],
+): Promise<ToolDefinition[]> {
+  const validGrants = grantedTools.filter((name) =>
+    (SKILL_GRANTABLE_TOOLS as readonly string[]).includes(name),
+  );
+  if (validGrants.length === 0) {
+    return consultationTools;
+  }
+
+  const [consultee] = await ctx.db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+    })
+    .from(users)
+    .where(eq(users.id, consulteeUserId))
+    .limit(1);
+  if (!consultee) {
+    throw new Error(`Consultee not found: ${consulteeUserId}`);
+  }
+
+  // 以咨询者身份构建全套工具后只取授权项（执行器与个人会话完全
+  // 一致，避免复制定义导致漂移），再按名替换进咨询工具集
+  const consulteeCtx: Context = { ...ctx, user: consultee };
+  const consulteeTools = await buildAgentTools(consulteeCtx);
+  const grantedByName = new Map(
+    consulteeTools
+      .filter((t) => validGrants.includes(t.name))
+      .map((t) => [t.name, t] as const),
+  );
+
+  return consultationTools.map((t) => {
+    const granted = grantedByName.get(t.name);
+    if (!granted) {
+      return t;
+    }
+    return {
+      ...granted,
+      description: `${granted.description}\n注意：本工具由咨询技能授权，操作的是咨询者自己的账号，产物保存在咨询者名下。`,
+    };
   });
 }

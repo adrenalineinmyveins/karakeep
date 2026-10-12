@@ -109,7 +109,9 @@ export function ActionBuilder({ value, onChange }: ActionBuilderProps) {
     <div className="space-y-3">
       {value.length === 0 ? (
         <div className="rounded-md border border-dashed p-4 text-center">
-          <p className="text-sm text-muted-foreground">No actions added yet</p>
+          <p className="text-sm text-muted-foreground">
+            {t("settings.rules.no_actions_yet")}
+          </p>
         </div>
       ) : (
         value.map((action, index) => (
@@ -210,7 +212,7 @@ export function ActionBuilder({ value, onChange }: ActionBuilderProps) {
         className="w-full"
       >
         <PlusCircle className="mr-2 h-4 w-4" />
-        Add Action
+        {t("settings.rules.add_action")}
       </Button>
     </div>
   );

@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/lib/i18n/client";
 import { toast } from "@/components/ui/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -42,6 +43,7 @@ export default function ResetPasswordDialog({
   userId,
 }: ResetPasswordDialogProps) {
   const api = useTRPC();
+  const { t } = useTranslation();
   const [isOpen, onOpenChange] = useState(false);
   const form = useForm<ResetPasswordSchema>({
     resolver: zodResolver(resetPasswordSchema),
@@ -55,7 +57,7 @@ export default function ResetPasswordDialog({
     api.admin.resetPassword.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Password reset successfully",
+          description: t("admin.users_dialogs.password_reset"),
         });
         onOpenChange(false);
       },
@@ -68,7 +70,7 @@ export default function ResetPasswordDialog({
         } else {
           toast({
             variant: "destructive",
-            description: "Failed to reset password",
+            description: t("admin.users_dialogs.password_reset_failed"),
           });
         }
       },
@@ -86,7 +88,7 @@ export default function ResetPasswordDialog({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Reset Password</DialogTitle>
+          <DialogTitle>{t("admin.users_list.reset_password")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit((val) => mutate(val))}>
@@ -96,11 +98,13 @@ export default function ResetPasswordDialog({
                 name="newPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>New Password</FormLabel>
+                    <FormLabel>
+                      {t("admin.users_dialogs.new_password")}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="New Password"
+                        placeholder={t("admin.users_dialogs.new_password")}
                         {...field}
                         className="w-full rounded border p-2"
                       />
@@ -114,11 +118,15 @@ export default function ResetPasswordDialog({
                 name="newPasswordConfirm"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm New Password</FormLabel>
+                    <FormLabel>
+                      {t("admin.users_dialogs.confirm_new_password")}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Confirm New Password"
+                        placeholder={t(
+                          "admin.users_dialogs.confirm_new_password",
+                        )}
                         {...field}
                         className="w-full rounded border p-2"
                       />
@@ -130,7 +138,7 @@ export default function ResetPasswordDialog({
               <DialogFooter className="sm:justify-end">
                 <DialogClose asChild>
                   <Button type="button" variant="secondary">
-                    Close
+                    {t("actions.close")}
                   </Button>
                 </DialogClose>
                 <ActionButton
@@ -138,7 +146,7 @@ export default function ResetPasswordDialog({
                   loading={isPending}
                   disabled={isPending}
                 >
-                  Reset
+                  {t("admin.users_dialogs.reset")}
                 </ActionButton>
               </DialogFooter>
             </div>

@@ -43,18 +43,18 @@ export function ChangePassword() {
   const mutator = useMutation(
     api.users.changePassword.mutationOptions({
       onSuccess: () => {
-        toast({ description: "Password changed successfully" });
+        toast({ description: t("settings.info.password_changed") });
         form.reset();
       },
       onError: (e) => {
         if (e.data?.code == "UNAUTHORIZED") {
           toast({
-            description: "Your current password is incorrect",
+            description: t("settings.info.current_password_incorrect"),
             variant: "destructive",
           });
         } else {
           toast({
-            description: "Something went wrong",
+            description: t("common.something_went_wrong"),
             variant: "destructive",
           });
         }
@@ -70,7 +70,7 @@ export function ChangePassword() {
   }
 
   return (
-    <SettingsSection title="Security">
+    <SettingsSection title={t("settings.security")}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -101,7 +101,9 @@ export function ChangePassword() {
                     size="sm"
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     aria-label={
-                      showCurrentPassword ? "Hide password" : "Show password"
+                      showCurrentPassword
+                        ? t("common.hide_password")
+                        : t("common.show_password")
                     }
                     aria-controls="current-password"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
@@ -147,7 +149,9 @@ export function ChangePassword() {
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       aria-label={
-                        showNewPassword ? "Hide password" : "Show password"
+                        showNewPassword
+                          ? t("common.hide_password")
+                          : t("common.show_password")
                       }
                       aria-controls="new-password"
                       onClick={() => setShowNewPassword(!showNewPassword)}
@@ -192,7 +196,9 @@ export function ChangePassword() {
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       aria-label={
-                        showConfirmPassword ? "Hide password" : "Show password"
+                        showConfirmPassword
+                          ? t("common.hide_password")
+                          : t("common.show_password")
                       }
                       aria-controls="confirm-password"
                       onClick={() =>

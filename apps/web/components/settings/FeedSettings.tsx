@@ -89,7 +89,7 @@ export function FeedsEditorDialog() {
     api.feeds.create.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Feed has been created!",
+          description: t("settings.feeds.feed_created"),
         });
         queryClient.invalidateQueries(api.feeds.list.pathFilter());
         setOpen(false);
@@ -107,7 +107,7 @@ export function FeedsEditorDialog() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Subscribe to a new Feed</DialogTitle>
+          <DialogTitle>{t("settings.feeds.subscribe_to_new_feed")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -124,9 +124,13 @@ export function FeedsEditorDialog() {
               render={({ field }) => {
                 return (
                   <FormItem className="flex-1">
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>{t("common.name")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Feed Name" type="text" {...field} />
+                      <Input
+                        placeholder={t("settings.feeds.feed_name_placeholder")}
+                        type="text"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -139,9 +143,13 @@ export function FeedsEditorDialog() {
               render={({ field }) => {
                 return (
                   <FormItem className="flex-1">
-                    <FormLabel>URL</FormLabel>
+                    <FormLabel>{t("common.url")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Feed URL" type="text" {...field} />
+                      <Input
+                        placeholder={t("settings.feeds.feed_url_placeholder")}
+                        type="text"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -155,9 +163,9 @@ export function FeedsEditorDialog() {
                 return (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                     <div className="space-y-0.5">
-                      <FormLabel>Import Tags</FormLabel>
+                      <FormLabel>{t("settings.feeds.import_tags")}</FormLabel>
                       <div className="text-sm text-muted-foreground">
-                        Automatically import categories from RSS feed as tags
+                        {t("settings.feeds.import_tags_description")}
                       </div>
                     </div>
                     <FormControl>
@@ -175,7 +183,7 @@ export function FeedsEditorDialog() {
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="secondary">
-              Close
+              {t("actions.close")}
             </Button>
           </DialogClose>
           <ActionButton
@@ -187,7 +195,7 @@ export function FeedsEditorDialog() {
             className="items-center"
           >
             <Plus className="mr-2 size-4" />
-            Add
+            {t("actions.add")}
           </ActionButton>
         </DialogFooter>
       </DialogContent>
@@ -214,7 +222,7 @@ export function EditFeedDialog({ feed }: { feed: ZFeed }) {
     api.feeds.update.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Feed has been updated!",
+          description: t("settings.feeds.feed_updated"),
         });
         setOpen(false);
         queryClient.invalidateQueries(api.feeds.list.pathFilter());
@@ -244,7 +252,7 @@ export function EditFeedDialog({ feed }: { feed: ZFeed }) {
       </Tooltip>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Feed</DialogTitle>
+          <DialogTitle>{t("settings.feeds.edit_feed")}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -276,7 +284,11 @@ export function EditFeedDialog({ feed }: { feed: ZFeed }) {
                   <FormItem className="flex-1">
                     <FormLabel>{t("common.name")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Feed name" type="text" {...field} />
+                      <Input
+                        placeholder={t("settings.feeds.feed_name_placeholder")}
+                        type="text"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -291,7 +303,11 @@ export function EditFeedDialog({ feed }: { feed: ZFeed }) {
                   <FormItem className="flex-1">
                     <FormLabel>{t("common.url")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Feed url" type="text" {...field} />
+                      <Input
+                        placeholder={t("settings.feeds.feed_url_placeholder")}
+                        type="text"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -305,9 +321,9 @@ export function EditFeedDialog({ feed }: { feed: ZFeed }) {
                 return (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                     <div className="space-y-0.5">
-                      <FormLabel>Import Tags</FormLabel>
+                      <FormLabel>{t("settings.feeds.import_tags")}</FormLabel>
                       <div className="text-sm text-muted-foreground">
-                        Automatically import categories from RSS feed as tags
+                        {t("settings.feeds.import_tags_description")}
                       </div>
                     </div>
                     <FormControl>
@@ -353,7 +369,7 @@ export function FeedRow({ feed }: { feed: ZFeed }) {
     api.feeds.delete.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Feed has been deleted!",
+          description: t("settings.feeds.feed_deleted"),
         });
         queryClient.invalidateQueries(api.feeds.list.pathFilter());
       },
@@ -364,7 +380,7 @@ export function FeedRow({ feed }: { feed: ZFeed }) {
     api.feeds.fetchNow.mutationOptions({
       onSuccess: () => {
         toast({
-          description: "Feed fetch has been enqueued!",
+          description: t("settings.feeds.feed_fetch_enqueued"),
         });
         queryClient.invalidateQueries(api.feeds.list.pathFilter());
       },
@@ -383,7 +399,9 @@ export function FeedRow({ feed }: { feed: ZFeed }) {
       },
       onError: (error) => {
         toast({
-          description: `Error: ${error.message}`,
+          description: t("common.error_message", {
+            message: error.message,
+          }),
           variant: "destructive",
         });
       },
@@ -415,15 +433,15 @@ export function FeedRow({ feed }: { feed: ZFeed }) {
       </TableCell>
       <TableCell>
         {feed.lastFetchedStatus === "success" ? (
-          <span title="Successful">
+          <span title={t("settings.feeds.status_successful")}>
             <CheckCircle />
           </span>
         ) : feed.lastFetchedStatus === "failure" ? (
-          <span title="Failed">
+          <span title={t("settings.feeds.status_failed")}>
             <XCircle />
           </span>
         ) : (
-          <span title="Pending">
+          <span title={t("settings.feeds.status_pending")}>
             <CircleDashed name="Pending" />
           </span>
         )}
@@ -445,8 +463,10 @@ export function FeedRow({ feed }: { feed: ZFeed }) {
           <TooltipContent>{t("actions.fetch_now")}</TooltipContent>
         </Tooltip>
         <ActionConfirmingDialog
-          title={`Delete Feed "${feed.name}"?`}
-          description={`Are you sure you want to delete the feed "${feed.name}"?`}
+          title={t("settings.feeds.delete_feed_title", { name: feed.name })}
+          description={t("settings.feeds.delete_feed_description", {
+            name: feed.name,
+          })}
           actionButton={() => (
             <ActionButton
               loading={isDeleting}
@@ -482,7 +502,7 @@ export default function FeedSettings() {
         {isLoading && <FullPageSpinner />}
         {feeds && feeds.feeds.length == 0 && (
           <p className="rounded-md bg-muted p-3 text-center text-sm text-muted-foreground">
-            You don&apos;t have any RSS subscriptions yet.
+            {t("settings.feeds.no_rss_subscriptions")}
           </p>
         )}
         {feeds && feeds.feeds.length > 0 && (
@@ -491,8 +511,8 @@ export default function FeedSettings() {
               <TableRow>
                 <TableHead>{t("common.name")}</TableHead>
                 <TableHead>{t("common.url")}</TableHead>
-                <TableHead>Last Fetch</TableHead>
-                <TableHead>Last Status</TableHead>
+                <TableHead>{t("settings.feeds.last_fetch")}</TableHead>
+                <TableHead>{t("settings.feeds.last_status")}</TableHead>
                 <TableHead>{t("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>

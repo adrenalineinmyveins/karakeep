@@ -151,13 +151,15 @@ export default function ChatPanel({
         )}
       </div>
 
-      {/* 输入区域（咨询会话开启「引用我的笔记」：显式选择暴露给专家的内容） */}
+      {/* 输入区域（咨询会话开启「引用我的笔记」与「点选专家技能」） */}
       <ChatInput
         onSend={sendMessage}
         onAbort={abort}
         isStreaming={isStreaming}
         disabled={!sessionId}
         enableAttach={!!sessionData?.session.publicationId}
+        enableSkills={!!sessionData?.session.publicationId}
+        publicationId={sessionData?.session.publicationId ?? null}
       />
     </div>
   );

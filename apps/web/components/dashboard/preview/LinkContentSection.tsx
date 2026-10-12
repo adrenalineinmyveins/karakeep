@@ -45,16 +45,17 @@ import ReaderView from "./ReaderView";
 import SavedPageOverview from "./SavedPageOverview";
 
 function CustomRendererErrorFallback({ error }: { error: Error }) {
+  const { t } = useTranslation();
   return (
     <div className="flex h-full w-full items-center justify-center p-4">
       <Alert variant="destructive" className="max-w-md">
         <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>Renderer Error</AlertTitle>
+        <AlertTitle>{t("preview.renderer_error")}</AlertTitle>
         <AlertDescription>
-          Failed to load custom content renderer.{" "}
+          {t("preview.renderer_failed")}{" "}
           <details className="mt-2">
             <summary className="cursor-pointer text-xs">
-              Technical details
+              {t("preview.technical_details")}
             </summary>
             <code className="mt-1 block text-xs">{error.message}</code>
           </details>
@@ -94,13 +95,14 @@ function ScreenshotSection({ link }: { link: ZBookmarkedLink }) {
 }
 
 function VideoSection({ link }: { link: ZBookmarkedLink }) {
+  const { t } = useTranslation();
   return (
     <div className="relative h-full w-full overflow-hidden">
       <div className="absolute inset-0 h-full w-full">
         {/* eslint-disable-next-line jsx-a11y/media-has-caption -- captions not (yet) available */}
         <video className="m-auto max-h-full max-w-full" controls>
           <source src={`/api/assets/${link.videoAssetId}`} />
-          Not supported by your browser
+          {t("preview.not_supported")}
         </video>
       </div>
     </div>
@@ -108,9 +110,10 @@ function VideoSection({ link }: { link: ZBookmarkedLink }) {
 }
 
 function PDFSection({ link }: { link: ZBookmarkedLink }) {
+  const { t } = useTranslation();
   return (
     <iframe
-      title="PDF Viewer"
+      title={t("preview.pdf_viewer")}
       src={`/api/assets/${link.pdfAssetId}`}
       className="relative h-full min-w-full"
     />
@@ -204,7 +207,9 @@ export default function LinkContentSection({
                   <SelectItem key={renderer.id} value={renderer.id}>
                     <div className="flex items-center">
                       <IconComponent className="mr-2 h-4 w-4" />
-                      {renderer.name}
+                      {typeof renderer.name === "function"
+                        ? renderer.name(t)
+                        : renderer.name}
                     </div>
                   </SelectItem>
                 );
@@ -277,7 +282,9 @@ export default function LinkContentSection({
                   <ExpandIcon className="h-4 w-4" />
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="bottom">FullScreen</TooltipContent>
+              <TooltipContent side="bottom">
+                {t("preview.fullscreen")}
+              </TooltipContent>
             </Tooltip>
           </>
         )}

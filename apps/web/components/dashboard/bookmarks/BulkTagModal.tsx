@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/sonner";
+import { useTranslation } from "@/lib/i18n/client";
 import { useQueries } from "@tanstack/react-query";
 
 import { useUpdateBookmarkTags } from "@saiye/shared-react/hooks/bookmarks";
@@ -26,6 +27,7 @@ export default function BulkTagModal({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
+  const { t } = useTranslation();
   const api = useTRPC();
   const results = useQueries({
     queries: bookmarkIds.map((id) =>
@@ -56,7 +58,7 @@ export default function BulkTagModal({
       } else {
         toast({
           variant: "destructive",
-          title: "Something went wrong",
+          title: t("common.something_went_wrong"),
         });
       }
     },
@@ -78,7 +80,10 @@ export default function BulkTagModal({
     );
     const successes = results.filter((r) => r.status == "fulfilled").length;
     toast({
-      description: `Tag "${tag.tagName}" has been added to ${successes} bookmarks!`,
+      description: t("toasts.tags.bulk_added", {
+        tagName: tag.tagName,
+        count: successes,
+      }),
     });
   };
 
@@ -104,7 +109,10 @@ export default function BulkTagModal({
     );
     const successes = results.filter((r) => r.status == "fulfilled").length;
     toast({
-      description: `Tag "${tagName}" has been removed from ${successes} bookmarks!`,
+      description: t("toasts.tags.bulk_removed", {
+        tagName: tagName,
+        count: successes,
+      }),
     });
   };
 
@@ -123,13 +131,15 @@ export default function BulkTagModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Tags of {bookmarks.length} Bookmarks</DialogTitle>
+          <DialogTitle>
+            {t("dialogs.bulk_tags.title", { count: bookmarks.length })}
+          </DialogTitle>
         </DialogHeader>
         <TagsEditor tags={tags} onAttach={onAttach} onDetach={onDetach} />
         <DialogFooter className="sm:justify-end">
           <DialogClose asChild>
             <Button type="button" variant="secondary">
-              Close
+              {t("actions.close")}
             </Button>
           </DialogClose>
         </DialogFooter>

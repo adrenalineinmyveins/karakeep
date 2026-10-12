@@ -66,7 +66,11 @@ export default function RegenerateApiKey({
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" title="Regenerate">
+        <Button
+          variant="ghost"
+          size="sm"
+          title={t("settings.api_keys.regenerate_api_key")}
+        >
           <RefreshCcw className="h-4 w-4" />
         </Button>
       </DialogTrigger>

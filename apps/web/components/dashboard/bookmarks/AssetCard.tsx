@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { FileAudio2, FileText } from "lucide-react";
 
@@ -19,6 +20,7 @@ function AssetImage({
   bookmark: ZBookmarkTypeAsset;
   className?: string;
 }) {
+  const { t } = useTranslation();
   const bookmarkedAsset = bookmark.content;
   switch (bookmarkedAsset.assetType) {
     case "image": {
@@ -42,7 +44,7 @@ function AssetImage({
         return (
           <div
             className={cn(className, "flex items-center justify-center")}
-            title="PDF screenshot not available. Run asset preprocessing job to generate one screenshot"
+            title={t("common.pdf_screenshot_unavailable")}
           >
             <FileText size={80} />
           </div>

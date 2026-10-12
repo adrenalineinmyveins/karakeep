@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BookmarkMarkdownComponent } from "@/components/dashboard/bookmarks/BookmarkMarkdownComponent";
+import { useTranslation } from "@/lib/i18n/client";
 import { bookmarkLayoutSwitch } from "@/lib/userLocalSettings/bookmarksLayout";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,7 @@ export default function TextCard({
   className?: string;
   bookmarkIndex?: number;
 }) {
+  const { t } = useTranslation();
   const banner = bookmark.assets.find((a) => a.assetType == "bannerImage");
   return (
     <>
@@ -66,7 +68,7 @@ export default function TextCard({
                   className,
                 )}
               >
-                Note
+                {t("common.note")}
               </div>
             ),
           })

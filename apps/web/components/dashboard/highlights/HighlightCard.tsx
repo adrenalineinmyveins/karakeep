@@ -1,5 +1,6 @@
 import { ActionButton } from "@/components/ui/action-button";
 import { toast } from "@/components/ui/sonner";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 
@@ -19,16 +20,17 @@ export default function HighlightCard({
   className?: string;
   readOnly: boolean;
 }) {
+  const { t } = useTranslation();
   const { mutate: deleteHighlight, isPending: isDeleting } = useDeleteHighlight(
     {
       onSuccess: () => {
         toast({
-          description: "Highlight has been deleted!",
+          description: t("highlights.highlight_deleted"),
         });
       },
       onError: () => {
         toast({
-          description: "Something went wrong",
+          description: t("common.something_went_wrong"),
           variant: "destructive",
         });
       },

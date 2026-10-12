@@ -12,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useTranslation } from "@/lib/i18n/client";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import {
@@ -26,6 +27,7 @@ export function WebhookEventSelector({
   value: ZWebhookEvent[];
   onChange: (value: ZWebhookEvent[]) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -34,15 +36,21 @@ export function WebhookEventSelector({
           role="combobox"
           className="w-full justify-between"
         >
-          {value.length > 0 ? value.join(", ") : "Select events"}
+          {value.length > 0
+            ? value.join(", ")
+            : t("settings.webhooks.events.select_placeholder")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent>
         <Command>
-          <CommandInput placeholder="Search events..." />
+          <CommandInput
+            placeholder={t("settings.webhooks.events.search_placeholder")}
+          />
           <CommandList>
-            <CommandEmpty>No events found.</CommandEmpty>
+            <CommandEmpty>
+              {t("settings.webhooks.events.no_events_found")}
+            </CommandEmpty>
             <CommandGroup>
               {zWebhookEventSchema.options.map((eventType) => (
                 <CommandItem

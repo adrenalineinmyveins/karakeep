@@ -24,6 +24,7 @@
     "lint": "turbo --no-daemon lint --continue",
     "lint:fix": "turbo --no-daemon lint:fix --continue",
     "test": "turbo --no-daemon test",
+    "test:ui": "pnpm --filter @saiye/e2e_tests run test:ui",
     "typecheck": "turbo --no-daemon typecheck",
     "preflight": "turbo run --no-daemon typecheck lint format",
     "preflight:fix": "turbo run --no-daemon typecheck lint:fix format:fix"

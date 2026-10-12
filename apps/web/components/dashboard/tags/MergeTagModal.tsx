@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "@/components/ui/sonner";
+import { useTranslation } from "@/lib/i18n/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -40,6 +41,7 @@ export function MergeTagModal({
 }) {
   const currentPath = usePathname();
   const router = useRouter();
+  const { t } = useTranslation();
   const formSchema = z.object({
     intoTagId: z.string(),
   });
@@ -53,7 +55,7 @@ export function MergeTagModal({
   const { mutate: mergeTag, isPending } = useMergeTag({
     onSuccess: (resp) => {
       toast({
-        description: "Tag has been updated!",
+        description: t("actions.tag_updated"),
       });
       setOpen(false);
       if (currentPath.includes(tag.id)) {
@@ -78,7 +80,7 @@ export function MergeTagModal({
       } else {
         toast({
           variant: "destructive",
-          title: "Something went wrong",
+          title: t("common.something_went_wrong"),
         });
       }
     },
@@ -104,12 +106,11 @@ export function MergeTagModal({
             })}
           >
             <DialogHeader>
-              <DialogTitle>Merge Tag</DialogTitle>
+              <DialogTitle>{t("actions.merge_tag")}</DialogTitle>
             </DialogHeader>
 
             <DialogDescription className="pt-4">
-              You&apos;re about to move all the bookmarks in the tag &quot;
-              {tag.name}&quot; into the tag you select.
+              {t("actions.merge_tag_description", { tag: tag.name })}
             </DialogDescription>
 
             <FormField
@@ -133,11 +134,11 @@ export function MergeTagModal({
             <DialogFooter className="sm:justify-end">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
-                  Close
+                  {t("actions.close")}
                 </Button>
               </DialogClose>
               <ActionButton type="submit" loading={isPending}>
-                Save
+                {t("actions.save")}
               </ActionButton>
             </DialogFooter>
           </form>

@@ -33,6 +33,7 @@ import { useTheme } from "next-themes";
 import { useWhoAmI } from "@saiye/shared-react/hooks/users";
 
 import { AdminNoticeBadge } from "../../admin/AdminNotices";
+import { WhatsNew } from "./WhatsNew";
 
 function DarkModeToggle() {
   const { t } = useTranslation();
@@ -55,7 +56,13 @@ function DarkModeToggle() {
   }
 }
 
-export default function SidebarProfileOptions() {
+export default function ProfileOptions({
+  serverVersion,
+  changeLogVersion,
+}: {
+  serverVersion?: string;
+  changeLogVersion?: string;
+}) {
   const { t } = useTranslation();
   const toggleTheme = useToggleTheme();
   const { data: session } = useSession();
@@ -152,6 +159,10 @@ export default function SidebarProfileOptions() {
             {t("options.documentation")}
           </a>
         </DropdownMenuItem>
+        <WhatsNew
+          serverVersion={serverVersion}
+          changeLogVersion={changeLogVersion}
+        />
         <Separator className="my-2" />
         <DropdownMenuItem onClick={() => router.push("/logout")}>
           <LogOut className="mr-2 size-4" />

@@ -1,10 +1,5 @@
-import React from "react";
-import { redirect } from "next/navigation";
 import { AdminNotices } from "@/components/admin/AdminNotices";
-import MobileSidebar from "@/components/shared/sidebar/MobileSidebar";
-import Sidebar from "@/components/shared/sidebar/Sidebar";
-import SidebarLayout from "@/components/shared/sidebar/SidebarLayout";
-import { getServerAuthSession } from "@/server/auth";
+import AppShell from "@/components/shared/app-shell/AppShell";
 import { TFunction } from "i18next";
 import { Activity, ArrowLeft, Settings, Users, Wrench } from "lucide-react";
 
@@ -47,20 +42,12 @@ export default async function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerAuthSession();
-  if (!session || session.user.role !== "admin") {
-    redirect("/");
-  }
-
   return (
-    <SidebarLayout
-      sidebar={<Sidebar items={adminSidebarItems} />}
-      mobileSidebar={<MobileSidebar items={adminSidebarItems} />}
-    >
+    <AppShell adminOnly withoutUserSettings items={adminSidebarItems}>
       <div className="flex flex-col gap-1">
         <AdminNotices />
         {children}
       </div>
-    </SidebarLayout>
+    </AppShell>
   );
 }

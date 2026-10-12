@@ -4,7 +4,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 
+import { useTranslation } from "@/lib/i18n/client";
+
 export default function ErrorFallback() {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-1 items-center justify-center rounded-lg bg-slate-50 p-8 shadow-sm dark:bg-slate-700/50 dark:shadow-md">
       <div className="w-full max-w-md space-y-8 text-center">
@@ -16,24 +19,23 @@ export default function ErrorFallback() {
 
         <div className="space-y-4">
           <h1 className="text-balance text-2xl font-semibold text-foreground">
-            Oops! Something went wrong
+            {t("error_pages.error_title")}
           </h1>
           <p className="text-pretty leading-relaxed text-muted-foreground">
-            We&apos;re sorry, but an unexpected error occurred. Please try again
-            or contact support if the issue persists.
+            {t("error_pages.error_description")}
           </p>
         </div>
 
         <div className="space-y-3">
           <Button className="w-full" onClick={() => window.location.reload()}>
             <RefreshCw className="mr-2 h-4 w-4" />
-            Try Again
+            {t("error_pages.try_again")}
           </Button>
 
           <Link href="/" className="block">
             <Button variant="outline" className="w-full">
               <Home className="mr-2 h-4 w-4" />
-              Go Home
+              {t("error_pages.go_home")}
             </Button>
           </Link>
         </div>

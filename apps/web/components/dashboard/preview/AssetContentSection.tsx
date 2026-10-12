@@ -129,6 +129,7 @@ function AudioContentSection({ bookmark }: { bookmark: ZBookmark }) {
 }
 
 export function AssetContentSection({ bookmark }: { bookmark: ZBookmark }) {
+  const { t } = useTranslation();
   if (bookmark.content.type != BookmarkTypes.ASSET) {
     throw new Error("Invalid content type");
   }
@@ -140,6 +141,6 @@ export function AssetContentSection({ bookmark }: { bookmark: ZBookmark }) {
     case "pdf":
       return <PDFContentSection bookmark={bookmark} />;
     default:
-      return <div>Unsupported asset type</div>;
+      return <div>{t("preview.unsupported_asset_type")}</div>;
   }
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `agentSkills` ADD `tool_grant` text;

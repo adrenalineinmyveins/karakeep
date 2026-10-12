@@ -33,8 +33,8 @@ export default function RulesSettingsPage() {
   const handleCreateRule = () => {
     const newRule = {
       id: null,
-      name: "New Rule",
-      description: "Description of the new rule",
+      name: t("settings.rules.new_rule_name"),
+      description: t("settings.rules.new_rule_description"),
       enabled: true,
       event: { type: "bookmarkAdded" as const },
       condition: { type: "alwaysTrue" as const },

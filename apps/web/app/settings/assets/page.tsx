@@ -112,7 +112,7 @@ export default function AssetsSettingsPage() {
                       prefetch={false}
                     >
                       <ExternalLink className="size-4" />
-                      <span>View Asset</span>
+                      <span>{t("settings.manage_assets.view_asset")}</span>
                     </Link>
                   </TableCell>
                   <TableCell>
@@ -123,10 +123,12 @@ export default function AssetsSettingsPage() {
                         prefetch={false}
                       >
                         <ExternalLink className="size-4" />
-                        <span>View Bookmark</span>
+                        <span>{t("settings.manage_assets.view_bookmark")}</span>
                       </Link>
                     ) : (
-                      <span className="text-muted-foreground">No bookmark</span>
+                      <span className="text-muted-foreground">
+                        {t("settings.manage_assets.no_bookmark")}
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -179,7 +181,7 @@ export default function AssetsSettingsPage() {
               loading={isFetchingNextPage}
               ignoreDemoMode={true}
             >
-              Load More
+              {t("settings.manage_assets.load_more")}
             </ActionButton>
           </div>
         )}

@@ -16,6 +16,10 @@ import {
 import type { ZApiKeyScope } from "@saiye/shared/types/apiKeys";
 import { API_KEY_FULL_ACCESS_SCOPE } from "@saiye/shared/types/apiKeys";
 import type { KnowledgeScope } from "@saiye/shared/types/agentProfiles";
+import type {
+  SkillParam,
+  SkillToolGrant,
+} from "@saiye/shared/types/agentSkills";
 import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import type { ZReaderViewReason } from "@saiye/shared/types/bookmarks";
 
@@ -766,6 +770,51 @@ export const agentProfiles = sqliteTable(
   (ap) => [index("agentProfiles_userId_idx").on(ap.userId)],
 );
 
+// ── P1 提示词模板型技能 ──────────────────────────────
+//
+// 挂在 agentProfile 下的可复用提示词模板：咨询者咨询时点选技能，
+// 模板正文以 <skill_directive> 块拼入当轮 prompt，指引专家按固定流程作答。
+// 发布联动：publication 处于 published/delisting 时技能可被选用，下架即失效。
+export const agentSkills = sqliteTable(
+  "agentSkills",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    agentProfileId: text("agentProfileId")
+      .notNull()
+      .references(() => agentProfiles.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description").notNull(),
+    // 模板正文（注入当轮 prompt 的指令内容）
+    promptTemplate: text("promptTemplate").notNull(),
+    // 输出格式提示（拼接在模板正文之后，可空）
+    outputHint: text("outputHint"),
+    // P3 参数化技能：参数定义数组（null = 无参提示词模板型）
+    paramsSchema: text("params_schema", { mode: "json" }).$type<
+      SkillParam[] | null
+    >(),
+    // P2 技能级语料范围：点选技能的当轮以「档案 scope ∩ 技能 scope」
+    // 交集收窄检索范围；null = 不收窄（仅档案 scope）
+    knowledgeScope: text("knowledge_scope", {
+      mode: "json",
+    }).$type<KnowledgeScope | null>(),
+    // P4 工具执行型技能：点选技能的当轮临时解锁的工具白名单
+    // （null = 纯提示词技能；执行身份=咨询者，产物归属咨询者）
+    toolGrant: text("tool_grant", {
+      mode: "json",
+    }).$type<SkillToolGrant | null>(),
+    enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+    createdAt: createdAtMsField(),
+    modifiedAt: modifiedAtMsField(),
+  },
+  (as) => [index("agentSkills_profileId_idx").on(as.agentProfileId)],
+);
+
 // B1 长期记忆固化：agent 对话中提炼的用户偏好/事实，
 // 注入三源 RAG 上下文，让 agent 越用越懂用户。
 export const agentMemories = sqliteTable(
@@ -915,6 +964,10 @@ export const consultationUsages = sqliteTable(
       .references(() => chatSessions.id, { onDelete: "cascade" }),
     // 本次调用单价快照（credits）
     amount: integer("amount").notNull(),
+    // P2 技能使用统计：该轮点选的技能；技能删除后置 null（历史保留）
+    skillId: text("skillId").references(() => agentSkills.id, {
+      onDelete: "set null",
+    }),
     // F4 结算归属；null = 未结算
     settlementId: text("settlementId").references(
       () => consultationSettlements.id,
