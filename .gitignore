@@ -83,6 +83,10 @@ apps/desktop/src-tauri/payload.tar.gz
 # Expo local files
 .expo/
 
+# Mobile build artifacts (distribute via Release/EAS instead)
+apps/mobile/*.apk
+apps/mobile/*.aab
+
 # Local recovery workspace
 .recover/
 
