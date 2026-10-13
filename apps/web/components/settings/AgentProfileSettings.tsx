@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Archive,
   BadgeCheck,
+  Bot,
   Download,
   Globe,
   Hourglass,
@@ -116,6 +117,13 @@ function timeouts(form: ProfileFormState) {
   return Number.isFinite(minutes) ? { timeoutMinutes: minutes } : {};
 }
 
+/** 档案类型 → i18n 标签 key（hosted = 宿主型个人 Agent） */
+const typeLabelKey = {
+  "openai-compatible": "settings.agent_profiles.type_openai_compatible",
+  "trae-cli": "settings.agent_profiles.type_trae_cli",
+  hosted: "settings.agent_profiles.type_hosted",
+} as const satisfies Record<AgentProfileType, string>;
+
 function ProfileFormDialog({
   profile,
   open,
@@ -214,12 +222,14 @@ function ProfileFormDialog({
             model: form.model.trim(),
             ...(form.apiKey.trim() ? { apiKey: form.apiKey.trim() } : {}),
           }
-        : {
-            type: "trae-cli" as const,
-            ...base,
-            command: form.command.trim(),
-            ...timeouts(form),
-          };
+        : form.type === "hosted"
+          ? { type: "hosted" as const, ...base }
+          : {
+              type: "trae-cli" as const,
+              ...base,
+              command: form.command.trim(),
+              ...timeouts(form),
+            };
     if (profile) {
       updateMutation.mutate({ ...input, id: profile.id });
     } else {
@@ -253,11 +263,7 @@ function ProfileFormDialog({
               <SelectContent>
                 {AGENT_PROFILE_TYPES.map((type) => (
                   <SelectItem key={type} value={type}>
-                    {t(
-                      type === "openai-compatible"
-                        ? `${tp}.type_openai_compatible`
-                        : `${tp}.type_trae_cli`,
-                    )}
+                    {t(typeLabelKey[type])}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -275,7 +281,7 @@ function ProfileFormDialog({
             />
           </div>
 
-          {form.type === "openai-compatible" ? (
+          {form.type === "openai-compatible" && (
             <>
               <div className="grid gap-2">
                 <Label htmlFor="profile-base-url">{t(`${tp}.base_url`)}</Label>
@@ -310,7 +316,9 @@ function ProfileFormDialog({
                 />
               </div>
             </>
-          ) : (
+          )}
+
+          {form.type === "trae-cli" && (
             <>
               <div className="grid gap-2">
                 <Label htmlFor="profile-command">{t(`${tp}.command`)}</Label>
@@ -1540,16 +1548,24 @@ export default function AgentProfileSettings() {
                     </span>
                   </TableCell>
                   <TableCell>
-                    {t(
-                      p.type === "openai-compatible"
-                        ? `${tp}.type_openai_compatible`
-                        : `${tp}.type_trae_cli`,
-                    )}
+                    <span className="flex items-center gap-1.5">
+                      {t(typeLabelKey[p.type])}
+                      {p.type === "hosted" && (
+                        <span
+                          className="flex items-center rounded-full bg-primary/10 px-1.5 py-0.5"
+                          title={t(`${tp}.type_hosted`)}
+                        >
+                          <Bot className="size-3.5 text-primary" />
+                        </span>
+                      )}
+                    </span>
                   </TableCell>
                   <TableCell className="max-w-64 truncate text-muted-foreground">
                     {p.type === "openai-compatible"
                       ? `${p.model ?? ""} · ${p.baseUrl ?? ""}`
-                      : `${p.command ?? ""} · ${t(`${tp}.timeout_minutes`)} ${p.timeoutMinutes}`}
+                      : p.type === "trae-cli"
+                        ? `${p.command ?? ""} · ${t(`${tp}.timeout_minutes`)} ${p.timeoutMinutes}`
+                        : "—"}
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">
