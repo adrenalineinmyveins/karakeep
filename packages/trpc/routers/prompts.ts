@@ -113,8 +113,9 @@ export const promptsAppRouter = router({
             eq(customPrompts.userId, ctx.user.id),
             eq(customPrompts.id, input.promptId),
           ),
-        );
-      if (res.changes == 0) {
+        )
+        .returning({ id: customPrompts.id });
+      if (res.length == 0) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
     }),

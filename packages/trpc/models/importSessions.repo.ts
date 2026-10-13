@@ -65,8 +65,9 @@ export class ImportSessionsRepo {
   async delete(id: string): Promise<boolean> {
     const result = await this.db
       .delete(importSessions)
-      .where(eq(importSessions.id, id));
-    return result.changes > 0;
+      .where(eq(importSessions.id, id))
+      .returning({ id: importSessions.id });
+    return result.length > 0;
   }
 
   async insertStagingBookmarks(
@@ -156,9 +157,10 @@ export class ImportSessionsRepo {
               eq(importSessions.id, session.id),
               eq(importSessions.status, "completed"),
             ),
-          );
+          )
+          .returning({ id: importSessions.id });
 
-        if (result.changes === 0) {
+        if (result.length === 0) {
           return false;
         }
 

@@ -444,5 +444,6 @@ export async function getBookmarkIdsFromMatcher(
   visitedListIds = new Set<string>(),
 ): Promise<string[]> {
   const results = await getIds(ctx, matcher, visitedListIds);
-  return results.map((r) => r.id);
+  // SQL 无 ORDER BY 时各库返回顺序未定义（SQLite 碰巧有序），统一排序
+  return results.map((r) => r.id).sort();
 }

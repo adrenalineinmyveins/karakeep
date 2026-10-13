@@ -6,15 +6,15 @@ import {
   desc,
   eq,
   gt,
+  ilike,
   inArray,
-  like,
   notExists,
   sql,
 } from "drizzle-orm";
 import { z } from "zod";
 
 import type { ZAttachedByEnum } from "@saiye/shared/types/tags";
-import { SqliteError } from "@saiye/db";
+import { isUniqueViolation } from "@saiye/db";
 import { bookmarkTags, tagsOnBookmarks } from "@saiye/db/schema";
 import { triggerSearchReindex } from "@saiye/shared-server";
 import {
@@ -71,7 +71,7 @@ export class Tag {
 
       return new Tag(ctx, result);
     } catch (e) {
-      if (e instanceof SqliteError && e.code === "SQLITE_CONSTRAINT_UNIQUE") {
+      if (isUniqueViolation(e)) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Tag name already exists for this user.",
@@ -118,7 +118,7 @@ export class Tag {
         and(
           eq(bookmarkTags.userId, ctx.user.id),
           opts.nameContains
-            ? like(bookmarkTags.name, `%${opts.nameContains}%`)
+            ? ilike(bookmarkTags.name, `%${opts.nameContains}%`)
             : undefined,
           opts.ids && opts.ids.length > 0
             ? inArray(bookmarkTags.id, opts.ids)
@@ -194,8 +194,9 @@ export class Tag {
               .where(eq(tagsOnBookmarks.tagId, bookmarkTags.id)),
           ),
         ),
-      );
-    return res.changes;
+      )
+      .returning({ id: bookmarkTags.id });
+    return res.length;
   }
 
   static async merge(
@@ -315,9 +316,10 @@ export class Tag {
           eq(bookmarkTags.id, this.tag.id),
           eq(bookmarkTags.userId, this.ctx.user.id),
         ),
-      );
+      )
+      .returning({ id: bookmarkTags.id });
 
-    if (res.changes === 0) {
+    if (res.length === 0) {
       throw new TRPCError({ code: "NOT_FOUND" });
     }
 
@@ -370,14 +372,12 @@ export class Tag {
         console.error("Failed to reindex affected bookmarks", e);
       }
     } catch (e) {
-      if (e instanceof SqliteError) {
-        if (e.code === "SQLITE_CONSTRAINT_UNIQUE") {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message:
-              "Tag name already exists. You might want to consider a merge instead.",
-          });
-        }
+      if (isUniqueViolation(e)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Tag name already exists. You might want to consider a merge instead.",
+        });
       }
       throw e;
     }

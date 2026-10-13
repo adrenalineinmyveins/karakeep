@@ -4,7 +4,7 @@ import { and, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 
-import { SqliteError } from "@saiye/db";
+import { isUniqueViolation } from "@saiye/db";
 import {
   assets,
   AssetTypes,
@@ -128,13 +128,11 @@ export class User {
 
         return result;
       } catch (e) {
-        if (e instanceof SqliteError) {
-          if (e.code === "SQLITE_CONSTRAINT_UNIQUE") {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
-              message: "Email is already taken",
-            });
-          }
+        if (isUniqueViolation(e)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Email is already taken",
+          });
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -220,9 +218,10 @@ export class User {
     const result = await ctx.db
       .update(users)
       .set({ emailVerified: new Date() })
-      .where(eq(users.email, email));
+      .where(eq(users.email, email))
+      .returning({ id: users.id });
 
-    if (result.changes === 0) {
+    if (result.length === 0) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "User not found",
@@ -403,9 +402,12 @@ export class User {
   private static async deleteInternal(db: Context["db"], userId: string) {
     await User.assertNoActiveStripeSubscriptionForUser(db, userId);
 
-    const res = await db.delete(users).where(eq(users.id, userId));
+    const res = await db
+      .delete(users)
+      .where(eq(users.id, userId))
+      .returning({ id: users.id });
 
-    if (res.changes === 0) {
+    if (res.length === 0) {
       throw new TRPCError({ code: "NOT_FOUND" });
     }
 
@@ -729,22 +731,22 @@ export class User {
           domain: sql<string>`CASE
             WHEN ${bookmarkLinks.url} LIKE 'https://%' THEN
               CASE
-                WHEN INSTR(SUBSTR(${bookmarkLinks.url}, 9), '/') > 0 THEN
-                  SUBSTR(${bookmarkLinks.url}, 9, INSTR(SUBSTR(${bookmarkLinks.url}, 9), '/') - 1)
+                WHEN POSITION('/' IN SUBSTR(${bookmarkLinks.url}, 9)) > 0 THEN
+                  SUBSTR(${bookmarkLinks.url}, 9, POSITION('/' IN SUBSTR(${bookmarkLinks.url}, 9)) - 1)
                 ELSE
                   SUBSTR(${bookmarkLinks.url}, 9)
               END
             WHEN ${bookmarkLinks.url} LIKE 'http://%' THEN
               CASE
-                WHEN INSTR(SUBSTR(${bookmarkLinks.url}, 8), '/') > 0 THEN
-                  SUBSTR(${bookmarkLinks.url}, 8, INSTR(SUBSTR(${bookmarkLinks.url}, 8), '/') - 1)
+                WHEN POSITION('/' IN SUBSTR(${bookmarkLinks.url}, 8)) > 0 THEN
+                  SUBSTR(${bookmarkLinks.url}, 8, POSITION('/' IN SUBSTR(${bookmarkLinks.url}, 8)) - 1)
                 ELSE
                   SUBSTR(${bookmarkLinks.url}, 8)
               END
             ELSE
               CASE
-                WHEN INSTR(${bookmarkLinks.url}, '/') > 0 THEN
-                  SUBSTR(${bookmarkLinks.url}, 1, INSTR(${bookmarkLinks.url}, '/') - 1)
+                WHEN POSITION('/' IN ${bookmarkLinks.url}) > 0 THEN
+                  SUBSTR(${bookmarkLinks.url}, 1, POSITION('/' IN ${bookmarkLinks.url}) - 1)
                 ELSE
                   ${bookmarkLinks.url}
               END
@@ -758,22 +760,22 @@ export class User {
           sql`CASE
           WHEN ${bookmarkLinks.url} LIKE 'https://%' THEN
             CASE
-              WHEN INSTR(SUBSTR(${bookmarkLinks.url}, 9), '/') > 0 THEN
-                SUBSTR(${bookmarkLinks.url}, 9, INSTR(SUBSTR(${bookmarkLinks.url}, 9), '/') - 1)
+              WHEN POSITION('/' IN SUBSTR(${bookmarkLinks.url}, 9)) > 0 THEN
+                SUBSTR(${bookmarkLinks.url}, 9, POSITION('/' IN SUBSTR(${bookmarkLinks.url}, 9)) - 1)
               ELSE
                 SUBSTR(${bookmarkLinks.url}, 9)
             END
           WHEN ${bookmarkLinks.url} LIKE 'http://%' THEN
             CASE
-              WHEN INSTR(SUBSTR(${bookmarkLinks.url}, 8), '/') > 0 THEN
-                SUBSTR(${bookmarkLinks.url}, 8, INSTR(SUBSTR(${bookmarkLinks.url}, 8), '/') - 1)
+              WHEN POSITION('/' IN SUBSTR(${bookmarkLinks.url}, 8)) > 0 THEN
+                SUBSTR(${bookmarkLinks.url}, 8, POSITION('/' IN SUBSTR(${bookmarkLinks.url}, 8)) - 1)
               ELSE
                 SUBSTR(${bookmarkLinks.url}, 8)
             END
           ELSE
             CASE
-              WHEN INSTR(${bookmarkLinks.url}, '/') > 0 THEN
-                SUBSTR(${bookmarkLinks.url}, 1, INSTR(${bookmarkLinks.url}, '/') - 1)
+              WHEN POSITION('/' IN ${bookmarkLinks.url}) > 0 THEN
+                SUBSTR(${bookmarkLinks.url}, 1, POSITION('/' IN ${bookmarkLinks.url}) - 1)
               ELSE
                 ${bookmarkLinks.url}
             END

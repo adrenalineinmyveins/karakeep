@@ -1023,7 +1023,8 @@ export class Bookmark extends BareBookmark {
           eq(bookmarks.userId, this.ctx.user.id),
           eq(bookmarks.id, this.bookmark.id),
         ),
-      );
+      )
+      .returning({ id: bookmarks.id });
 
     await SearchIndexingQueue.enqueue(
       {
@@ -1056,7 +1057,7 @@ export class Bookmark extends BareBookmark {
         groupId: this.ctx.user.id,
       },
     );
-    if (deleted.changes > 0) {
+    if (deleted.length > 0) {
       await this.cleanupAssets();
     }
   }

@@ -151,9 +151,10 @@ export class RuleEngineRuleModel {
             eq(ruleEngineRulesTable.id, input.id),
             eq(ruleEngineRulesTable.userId, this.ctx.user.id),
           ),
-        );
+        )
+        .returning({ id: ruleEngineRulesTable.id });
 
-      if (result.changes === 0) {
+      if (result.length === 0) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Rule not found" });
       }
 
@@ -192,9 +193,10 @@ export class RuleEngineRuleModel {
           eq(ruleEngineRulesTable.id, this.rule.id),
           eq(ruleEngineRulesTable.userId, this.ctx.user.id),
         ),
-      );
+      )
+      .returning({ id: ruleEngineRulesTable.id });
 
-    if (result.changes === 0) {
+    if (result.length === 0) {
       throw new TRPCError({ code: "NOT_FOUND", message: "Rule not found" });
     }
   }

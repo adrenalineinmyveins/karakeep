@@ -1,5 +1,5 @@
 import { experimental_trpcMiddleware, TRPCError } from "@trpc/server";
-import { and, eq, gt, inArray, like, lt, or } from "drizzle-orm";
+import { and, eq, gt, ilike, inArray, lt, or } from "drizzle-orm";
 import { z } from "zod";
 
 import {
@@ -471,9 +471,6 @@ export const bookmarksAppRouter = router({
             ...bookmark,
           };
         },
-        {
-          behavior: "immediate",
-        },
       );
 
       bookmarkCreationCounter.labels(input.source ?? "unknown").inc();
@@ -605,8 +602,9 @@ export const bookmarksAppRouter = router({
           const result = await tx
             .update(bookmarkLinks)
             .set(linkUpdateData)
-            .where(eq(bookmarkLinks.id, input.bookmarkId));
-          if (result.changes == 0) {
+            .where(eq(bookmarkLinks.id, input.bookmarkId))
+            .returning({ id: bookmarkLinks.id });
+          if (result.length == 0) {
             throw new TRPCError({
               code: "BAD_REQUEST",
               message:
@@ -622,9 +620,10 @@ export const bookmarksAppRouter = router({
             .set({
               text: input.text,
             })
-            .where(eq(bookmarkTexts.id, input.bookmarkId));
+            .where(eq(bookmarkTexts.id, input.bookmarkId))
+            .returning({ id: bookmarkTexts.id });
 
-          if (result.changes == 0) {
+          if (result.length == 0) {
             throw new TRPCError({
               code: "BAD_REQUEST",
               message:
@@ -640,9 +639,10 @@ export const bookmarksAppRouter = router({
             .set({
               content: input.assetContent,
             })
-            .where(and(eq(bookmarkAssets.id, input.bookmarkId)));
+            .where(and(eq(bookmarkAssets.id, input.bookmarkId)))
+            .returning({ id: bookmarkAssets.id });
 
-          if (result.changes == 0) {
+          if (result.length == 0) {
             throw new TRPCError({
               code: "BAD_REQUEST",
               message:
@@ -1202,7 +1202,7 @@ export const bookmarksAppRouter = router({
         .where(
           and(
             eq(bookmarks.userId, ctx.user.id),
-            like(bookmarkLinks.url, `${normalizedInput}%`),
+            ilike(bookmarkLinks.url, `${normalizedInput}%`),
           ),
         );
 
@@ -1355,8 +1355,9 @@ export const bookmarksAppRouter = router({
                 eq(tagsOnBookmarks.bookmarkId, input.bookmarkId),
                 inArray(tagsOnBookmarks.tagId, idsToRemove),
               ),
-            );
-          numChanges += res.changes;
+            )
+            .returning({ tagId: tagsOnBookmarks.tagId });
+          numChanges += res.length;
         }
 
         // Attach tags
@@ -1370,8 +1371,9 @@ export const bookmarksAppRouter = router({
                 attachedBy: tagIdToAttachedBy.get(i) ?? "human",
               })),
             )
-            .onConflictDoNothing();
-          numChanges += res.changes;
+            .onConflictDoNothing()
+            .returning({ tagId: tagsOnBookmarks.tagId });
+          numChanges += res.length;
         }
 
         // Update bookmark modified timestamp

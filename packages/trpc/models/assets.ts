@@ -192,8 +192,9 @@ export class Asset {
           eq(assets.id, input.assetId),
           eq(assets.bookmarkId, input.bookmarkId),
         ),
-      );
-    if (result.changes == 0) {
+      )
+      .returning({ id: assets.id });
+    if (result.length == 0) {
       throw new TRPCError({ code: "NOT_FOUND" });
     }
     await deleteAsset({ userId: ctx.user.id, assetId: input.assetId }).catch(

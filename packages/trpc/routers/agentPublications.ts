@@ -3,10 +3,10 @@ import {
   and,
   desc,
   eq,
+  ilike,
   inArray,
   isNotNull,
   isNull,
-  like,
   lte,
   or,
   sql,
@@ -382,17 +382,17 @@ export const agentPublicationsAppRouter = router({
         inArray(agentPublications.status, ["published", "delisting"]),
       ];
       if (input?.tag) {
-        // SQLite json_each；PG 迁移时换 jsonb 存在性检查
+        // tags 为 jsonb 数组；@> 检查包含该标签
         conditions.push(
-          sql`exists (select 1 from json_each(${agentPublications.tags}) where json_each.value = ${input.tag})`,
+          sql`${agentPublications.tags} @> ${JSON.stringify([input.tag])}::jsonb`,
         );
       }
       if (input?.query) {
         const pattern = `%${input.query}%`;
         conditions.push(
           or(
-            like(agentPublications.title, pattern),
-            like(agentPublications.description, pattern),
+            ilike(agentPublications.title, pattern),
+            ilike(agentPublications.description, pattern),
           )!,
         );
       }

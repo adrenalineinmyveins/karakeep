@@ -40,7 +40,7 @@ vi.mock("@saiye/db/drizzle.config", () => ({
 }));
 vi.mock("@saiye/db", async () => {
   const { getInMemoryDB } = await import("@saiye/db/drizzle");
-  return { db: getInMemoryDB(true) };
+  return { db: await getInMemoryDB(true) };
 });
 vi.mock("@saiye/shared/config", async (importOriginal) => {
   const fs = await import("node:fs");

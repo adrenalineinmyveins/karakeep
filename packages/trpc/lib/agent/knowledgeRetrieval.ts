@@ -186,9 +186,9 @@ function escapeLike(input: string): string {
   return input.replace(/[\\%_]/g, (c) => `\\${c}`);
 }
 
-/** 列 LIKE 条件 */
+/** 列 ILIKE 条件（PG ILIKE = SQLite LIKE 的大小写不敏感语义） */
 function like(col: unknown, token: string) {
-  return sql`${col} LIKE ${`%${escapeLike(token)}%`} ESCAPE '\\'`;
+  return sql`${col} ILIKE ${`%${escapeLike(token)}%`} ESCAPE '\\'`;
 }
 
 /** 覆盖数打分：token 在文本中命中的个数 */
@@ -244,14 +244,15 @@ function isScopeActive(scope: KnowledgeScope | null | undefined): boolean {
  */
 function scopedBookmarkFilter(scope: KnowledgeScope): SQL | undefined {
   const parts: SQL[] = [];
+  // 注意：raw SQL 中的驼峰表名/列名必须加双引号，否则 PG 会折叠为小写
   if (scope.tagIds.length > 0) {
     parts.push(
-      sql`EXISTS (SELECT 1 FROM tagsOnBookmarks WHERE tagsOnBookmarks.bookmarkId = ${bookmarks.id} AND ${inArray(tagsOnBookmarks.tagId, scope.tagIds)})`,
+      sql`EXISTS (SELECT 1 FROM "tagsOnBookmarks" WHERE "tagsOnBookmarks"."bookmarkId" = ${bookmarks.id} AND ${inArray(tagsOnBookmarks.tagId, scope.tagIds)})`,
     );
   }
   if (scope.listIds.length > 0) {
     parts.push(
-      sql`EXISTS (SELECT 1 FROM bookmarksInLists WHERE bookmarksInLists.bookmarkId = ${bookmarks.id} AND ${inArray(bookmarksInLists.listId, scope.listIds)})`,
+      sql`EXISTS (SELECT 1 FROM "bookmarksInLists" WHERE "bookmarksInLists"."bookmarkId" = ${bookmarks.id} AND ${inArray(bookmarksInLists.listId, scope.listIds)})`,
     );
   }
   if (parts.length === 0) {

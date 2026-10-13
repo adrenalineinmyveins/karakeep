@@ -40,12 +40,13 @@ async function getBookmarksWithLargeInlineHtml(limit: number, cursor?: string) {
             gt(bookmarkLinks.id, cursor),
             isNotNull(bookmarkLinks.htmlContent),
             isNull(bookmarkLinks.contentAssetId),
-            sql`length(CAST(${bookmarkLinks.htmlContent} AS BLOB)) > ${serverConfig.crawler.htmlContentSizeThreshold}`,
+            // octet_length = 字节数（SQLite 的 length(CAST(x AS BLOB)) 等价）
+            sql`octet_length(${bookmarkLinks.htmlContent}) > ${serverConfig.crawler.htmlContentSizeThreshold}`,
           )
         : and(
             isNotNull(bookmarkLinks.htmlContent),
             isNull(bookmarkLinks.contentAssetId),
-            sql`length(CAST(${bookmarkLinks.htmlContent} AS BLOB)) > ${serverConfig.crawler.htmlContentSizeThreshold}`,
+            sql`octet_length(${bookmarkLinks.htmlContent}) > ${serverConfig.crawler.htmlContentSizeThreshold}`,
           ),
     )
     .orderBy(asc(bookmarkLinks.id))
@@ -112,9 +113,10 @@ async function migrateBookmarkHtml(
             eq(bookmarkLinks.id, bookmarkId),
             isNull(bookmarkLinks.contentAssetId),
           ),
-        );
+        )
+        .returning({ id: bookmarkLinks.id });
 
-      if (res.changes === 0) {
+      if (res.length === 0) {
         throw new Error("Failed to update bookmark");
       }
 

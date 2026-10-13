@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, like, lt, lte, or } from "drizzle-orm";
+import { and, desc, eq, ilike, lt, lte, or } from "drizzle-orm";
 import { z } from "zod";
 
 import {
@@ -231,7 +231,7 @@ export const sharedAssetsAppRouter = router({
               ? eq(sharedAgentAssets.assetType, input.assetType)
               : undefined,
             input.query
-              ? like(sharedAgentAssets.name, `%${input.query}%`)
+              ? ilike(sharedAgentAssets.name, `%${input.query}%`)
               : undefined,
             input.cursor
               ? or(
@@ -276,8 +276,9 @@ export const sharedAssetsAppRouter = router({
             eq(sharedAgentAssets.id, input.id),
             eq(sharedAgentAssets.userId, ctx.user.id),
           ),
-        );
-      if (res.changes == 0) {
+        )
+        .returning({ id: sharedAgentAssets.id });
+      if (res.length == 0) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Shared asset not found",

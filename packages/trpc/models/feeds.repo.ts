@@ -52,8 +52,9 @@ export class FeedsRepo {
   async delete(id: string): Promise<boolean> {
     const res = await this.db
       .delete(rssFeedsTable)
-      .where(eq(rssFeedsTable.id, id));
-    return res.changes > 0;
+      .where(eq(rssFeedsTable.id, id))
+      .returning({ id: rssFeedsTable.id });
+    return res.length > 0;
   }
 
   async update(

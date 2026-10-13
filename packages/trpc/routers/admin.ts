@@ -561,9 +561,10 @@ export const adminAppRouter = router({
       const result = await ctx.db
         .update(users)
         .set(updateData)
-        .where(eq(users.id, input.userId));
+        .where(eq(users.id, input.userId))
+        .returning({ id: users.id });
 
-      if (!result.changes) {
+      if (!result.length) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User not found",
@@ -584,9 +585,10 @@ export const adminAppRouter = router({
       const result = await ctx.db
         .update(users)
         .set({ password: hashedPassword, salt: newSalt })
-        .where(eq(users.id, input.userId));
+        .where(eq(users.id, input.userId))
+        .returning({ id: users.id });
 
-      if (result.changes == 0) {
+      if (result.length == 0) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User not found",

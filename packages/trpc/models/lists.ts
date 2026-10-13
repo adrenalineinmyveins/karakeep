@@ -4,7 +4,7 @@ import { and, count, eq, inArray, or, sql } from "drizzle-orm";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 
-import { SaiyeDBTransaction, SqliteError } from "@saiye/db";
+import { SaiyeDBTransaction, isUniqueViolation } from "@saiye/db";
 import {
   bookmarkLists,
   bookmarks,
@@ -474,13 +474,9 @@ export abstract class List {
       .where(
         and(
           eq(ruleEngineRulesTable.userId, this.ctx.user.id),
-          sql`json_valid(${ruleEngineRulesTable.event})`,
-          sql`json_extract(${ruleEngineRulesTable.event}, '$.type') IN ('addedToList', 'removedFromList')`,
-          sql`EXISTS (
-            SELECT 1
-            FROM json_each(json_extract(${ruleEngineRulesTable.event}, '$.listIds'))
-            WHERE value = ${this.list.id}
-          )`,
+          // event 为 text 列存 JSON；PG 下显式 cast 到 jsonb 操作
+          sql`(${ruleEngineRulesTable.event}::jsonb->>'type') IN ('addedToList', 'removedFromList')`,
+          sql`(${ruleEngineRulesTable.event}::jsonb->'listIds') @> ${JSON.stringify([this.list.id])}::jsonb`,
         ),
       );
     const rulesToDelete: string[] = [];
@@ -554,8 +550,9 @@ export abstract class List {
             eq(bookmarkLists.id, this.list.id),
             eq(bookmarkLists.userId, this.ctx.user.id),
           ),
-        );
-      if (res.changes == 0) {
+        )
+        .returning({ id: bookmarkLists.id });
+      if (res.length == 0) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
       await this.cleanupRulesAfterListDeletion(tx);
@@ -719,9 +716,10 @@ export abstract class List {
           eq(listCollaborators.listId, this.list.id),
           eq(listCollaborators.userId, userId),
         ),
-      );
+      )
+      .returning({ id: listCollaborators.id });
 
-    if (result.changes === 0) {
+    if (result.length === 0) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Collaborator not found",
@@ -750,9 +748,10 @@ export abstract class List {
           eq(listCollaborators.listId, this.list.id),
           eq(listCollaborators.userId, this.ctx.user.id),
         ),
-      );
+      )
+      .returning({ id: listCollaborators.id });
 
-    if (result.changes === 0) {
+    if (result.length === 0) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Collaborator not found",
@@ -777,9 +776,10 @@ export abstract class List {
           eq(listCollaborators.listId, this.list.id),
           eq(listCollaborators.userId, userId),
         ),
-      );
+      )
+      .returning({ id: listCollaborators.id });
 
-    if (result.changes === 0) {
+    if (result.length === 0) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Collaborator not found",
@@ -1045,11 +1045,9 @@ export class ManualList extends List {
         );
       }
     } catch (e) {
-      if (e instanceof SqliteError) {
-        if (e.code == "SQLITE_CONSTRAINT_PRIMARYKEY") {
-          // this is fine, it just means the bookmark is already in the list
-          return;
-        }
+      if (isUniqueViolation(e)) {
+        // this is fine, it just means the bookmark is already in the list
+        return;
       }
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -1069,8 +1067,9 @@ export class ManualList extends List {
           eq(bookmarksInLists.listId, this.list.id),
           eq(bookmarksInLists.bookmarkId, bookmarkId),
         ),
-      );
-    if (deleted.changes == 0) {
+      )
+      .returning({ bookmarkId: bookmarksInLists.bookmarkId });
+    if (deleted.length == 0) {
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: `Bookmark ${bookmarkId} is already not in list ${this.list.id}`,

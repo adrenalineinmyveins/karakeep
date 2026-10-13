@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 // reconcile.ts 及其依赖 compiler.ts 均引用全局 db；替换为内存库跑真实 SQL
 vi.mock("@saiye/db", async () => {
   const { getInMemoryDB } = await import("@saiye/db/drizzle");
-  return { db: getInMemoryDB(true) };
+  return { db: await getInMemoryDB(true) };
 });
 vi.mock("@saiye/shared-server", () => ({
   triggerConceptMirrorExport: vi.fn(),

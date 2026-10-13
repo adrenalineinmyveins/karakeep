@@ -53,9 +53,10 @@ export async function regenerateApiKey(
       keyId: keyId,
       keyHash: secretHash,
     })
-    .where(and(eq(apiKeys.id, id), eq(apiKeys.userId, userId)));
+    .where(and(eq(apiKeys.id, id), eq(apiKeys.userId, userId)))
+    .returning({ id: apiKeys.id });
 
-  if (res.changes == 0) {
+  if (res.length == 0) {
     throw new Error("Failed to regenerate API key");
   }
   return plain;

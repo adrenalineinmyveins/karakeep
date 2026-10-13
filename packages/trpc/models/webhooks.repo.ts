@@ -54,8 +54,9 @@ export class WebhooksRepo {
   async delete(id: string): Promise<boolean> {
     const res = await this.db
       .delete(webhooksTable)
-      .where(eq(webhooksTable.id, id));
-    return res.changes > 0;
+      .where(eq(webhooksTable.id, id))
+      .returning({ id: webhooksTable.id });
+    return res.length > 0;
   }
 
   async update(
