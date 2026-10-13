@@ -750,7 +750,10 @@ export const agentProfiles = sqliteTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    type: text("type", { enum: ["openai-compatible", "trae-cli"] }).notNull(),
+    // hosted = 宿主型个人 Agent：大脑由平台推理承担（无外部连接字段）
+    type: text("type", {
+      enum: ["openai-compatible", "trae-cli", "hosted"],
+    }).notNull(),
     baseUrl: text("baseUrl"),
     apiKey: text("apiKey"),
     model: text("model"),
@@ -920,6 +923,12 @@ export const agentPublications = sqliteTable(
       .$type<string[]>()
       .notNull()
       .default([]),
+    // Agent Card 专长摘要（D2 喂养流水线 LLM 刷新；null = 尚未生成）
+    autoExpertise: text("auto_expertise", { mode: "json" }).$type<
+      string[] | null
+    >(),
+    // 卡片头像资产 id（无 FK：资产删除后头像优雅降级为默认）
+    avatarAssetId: text("avatarAssetId"),
     // 单次知识检索调用单价（单位：credits；P0 仅记账不结算）
     pricePerCall: integer("pricePerCall").notNull().default(0),
     // F2 per-publication 会话计费封顶（credits）；null = 跟随全局默认
@@ -1005,6 +1014,75 @@ export const consultationSettlements = sqliteTable(
   },
   (cs) => [
     index("consultationSettlements_publicationId_idx").on(cs.publicationId),
+  ],
+);
+
+// ── A2A 咨询消息（agent ↔ agent 异步信箱）──────────────
+//
+// 跨用户/跨 Agent 的异步咨询信封：requester 向已发布的目标 Agent 发问，
+// worker 通过影子会话（chatSessions）执行咨询流（知识检索按发布所有者、
+// 沿用计量记账），答案回写 answer。need_input 态预留目标方反问澄清
+// （EigenFlux need_input 契约模式）。
+export const agentMessages = sqliteTable(
+  "agentMessages",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    // 发起方：咨询用户（P0 人确认后代发；P2 agent 自主发起需预算授权）
+    requesterUserId: text("requesterUserId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    // 发起方使用的个人 Agent 档案（null = 用户本人直接提问）
+    requesterProfileId: text("requesterProfileId").references(
+      () => agentProfiles.id,
+      { onDelete: "set null" },
+    ),
+    // 目标：被咨询的发布（hosted / openai-compatible 型可异步执行）
+    targetPublicationId: text("targetPublicationId")
+      .notNull()
+      .references(() => agentPublications.id, { onDelete: "cascade" }),
+    // 点选的技能（可空；发布方技能）
+    skillId: text("skillId").references(() => agentSkills.id, {
+      onDelete: "set null",
+    }),
+    // 影子会话：worker 以此复用 sendMessageSync 咨询执行链
+    sessionId: text("sessionId").references(() => chatSessions.id, {
+      onDelete: "set null",
+    }),
+    question: text("question").notNull(),
+    answer: text("answer"),
+    // pending: 待执行 / dispatched: 执行中 / answered: 已回答
+    // need_input: 目标方反问待澄清 / expired: 超时 / failed: 执行失败
+    state: text("state", {
+      enum: [
+        "pending",
+        "dispatched",
+        "answered",
+        "need_input",
+        "expired",
+        "failed",
+      ],
+    })
+      .notNull()
+      .default("pending"),
+    // failed/need_input 时的说明
+    note: text("note"),
+    expiresAt: integer("expiresAt", { mode: "timestamp_ms" }).notNull(),
+    createdAt: createdAtMsField(),
+    modifiedAt: modifiedAtMsField(),
+  },
+  (am) => [
+    index("agentMessages_target_state_idx").on(
+      am.targetPublicationId,
+      am.state,
+    ),
+    index("agentMessages_requester_created_idx").on(
+      am.requesterUserId,
+      am.createdAt,
+    ),
+    index("agentMessages_session_idx").on(am.sessionId),
   ],
 );
 

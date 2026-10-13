@@ -771,6 +771,13 @@
       "when": 1791645453642,
       "tag": "0109_agent_skill_tool_grant",
       "breakpoints": true
+    },
+    {
+      "idx": 110,
+      "version": "6",
+      "when": 1791809339887,
+      "tag": "0110_hosted_agent_and_messages",
+      "breakpoints": true
     }
   ]
 }

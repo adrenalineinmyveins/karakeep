@@ -119,6 +119,11 @@ type EventLogInternal =
       ["event.name"]: "conceptWorker.run";
       "conceptPage.id"?: string;
     }
+  | {
+      ["event.name"]: "agentMessageWorker.run";
+      "agent_message.id": string;
+      "agent_message.state"?: string;
+    }
   // Product Events
   | {
       ["event.name"]: "user.login";

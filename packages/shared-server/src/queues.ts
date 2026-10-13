@@ -468,3 +468,20 @@ export const BackupQueue = createDeferredQueue<ZBackupRequest>("backup_queue", {
   },
   keepFailedJobs: false,
 });
+
+// A2A 咨询消息 worker
+// 仅携带 messageId，worker 从 DB 重读全量状态（含过期惰性结算）；
+// 重试由状态机自管（避免同一条消息被重复执行/重复计费），队列层不重试。
+export const zAgentMessageRequestSchema = z.object({
+  messageId: z.string(),
+});
+export type ZAgentMessageRequest = z.infer<typeof zAgentMessageRequestSchema>;
+export const AgentMessageQueue = createDeferredQueue<ZAgentMessageRequest>(
+  "agent_message_queue",
+  {
+    defaultJobArgs: {
+      numRetries: 0,
+    },
+    keepFailedJobs: false,
+  },
+);

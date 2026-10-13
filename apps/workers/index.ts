@@ -4,6 +4,7 @@ import { buildServer } from "server";
 
 import {
   AdminMaintenanceQueue,
+  AgentMessageQueue,
   AssetPreprocessingQueue,
   BackupQueue,
   ConceptCompilationQueue,
@@ -30,6 +31,7 @@ import logger from "@saiye/shared/logger";
 
 import { shutdownPromise } from "./exit";
 import { AdminMaintenanceWorker } from "./workers/adminMaintenanceWorker";
+import { AgentMessageWorker } from "./workers/agentMessageWorker";
 import { AssetPreprocessingWorker } from "./workers/assetPreprocessingWorker";
 import { BackupSchedulingWorker, BackupWorker } from "./workers/backupWorker";
 import { CrawlerWorker } from "./workers/crawlerWorker";
@@ -101,6 +103,10 @@ const workerBuilders = {
   concept: async () => {
     await ConceptCompilationQueue.ensureInit();
     return ConceptWorker.build();
+  },
+  agentMessage: async () => {
+    await AgentMessageQueue.ensureInit();
+    return AgentMessageWorker.build();
   },
 } as const;
 
