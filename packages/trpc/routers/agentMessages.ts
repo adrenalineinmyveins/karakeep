@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, gt, inArray } from "drizzle-orm";
+import { and, count, desc, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import type { DB } from "@saiye/db";
@@ -8,6 +8,7 @@ import {
   agentProfiles,
   agentPublications,
   agentSkills,
+  consultationUsages,
 } from "@saiye/db/schema";
 import serverConfig from "@saiye/shared/config";
 import { AgentMessageQueue } from "@saiye/shared-server";
@@ -82,6 +83,77 @@ async function listMessages(
  * worker 经影子会话执行（沿用 owner 知识检索与计量记账）。
  * P0 仅支持"人确认后代发"；agent 自主发起的预算授权留待 P2。
  */
+/**
+ * 发起方三道护栏（防单用户扫场烧钱）。单目标限流只保护被咨询方，
+ * 挡不住一个用户向全场 N 个 agent 各发 N-1 条。
+ * - 每小时条数：跨所有目标（防轰炸）
+ * - 当月条数：P0 0 价阶段的实际防线；发起即计（含 pending/expired/failed）
+ * - 当月 credits 预算：定价启用后开启（config 未设置则跳过）。
+ *   按 consultationUsages.consulteeUserId 汇总——该字段沿影子会话/
+ *   咨询会话的 userId 记录，即咨询发起方。
+ */
+async function enforceRequesterLimits(db: DB, requesterUserId: string) {
+  const hourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const [hourly] = await db
+    .select({ n: count() })
+    .from(agentMessages)
+    .where(
+      and(
+        eq(agentMessages.requesterUserId, requesterUserId),
+        gt(agentMessages.createdAt, hourAgo),
+      ),
+    );
+  if (
+    (hourly?.n ?? 0) >= serverConfig.consultation.agentMessageRequesterHourlyLimit
+  ) {
+    throw new TRPCError({
+      code: "TOO_MANY_REQUESTS",
+      message: "You have sent too many consultations this hour, try later",
+    });
+  }
+
+  const [monthly] = await db
+    .select({ n: count() })
+    .from(agentMessages)
+    .where(
+      and(
+        eq(agentMessages.requesterUserId, requesterUserId),
+        gt(agentMessages.createdAt, monthStart),
+      ),
+    );
+  if ((monthly?.n ?? 0) >= serverConfig.consultation.agentMessageMonthlyLimit) {
+    throw new TRPCError({
+      code: "TOO_MANY_REQUESTS",
+      message: "Monthly consultation limit reached",
+    });
+  }
+
+  const budget = serverConfig.consultation.agentMessageMonthlyBudgetCredits;
+  if (budget !== null && budget !== undefined) {
+    const [spent] = await db
+      .select({
+        total: sql<number>`coalesce(sum(${consultationUsages.amount}), 0)`,
+      })
+      .from(consultationUsages)
+      .where(
+        and(
+          eq(consultationUsages.consulteeUserId, requesterUserId),
+          gt(consultationUsages.createdAt, monthStart),
+        ),
+      );
+    if ((spent?.total ?? 0) >= budget) {
+      throw new TRPCError({
+        code: "TOO_MANY_REQUESTS",
+        message: "Monthly consultation budget exhausted",
+      });
+    }
+  }
+}
+
 export const agentMessagesAppRouter = router({
   // 发起咨询：校验目标可达性 + 每小时限流，落 pending 后入队
   send: authedProcedure
@@ -151,6 +223,9 @@ export const agentMessagesAppRouter = router({
           message: "This agent is receiving too many consultations, try later",
         });
       }
+
+      // 发起方护栏：每小时/当月条数 + （可选）当月 credits 预算
+      await enforceRequesterLimits(ctx.db, ctx.user.id);
 
       // 发起方个人档案（可空）：仅做归属校验
       if (input.requesterProfileId) {

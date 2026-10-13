@@ -150,6 +150,83 @@ describe("Agent Messages Routes（PR-4）", () => {
     ).rejects.toThrowError(/too many consultations/i);
   });
 
+  test<CustomTestContext>("send：发起方每小时限流（跨目标，单目标不满额也拦截）", async ({
+    apiCallers,
+    db,
+  }) => {
+    // 两个不同目标：pub2 用来灌满发起方额度，pub1 保持单目标额度空
+    const pub1 = await publishHostedAgent(apiCallers[0]);
+    const pub2 = await publishHostedAgent(apiCallers[2]);
+
+    // 发一条拿真实 requesterUserId（测试用户与 caller 的映射不做假设）
+    const { message } = await apiCallers[1].agentMessages.send({
+      targetPublicationId: pub2.publicationId,
+      question: "占位第一条",
+    });
+    const requesterId = message.requesterUserId;
+
+    // 灌满剩余额度（全部指向 pub2，pub1 单目标限流不受影响）
+    const hourlyLimit =
+      serverConfig.consultation.agentMessageRequesterHourlyLimit;
+    const expiresAt = new Date(Date.now() + 60_000);
+    await db.insert(agentMessages).values(
+      Array.from({ length: hourlyLimit - 1 }, (_, i) => ({
+        requesterUserId: requesterId,
+        targetPublicationId: pub2.publicationId,
+        question: `hourly-filler-${i}`,
+        state: "answered" as const,
+        answer: "ok",
+        expiresAt,
+      })),
+    );
+
+    // 向额度空着的 pub1 发起 → 被发起方每小时护栏拦截（区别于单目标限流文案）
+    await expect(
+      apiCallers[1].agentMessages.send({
+        targetPublicationId: pub1.publicationId,
+        question: "扫场请求",
+      }),
+    ).rejects.toThrowError(/You have sent too many consultations/i);
+  });
+
+  test<CustomTestContext>("send：发起方当月条数上限生效（历史窗口外数据不计入小时限流）", async ({
+    apiCallers,
+    db,
+  }) => {
+    const { publicationId } = await publishHostedAgent(apiCallers[0]);
+
+    // 发一条拿真实 requesterUserId
+    const { message } = await apiCallers[1].agentMessages.send({
+      targetPublicationId: publicationId,
+      question: "占位第一条",
+    });
+    const requesterId = message.requesterUserId;
+
+    // 灌月度剩余额度，createdAt 全部放在 3 小时前（小时窗口外）
+    const monthlyLimit = serverConfig.consultation.agentMessageMonthlyLimit;
+    const stale = new Date(Date.now() - 3 * 60 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 60_000);
+    await db.insert(agentMessages).values(
+      Array.from({ length: monthlyLimit - 1 }, (_, i) => ({
+        requesterUserId: requesterId,
+        targetPublicationId: publicationId,
+        question: `monthly-filler-${i}`,
+        state: "answered" as const,
+        answer: "ok",
+        expiresAt,
+        createdAt: stale,
+      })),
+    );
+
+    // 小时限流（1 < 20）与单目标限流均未触发，月度 1 + (limit-1) = limit 拦截
+    await expect(
+      apiCallers[1].agentMessages.send({
+        targetPublicationId: publicationId,
+        question: "月度超限请求",
+      }),
+    ).rejects.toThrowError(/Monthly consultation limit/i);
+  });
+
   test<CustomTestContext>("retry：failed 可重试，answered 不可", async ({
     apiCallers,
     db,

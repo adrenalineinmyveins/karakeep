@@ -100,6 +100,12 @@ const allEnv = z.object({
   AGENT_SESSION_BILLING_CAP_CREDITS: z.coerce.number().int().min(1).optional(),
   // A2A：单个发布每小时可接收的咨询消息上限（防垃圾请求烧目标方预算）
   AGENT_MESSAGE_HOURLY_LIMIT: z.coerce.number().int().min(1).optional(),
+  // A2A：单个用户每小时可发起的咨询消息总数（跨所有目标，防扫场轰炸）
+  AGENT_MESSAGE_REQUESTER_HOURLY_LIMIT: z.coerce.number().int().min(1).optional(),
+  // A2A：单个用户每月可发起的咨询消息总数（P0 0 价阶段的实际防线）
+  AGENT_MESSAGE_MONTHLY_LIMIT: z.coerce.number().int().min(1).optional(),
+  // A2A：单个用户每月咨询消耗（credits）预算；未设置 = 不启用（定价开启后再开）
+  AGENT_MESSAGE_MONTHLY_BUDGET_CREDITS: z.coerce.number().int().min(1).optional(),
   // A2A：消息有效期（ms），过期未执行则置 expired
   AGENT_MESSAGE_EXPIRY_MS: z.coerce.number().int().min(60_000).optional(),
   // A3 三源 RAG 检索注入的可调参数（top K）
@@ -418,6 +424,11 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
         val.AGENT_DELISTING_GRACE_PERIOD_MS ?? 7 * 24 * 60 * 60 * 1000,
       sessionBillingCapCredits: val.AGENT_SESSION_BILLING_CAP_CREDITS ?? 1000,
       agentMessageHourlyLimit: val.AGENT_MESSAGE_HOURLY_LIMIT ?? 20,
+      agentMessageRequesterHourlyLimit:
+        val.AGENT_MESSAGE_REQUESTER_HOURLY_LIMIT ?? 20,
+      agentMessageMonthlyLimit: val.AGENT_MESSAGE_MONTHLY_LIMIT ?? 100,
+      agentMessageMonthlyBudgetCredits:
+        val.AGENT_MESSAGE_MONTHLY_BUDGET_CREDITS ?? null,
       agentMessageExpiryMs: val.AGENT_MESSAGE_EXPIRY_MS ?? 24 * 60 * 60 * 1000,
     },
     tavily: {
