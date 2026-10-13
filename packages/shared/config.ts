@@ -301,6 +301,8 @@ const allEnv = z.object({
 
   // Database configuration
   DB_WAL_MODE: stringBool("false"),
+  // PostgreSQL 连接串；未设置时使用 PGlite 嵌入式库（桌面/本地单机默认）
+  DATABASE_URL: z.string().optional(),
 
   // OpenTelemetry tracing configuration
   OTEL_TRACING_ENABLED: stringBool("false"),
@@ -583,6 +585,9 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
     },
     database: {
       walMode: val.DB_WAL_MODE,
+      // PG 连接串；设置 = postgres-js（服务器部署），未设置 = PGlite（嵌入式）
+      url: val.DATABASE_URL,
+      dialect: val.DATABASE_URL ? ("pg" as const) : ("pglite" as const),
     },
     tracing: {
       enabled: val.OTEL_TRACING_ENABLED,

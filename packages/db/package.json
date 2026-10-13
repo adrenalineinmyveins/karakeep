@@ -8,6 +8,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "migrate": "tsx migrate.ts",
+    "migrate:sqlite-to-pg": "tsx scripts/migrateSqliteToPg.ts",
     "generate": "drizzle-kit generate",
     "studio": "drizzle-kit studio",
     "format": "oxfmt --ignore-path=../../.gitignore --check .",
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "@auth/core": "^0.27.0",
+    "@electric-sql/pglite": "^0.5.8",
     "@opentelemetry/api": "^1.9.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@saiye/shared": "workspace:*",
@@ -24,6 +26,7 @@
     "dotenv": "^16.4.1",
     "drizzle-kit": "^0.31.10",
     "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.9",
     "tsx": "^4.8.1"
   },
   "devDependencies": {

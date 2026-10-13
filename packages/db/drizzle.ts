@@ -1,126 +1,99 @@
 import "dotenv/config";
 
 import path from "path";
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import { PGlite } from "@electric-sql/pglite";
+import { drizzle as pgliteDrizzle } from "drizzle-orm/pglite";
+import { migrate as pgliteMigrate } from "drizzle-orm/pglite/migrator";
+import { drizzle as pgjsDrizzle } from "drizzle-orm/postgres-js";
+import { migrate as pgjsMigrate } from "drizzle-orm/postgres-js/migrator";
+import postgres from "postgres";
 
 import serverConfig from "@saiye/shared/config";
 
-import dbConfig from "./drizzle.config";
-import { instrumentDatabase } from "./instrumentation";
 import * as schema from "./schema";
 
+// 迁移目录解析必须是惰性的：Next/Turbopack 服务端 bundle 里
+// import.meta.dirname 为 undefined（顶层求值会直接崩溃），而 tsx/vitest
+// 的 ESM 环境里 __dirname 不存在——运行时按环境择一，最后兜底 cwd。
+declare const __dirname: string | undefined;
+
+function getMigrationsFolder(): string {
+  const baseDir =
+    import.meta.dirname ??
+    (typeof __dirname !== "undefined" ? __dirname : process.cwd());
+  return path.resolve(baseDir, "./drizzle");
+}
+
 /**
- * The app (and liteque, the queue backend) uses drizzle's sync better-sqlite3
- * driver with async transaction callbacks (`db.transaction(async (tx) => ...)`)
- * . better-sqlite3 <12 tolerated this (committing at the first await point);
- * better-sqlite3 >=12 throws "Transaction function cannot return a promise".
- * Emulate the old behavior with proper semantics instead: drive
- * BEGIN/COMMIT/ROLLBACK (or SAVEPOINT when nested) around the awaited
- * callback.
- *
- * Since only one transaction can be open on a connection at a time,
- * concurrent top-level async transactions on the same instance are
- * serialized through a per-instance promise chain; calls made while a
- * transaction is already open (nested) use SAVEPOINTs instead.
- *
- * Patched on the prototype (not per instance) so that Database instances
- * created inside dependencies (e.g. liteque's queue.db client) are covered
- * too.
+ * PGlite 驱动的 DB 实例类型。两种驱动（postgres-js / PGlite）在 drizzle
+ * 层的查询 API 完全一致（select/insert/update/delete/transaction/relational
+ * queries），仅原始结果集类型不同——业务代码不直接消费原始结果集，因此
+ * postgres-js 实例统一收敛到此类型。
  */
-patchDatabaseTransactions();
+export type DB = ReturnType<typeof buildPgliteDB>;
 
-function patchDatabaseTransactions() {
-  const proto = Database.prototype as unknown as {
-    transaction?: unknown;
-    __asyncTransactionsPatched?: boolean;
-  };
-  if (proto.__asyncTransactionsPatched) {
-    return;
+function buildPgliteDB(file: string) {
+  // PGlite 无参构造 = 内存库；传 ":memory:" 会被当作文件路径
+  const client = file === ":memory:" ? new PGlite() : new PGlite(file);
+  return pgliteDrizzle(client, { schema });
+}
+
+function buildPgjsDB(url: string) {
+  const client = postgres(url, { max: 10 });
+  return pgjsDrizzle(client, { schema }) as unknown as DB;
+}
+
+function pgliteDbFile() {
+  return serverConfig.dataDir
+    ? path.join(serverConfig.dataDir, "pg.db")
+    : "./pg.db";
+}
+
+// 单例必须挂在 globalThis：Turbopack dev 会为每个 route chunk 单独实例化
+// 本模块（模块级 let 缓存随之失效），多个 PGlite 实例同时打开同一 pg.db
+// 目录会互相踩踏，表现为查询成功但 PGlite WASM "Aborted()" 崩溃。
+// globalThis 在同进程内跨模块图共享（Prisma 在 Next dev 下的同款做法）。
+const globalForDb = globalThis as typeof globalThis & {
+  __saiyeDbInstance?: DB;
+};
+
+export function getDb(): DB {
+  if (!globalForDb.__saiyeDbInstance) {
+    console.warn(
+      `[db] new ${serverConfig.database.url ? "postgres-js" : "PGlite"} instance, target=${serverConfig.database.url ?? pgliteDbFile()}`,
+    );
+    globalForDb.__saiyeDbInstance = serverConfig.database.url
+      ? buildPgjsDB(serverConfig.database.url)
+      : buildPgliteDB(pgliteDbFile());
   }
-  proto.__asyncTransactionsPatched = true;
-
-  let savepointSeq = 0;
-  const txnTails = new WeakMap<object, Promise<unknown>>();
-  proto.transaction = function (
-    this: Database.Database,
-    fn: (...args: unknown[]) => unknown,
-  ) {
-    const run =
-      (behavior: "deferred" | "immediate" | "exclusive") =>
-      async (...args: unknown[]) => {
-        if (this.inTransaction) {
-          // Nested call: run inside the enclosing transaction as a savepoint.
-          const savepoint = `sp_async_${savepointSeq++}`;
-          this.exec(`savepoint ${savepoint}`);
-          try {
-            const result = await fn(...args);
-            this.exec(`release ${savepoint}`);
-            return result;
-          } catch (err) {
-            if (this.inTransaction) {
-              this.exec(`rollback to ${savepoint}; release ${savepoint}`);
-            }
-            throw err;
-          }
-        }
-        // Top-level call: serialize against other top-level async
-        // transactions on this instance.
-        const prev = txnTails.get(this) ?? Promise.resolve();
-        const task = prev.then(async () => {
-          this.exec(`begin ${behavior}`);
-          try {
-            const result = await fn(...args);
-            this.exec("commit");
-            return result;
-          } catch (err) {
-            if (this.inTransaction) {
-              this.exec("rollback");
-            }
-            throw err;
-          }
-        });
-        txnTails.set(
-          this,
-          task.then(
-            () => undefined,
-            () => undefined,
-          ),
-        );
-        return task;
-      };
-    const variants = {
-      deferred: run("deferred"),
-      immediate: run("immediate"),
-      exclusive: run("exclusive"),
-    };
-    return Object.assign(run("deferred"), variants);
-  };
+  return globalForDb.__saiyeDbInstance;
 }
 
-const sqlite = new Database(dbConfig.dbCredentials.url);
+export const db = getDb();
 
-if (serverConfig.database.walMode) {
-  sqlite.pragma("journal_mode = WAL");
-  sqlite.pragma("synchronous = NORMAL");
-} else {
-  sqlite.pragma("journal_mode = DELETE");
+/** 按当前驱动运行迁移（db:migrate 脚本入口） */
+export async function runMigrations(target: DB = db) {
+  const migrationsFolder = getMigrationsFolder();
+  if (serverConfig.database.url) {
+    await pgjsMigrate(
+      target as unknown as Parameters<typeof pgjsMigrate>[0],
+      { migrationsFolder },
+    );
+  } else {
+    await pgliteMigrate(
+      target as unknown as Parameters<typeof pgliteMigrate>[0],
+      { migrationsFolder },
+    );
+  }
 }
-sqlite.pragma("cache_size = -65536");
-sqlite.pragma("foreign_keys = ON");
-sqlite.pragma("temp_store = MEMORY");
 
-instrumentDatabase(sqlite);
-
-export const db = drizzle(sqlite, { schema });
-export type DB = typeof db;
-
-export function getInMemoryDB(runMigrations: boolean) {
-  const mem = new Database(":memory:");
-  const db = drizzle(mem, { schema, logger: false });
+/**
+ * 测试用内存库（PGlite :memory:）。迁移是异步的，返回 Promise。
+ */
+export async function getInMemoryDB(runMigrations: boolean) {
+  const db = buildPgliteDB(":memory:");
   if (runMigrations) {
-    migrate(db, { migrationsFolder: path.resolve(__dirname, "./drizzle") });
+    await pgliteMigrate(db, { migrationsFolder: getMigrationsFolder() });
   }
   return db;
 }

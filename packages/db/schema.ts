@@ -2,16 +2,19 @@ import type { AdapterAccount } from "@auth/core/adapters";
 import { createId } from "@paralleldrive/cuid2";
 import { relations, sql, SQL } from "drizzle-orm";
 import {
-  AnySQLiteColumn,
+  AnyPgColumn,
+  boolean,
   foreignKey,
   index,
   integer,
+  jsonb,
+  pgTable,
   primaryKey,
   real,
-  sqliteTable,
   text,
+  timestamp,
   unique,
-} from "drizzle-orm/sqlite-core";
+} from "drizzle-orm/pg-core";
 
 import type { ZApiKeyScope } from "@saiye/shared/types/apiKeys";
 import { API_KEY_FULL_ACCESS_SCOPE } from "@saiye/shared/types/apiKeys";
@@ -24,37 +27,37 @@ import { BookmarkTypes } from "@saiye/shared/types/bookmarks";
 import type { ZReaderViewReason } from "@saiye/shared/types/bookmarks";
 
 function createdAtField(colName = "createdAt") {
-  return integer(colName, { mode: "timestamp" })
+  return timestamp(colName, { withTimezone: true })
     .notNull()
     .$defaultFn(() => new Date());
 }
 
 function createdAtMsField() {
-  return integer("createdAt", { mode: "timestamp_ms" })
+  return timestamp("createdAt", { withTimezone: true })
     .notNull()
     .$defaultFn(() => new Date());
 }
 
 function modifiedAtField() {
-  return integer("modifiedAt", { mode: "timestamp" })
+  return timestamp("modifiedAt", { withTimezone: true })
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date());
 }
 
 function modifiedAtMsField() {
-  return integer("modifiedAt", { mode: "timestamp_ms" })
+  return timestamp("modifiedAt", { withTimezone: true })
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date());
 }
 
-export const users = sqliteTable("user", {
+export const users = pgTable("user", {
   id: text("id")
     .notNull()
     .primaryKey()
     .$defaultFn(() => createId()),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
+  emailVerified: timestamp("emailVerified", { withTimezone: true }),
   image: text("image"),
   password: text("password"),
   salt: text("salt").notNull().default(""),
@@ -63,9 +66,7 @@ export const users = sqliteTable("user", {
   // Admin Only Settings
   bookmarkQuota: integer("bookmarkQuota"),
   storageQuota: integer("storageQuota"),
-  browserCrawlingEnabled: integer("browserCrawlingEnabled", {
-    mode: "boolean",
-  }),
+  browserCrawlingEnabled: boolean("browserCrawlingEnabled"),
   // Admin-granted plan label (e.g. a collaborator name). While set, Stripe
   // sync doesn't downgrade the user's entitlements; it's cleared when the
   // user gets an active Stripe subscription.
@@ -85,7 +86,7 @@ export const users = sqliteTable("user", {
   timezone: text("timezone").default("UTC"),
 
   // Backup Settings
-  backupsEnabled: integer("backupsEnabled", { mode: "boolean" })
+  backupsEnabled: boolean("backupsEnabled")
     .notNull()
     .default(false),
   backupsFrequency: text("backupsFrequency", {
@@ -103,14 +104,10 @@ export const users = sqliteTable("user", {
   }),
 
   // AI Settings (nullable = opt-in, null means use server default)
-  autoTaggingEnabled: integer("autoTaggingEnabled", { mode: "boolean" }),
-  autoSummarizationEnabled: integer("autoSummarizationEnabled", {
-    mode: "boolean",
-  }),
+  autoTaggingEnabled: boolean("autoTaggingEnabled"),
+  autoSummarizationEnabled: boolean("autoSummarizationEnabled"),
   // Chat knowledge context injection (nullable = default ON, null means enabled)
-  chatKnowledgeContextEnabled: integer("chatKnowledgeContextEnabled", {
-    mode: "boolean",
-  }),
+  chatKnowledgeContextEnabled: boolean("chatKnowledgeContextEnabled"),
   tagStyle: text("tagStyle", {
     enum: [
       "lowercase-hyphens",
@@ -122,11 +119,11 @@ export const users = sqliteTable("user", {
       "as-generated",
     ],
   }).default("titlecase-spaces"),
-  curatedTagIds: text("curatedTagIds", { mode: "json" }).$type<string[]>(),
+  curatedTagIds: jsonb("curatedTagIds").$type<string[]>(),
   inferredTagLang: text("inferredTagLang"),
 });
 
-export const accounts = sqliteTable(
+export const accounts = pgTable(
   "account",
   {
     userId: text("userId")
@@ -150,7 +147,7 @@ export const accounts = sqliteTable(
   ],
 );
 
-export const sessions = sqliteTable("session", {
+export const sessions = pgTable("session", {
   sessionToken: text("sessionToken")
     .notNull()
     .primaryKey()
@@ -158,20 +155,20 @@ export const sessions = sqliteTable("session", {
   userId: text("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
+  expires: timestamp("expires", { withTimezone: true }).notNull(),
 });
 
-export const verificationTokens = sqliteTable(
+export const verificationTokens = pgTable(
   "verificationToken",
   {
     identifier: text("identifier").notNull(),
     token: text("token").notNull(),
-    expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
+    expires: timestamp("expires", { withTimezone: true }).notNull(),
   },
   (vt) => [primaryKey({ columns: [vt.identifier, vt.token] })],
 );
 
-export const passwordResetTokens = sqliteTable(
+export const passwordResetTokens = pgTable(
   "passwordResetToken",
   {
     id: text("id")
@@ -182,13 +179,13 @@ export const passwordResetTokens = sqliteTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     token: text("token").notNull().unique(),
-    expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
+    expires: timestamp("expires", { withTimezone: true }).notNull(),
     createdAt: createdAtField(),
   },
   (prt) => [index("passwordResetTokens_userId_idx").on(prt.userId)],
 );
 
-export const apiKeys = sqliteTable(
+export const apiKeys = pgTable(
   "apiKey",
   {
     id: text("id")
@@ -197,10 +194,10 @@ export const apiKeys = sqliteTable(
       .$defaultFn(() => createId()),
     name: text("name").notNull(),
     createdAt: createdAtField(),
-    lastUsedAt: integer("lastUsedAt", { mode: "timestamp" }),
+    lastUsedAt: timestamp("lastUsedAt", { withTimezone: true }),
     keyId: text("keyId").notNull().unique(),
     keyHash: text("keyHash").notNull(),
-    scopes: text("scopes", { mode: "json" })
+    scopes: jsonb("scopes")
       .$type<ZApiKeyScope[]>()
       .notNull()
       .$defaultFn(() => [API_KEY_FULL_ACCESS_SCOPE]),
@@ -211,7 +208,7 @@ export const apiKeys = sqliteTable(
   (ak) => [unique().on(ak.name, ak.userId)],
 );
 
-export const bookmarks = sqliteTable(
+export const bookmarks = pgTable(
   "bookmarks",
   {
     id: text("id")
@@ -230,8 +227,8 @@ export const bookmarks = sqliteTable(
     createdAt: createdAtField("lastSavedAt"),
     modifiedAt: modifiedAtField(),
     title: text("title"),
-    archived: integer("archived", { mode: "boolean" }).notNull().default(false),
-    favourited: integer("favourited", { mode: "boolean" })
+    archived: boolean("archived").notNull().default(false),
+    favourited: boolean("favourited")
       .notNull()
       .default(false),
     userId: text("userId")
@@ -287,7 +284,7 @@ export const bookmarks = sqliteTable(
   ],
 );
 
-export const bookmarkLinks = sqliteTable(
+export const bookmarkLinks = pgTable(
   "bookmarkLinks",
   {
     id: text("id")
@@ -302,8 +299,8 @@ export const bookmarkLinks = sqliteTable(
     description: text("description"),
     author: text("author"),
     publisher: text("publisher"),
-    datePublished: integer("datePublished", { mode: "timestamp" }),
-    dateModified: integer("dateModified", { mode: "timestamp" }),
+    datePublished: timestamp("datePublished", { withTimezone: true }),
+    dateModified: timestamp("dateModified", { withTimezone: true }),
     imageUrl: text("imageUrl"),
     favicon: text("favicon"),
     htmlContent: text("htmlContent"),
@@ -312,18 +309,18 @@ export const bookmarkLinks = sqliteTable(
       enum: ["readable", "not_readable", "uncertain", "unavailable"],
     }),
     readerViewScore: integer("readerViewScore"),
-    readerViewReasons: text("readerViewReasons", { mode: "json" }).$type<
+    readerViewReasons: jsonb("readerViewReasons").$type<
       ZReaderViewReason[]
     >(),
     readerViewClassifierVersion: integer("readerViewClassifierVersion"),
-    crawledAt: integer("crawledAt", { mode: "timestamp" }),
+    crawledAt: timestamp("crawledAt", { withTimezone: true }),
     crawlStatus: text("crawlStatus", {
       enum: ["pending", "failure", "success"],
     }).default("pending"),
     crawlStatusCode: integer("crawlStatusCode").default(200),
     // When the pre-crawl probe last extracted and stored this link's metadata.
     // Lets crawl retries skip re-fetching it.
-    probeMetadataAt: integer("probeMetadataAt", { mode: "timestamp" }),
+    probeMetadataAt: timestamp("probeMetadataAt", { withTimezone: true }),
   },
   (bl) => [index("bookmarkLinks_url_idx").on(bl.url)],
 );
@@ -344,7 +341,7 @@ export const enum AssetTypes {
   UNKNOWN = "unknown",
 }
 
-export const assets = sqliteTable(
+export const assets = pgTable(
   "assets",
   {
     // Asset ids don't have a default function as they are generated by the caller
@@ -384,7 +381,7 @@ export const assets = sqliteTable(
   ],
 );
 
-export const highlights = sqliteTable(
+export const highlights = pgTable(
   "highlights",
   {
     id: text("id")
@@ -422,7 +419,7 @@ export const highlights = sqliteTable(
 // anchorId intentionally has no FK: it points at either bookmarkTags.id or
 // bookmarkLists.id. Orphaned anchors (tag/list deleted) are cleaned up by the
 // periodic reconciliation cron.
-export const conceptPages = sqliteTable(
+export const conceptPages = pgTable(
   "conceptPages",
   {
     id: text("id")
@@ -457,7 +454,7 @@ export const conceptPages = sqliteTable(
     sourceContentHash: text("sourceContentHash"),
 
     compileVersion: integer("compileVersion").notNull().default(0),
-    lastCompiledAt: integer("lastCompiledAt", { mode: "timestamp" }),
+    lastCompiledAt: timestamp("lastCompiledAt", { withTimezone: true }),
     lastSourceChangeAt: modifiedAtField(),
 
     createdAt: createdAtField(),
@@ -472,7 +469,7 @@ export const conceptPages = sqliteTable(
 // Which bookmarks were fed into a concept page compile. Bookmark deletion
 // cascades rows away here; the reconciliation cron notices the mismatch with
 // conceptPages.sourceCount and marks the page stale.
-export const conceptPageSources = sqliteTable(
+export const conceptPageSources = pgTable(
   "conceptPageSources",
   {
     pageId: text("pageId")
@@ -481,7 +478,7 @@ export const conceptPageSources = sqliteTable(
     bookmarkId: text("bookmarkId")
       .notNull()
       .references(() => bookmarks.id, { onDelete: "cascade" }),
-    attachedAt: integer("attachedAt", { mode: "timestamp" }).$defaultFn(
+    attachedAt: timestamp("attachedAt", { withTimezone: true }).$defaultFn(
       () => new Date(),
     ),
   },
@@ -491,7 +488,7 @@ export const conceptPageSources = sqliteTable(
   ],
 );
 
-export const userReadingProgress = sqliteTable(
+export const userReadingProgress = pgTable(
   "userReadingProgress",
   {
     id: text("id")
@@ -518,7 +515,7 @@ export const userReadingProgress = sqliteTable(
   ],
 );
 
-export const bookmarkTexts = sqliteTable("bookmarkTexts", {
+export const bookmarkTexts = pgTable("bookmarkTexts", {
   id: text("id")
     .notNull()
     .primaryKey()
@@ -528,7 +525,7 @@ export const bookmarkTexts = sqliteTable("bookmarkTexts", {
   sourceUrl: text("sourceUrl"),
 });
 
-export const bookmarkAssets = sqliteTable("bookmarkAssets", {
+export const bookmarkAssets = pgTable("bookmarkAssets", {
   id: text("id")
     .notNull()
     .primaryKey()
@@ -542,7 +539,7 @@ export const bookmarkAssets = sqliteTable("bookmarkAssets", {
   sourceUrl: text("sourceUrl"),
 });
 
-export const bookmarkTags = sqliteTable(
+export const bookmarkTags = pgTable(
   "bookmarkTags",
   {
     id: text("id")
@@ -553,10 +550,8 @@ export const bookmarkTags = sqliteTable(
     normalizedName: text("normalizedName").generatedAlwaysAs(
       (): SQL =>
         // This function needs to be in sync with the tagNormalizer function in tagging.ts
+        // PG generated 列默认 stored（lower/replace 均 immutable，合法）
         sql`lower(replace(replace(replace(${bookmarkTags.name}, ' ', ''), '-', ''), '_', ''))`,
-      {
-        mode: "virtual",
-      },
     ),
     createdAt: createdAtField(),
     userId: text("userId")
@@ -571,7 +566,7 @@ export const bookmarkTags = sqliteTable(
   ],
 );
 
-export const tagsOnBookmarks = sqliteTable(
+export const tagsOnBookmarks = pgTable(
   "tagsOnBookmarks",
   {
     bookmarkId: text("bookmarkId")
@@ -581,7 +576,7 @@ export const tagsOnBookmarks = sqliteTable(
       .notNull()
       .references(() => bookmarkTags.id, { onDelete: "cascade" }),
 
-    attachedAt: integer("attachedAt", { mode: "timestamp" }).$defaultFn(
+    attachedAt: timestamp("attachedAt", { withTimezone: true }).$defaultFn(
       () => new Date(),
     ),
     attachedBy: text("attachedBy", { enum: ["ai", "human"] }).notNull(),
@@ -593,7 +588,7 @@ export const tagsOnBookmarks = sqliteTable(
   ],
 );
 
-export const bookmarkLists = sqliteTable(
+export const bookmarkLists = pgTable(
   "bookmarkLists",
   {
     id: text("id")
@@ -611,12 +606,12 @@ export const bookmarkLists = sqliteTable(
     // Only applicable for smart lists
     query: text("query"),
     parentId: text("parentId").references(
-      (): AnySQLiteColumn => bookmarkLists.id,
+      (): AnyPgColumn => bookmarkLists.id,
       { onDelete: "set null" },
     ),
     // Whoever have access to this token can read the content of this list
     rssToken: text("rssToken"),
-    public: integer("public", { mode: "boolean" }).notNull().default(false),
+    public: boolean("public").notNull().default(false),
   },
   (bl) => [
     index("bookmarkLists_userId_idx").on(bl.userId),
@@ -624,7 +619,7 @@ export const bookmarkLists = sqliteTable(
   ],
 );
 
-export const bookmarksInLists = sqliteTable(
+export const bookmarksInLists = pgTable(
   "bookmarksInLists",
   {
     bookmarkId: text("bookmarkId")
@@ -633,7 +628,7 @@ export const bookmarksInLists = sqliteTable(
     listId: text("listId")
       .notNull()
       .references(() => bookmarkLists.id, { onDelete: "cascade" }),
-    addedAt: integer("addedAt", { mode: "timestamp" }).$defaultFn(
+    addedAt: timestamp("addedAt", { withTimezone: true }).$defaultFn(
       () => new Date(),
     ),
     // Tie the list's existence to the user's membership
@@ -655,7 +650,7 @@ export const bookmarksInLists = sqliteTable(
   ],
 );
 
-export const listCollaborators = sqliteTable(
+export const listCollaborators = pgTable(
   "listCollaborators",
   {
     id: text("id")
@@ -681,7 +676,7 @@ export const listCollaborators = sqliteTable(
   ],
 );
 
-export const listInvitations = sqliteTable(
+export const listInvitations = pgTable(
   "listInvitations",
   {
     id: text("id")
@@ -698,7 +693,7 @@ export const listInvitations = sqliteTable(
     status: text("status", { enum: ["pending", "declined"] })
       .notNull()
       .default("pending"),
-    invitedAt: integer("invitedAt", { mode: "timestamp" })
+    invitedAt: timestamp("invitedAt", { withTimezone: true })
       .notNull()
       .$defaultFn(() => new Date()),
     invitedEmail: text("invitedEmail"),
@@ -714,7 +709,7 @@ export const listInvitations = sqliteTable(
   ],
 );
 
-export const customPrompts = sqliteTable(
+export const customPrompts = pgTable(
   "customPrompts",
   {
     id: text("id")
@@ -722,7 +717,7 @@ export const customPrompts = sqliteTable(
       .primaryKey()
       .$defaultFn(() => createId()),
     text: text("text").notNull(),
-    enabled: integer("enabled", { mode: "boolean" }).notNull(),
+    enabled: boolean("enabled").notNull(),
     appliesTo: text("appliesTo", {
       enum: ["all_tagging", "text", "images", "summary"],
     }).notNull(),
@@ -739,7 +734,7 @@ export const customPrompts = sqliteTable(
  * - openai-compatible：baseUrl + apiKey + model（pi-ai 每档案独立 provider）
  * - trae-cli：command + timeoutMinutes（CLI 子进程 adapter）
  */
-export const agentProfiles = sqliteTable(
+export const agentProfiles = pgTable(
   "agentProfiles",
   {
     id: text("id")
@@ -760,13 +755,11 @@ export const agentProfiles = sqliteTable(
     command: text("command"),
     timeoutMinutes: integer("timeoutMinutes").notNull().default(5),
     systemPrompt: text("systemPrompt"),
-    enableTools: integer("enableTools", { mode: "boolean" })
+    enableTools: boolean("enableTools")
       .notNull()
       .default(true),
     // per-profile 语料隔离：绑定标签/清单作为咨询语料范围；null 或两者皆空 = 全部书签语料
-    knowledgeScope: text("knowledge_scope", {
-      mode: "json",
-    }).$type<KnowledgeScope | null>(),
+    knowledgeScope: jsonb("knowledge_scope").$type<KnowledgeScope | null>(),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },
@@ -778,7 +771,7 @@ export const agentProfiles = sqliteTable(
 // 挂在 agentProfile 下的可复用提示词模板：咨询者咨询时点选技能，
 // 模板正文以 <skill_directive> 块拼入当轮 prompt，指引专家按固定流程作答。
 // 发布联动：publication 处于 published/delisting 时技能可被选用，下架即失效。
-export const agentSkills = sqliteTable(
+export const agentSkills = pgTable(
   "agentSkills",
   {
     id: text("id")
@@ -798,20 +791,16 @@ export const agentSkills = sqliteTable(
     // 输出格式提示（拼接在模板正文之后，可空）
     outputHint: text("outputHint"),
     // P3 参数化技能：参数定义数组（null = 无参提示词模板型）
-    paramsSchema: text("params_schema", { mode: "json" }).$type<
+    paramsSchema: jsonb("params_schema").$type<
       SkillParam[] | null
     >(),
     // P2 技能级语料范围：点选技能的当轮以「档案 scope ∩ 技能 scope」
     // 交集收窄检索范围；null = 不收窄（仅档案 scope）
-    knowledgeScope: text("knowledge_scope", {
-      mode: "json",
-    }).$type<KnowledgeScope | null>(),
+    knowledgeScope: jsonb("knowledge_scope").$type<KnowledgeScope | null>(),
     // P4 工具执行型技能：点选技能的当轮临时解锁的工具白名单
     // （null = 纯提示词技能；执行身份=咨询者，产物归属咨询者）
-    toolGrant: text("tool_grant", {
-      mode: "json",
-    }).$type<SkillToolGrant | null>(),
-    enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+    toolGrant: jsonb("tool_grant").$type<SkillToolGrant | null>(),
+    enabled: boolean("enabled").notNull().default(true),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },
@@ -820,7 +809,7 @@ export const agentSkills = sqliteTable(
 
 // B1 长期记忆固化：agent 对话中提炼的用户偏好/事实，
 // 注入三源 RAG 上下文，让 agent 越用越懂用户。
-export const agentMemories = sqliteTable(
+export const agentMemories = pgTable(
   "agentMemories",
   {
     id: text("id")
@@ -839,7 +828,7 @@ export const agentMemories = sqliteTable(
   (am) => [index("agentMemories_userId_idx").on(am.userId)],
 );
 
-export const chatSessions = sqliteTable(
+export const chatSessions = pgTable(
   "chatSessions",
   {
     id: text("id")
@@ -875,7 +864,7 @@ export const chatSessions = sqliteTable(
   ],
 );
 
-export const chatMessages = sqliteTable(
+export const chatMessages = pgTable(
   "chatMessages",
   {
     id: text("id")
@@ -887,7 +876,7 @@ export const chatMessages = sqliteTable(
       .references(() => chatSessions.id, { onDelete: "cascade" }),
     role: text("role", { enum: ["user", "assistant", "toolResult"] }).notNull(),
     content: text("content").notNull(),
-    metadata: text("metadata", { mode: "json" }).$type<unknown>(),
+    metadata: jsonb("metadata").$type<unknown>(),
     createdAt: createdAtMsField(),
   },
   (cm) => [
@@ -903,7 +892,7 @@ export const chatMessages = sqliteTable(
 // - delisting：下架缓冲期（默认 7 天），不接新会话、已购会话继续服务、可恢复
 // - delisted：彻底下架（delisting 到期后由读路径惰性转换），服务关闭
 // 删除 agentProfile 前必须先完成下架（router 层校验），防止绕过缓冲期。
-export const agentPublications = sqliteTable(
+export const agentPublications = pgTable(
   "agentPublications",
   {
     id: text("id")
@@ -919,12 +908,12 @@ export const agentPublications = sqliteTable(
     title: text("title").notNull(),
     description: text("description"),
     // 领域标签（发现/初筛用，L0 元数据）
-    tags: text("tags", { mode: "json" })
+    tags: jsonb("tags")
       .$type<string[]>()
       .notNull()
       .default([]),
     // Agent Card 专长摘要（D2 喂养流水线 LLM 刷新；null = 尚未生成）
-    autoExpertise: text("auto_expertise", { mode: "json" }).$type<
+    autoExpertise: jsonb("auto_expertise").$type<
       string[] | null
     >(),
     // 卡片头像资产 id（无 FK：资产删除后头像优雅降级为默认）
@@ -939,8 +928,8 @@ export const agentPublications = sqliteTable(
     })
       .notNull()
       .default("published"),
-    delistingAt: integer("delistingAt", { mode: "timestamp_ms" }),
-    delistedAt: integer("delistedAt", { mode: "timestamp_ms" }),
+    delistingAt: timestamp("delistingAt", { withTimezone: true }),
+    delistedAt: timestamp("delistedAt", { withTimezone: true }),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },
@@ -955,7 +944,7 @@ export const agentPublications = sqliteTable(
 // ── D6 咨询计量（per-call 记账；P0 只记账不结算） ──────
 // 咨询会话每条成功回复记一笔，amount 是记账当时的单价快照
 // （发布调价不影响已记条目），为后续支付结算留数据基础。
-export const consultationUsages = sqliteTable(
+export const consultationUsages = pgTable(
   "consultationUsages",
   {
     id: text("id")
@@ -993,7 +982,7 @@ export const consultationUsages = sqliteTable(
 // ── F4 咨询结算单：把一批未结算 usage 打包成快照 ──────
 // P1 无支付通道，结算 = 所有者触发的汇总快照（金额 + 笔数），
 // usage 行打上 settlementId 标记已结算；P2 接入真实支付后在此扩展。
-export const consultationSettlements = sqliteTable(
+export const consultationSettlements = pgTable(
   "consultationSettlements",
   {
     id: text("id")
@@ -1023,7 +1012,7 @@ export const consultationSettlements = sqliteTable(
 // worker 通过影子会话（chatSessions）执行咨询流（知识检索按发布所有者、
 // 沿用计量记账），答案回写 answer。need_input 态预留目标方反问澄清
 // （EigenFlux need_input 契约模式）。
-export const agentMessages = sqliteTable(
+export const agentMessages = pgTable(
   "agentMessages",
   {
     id: text("id")
@@ -1069,7 +1058,7 @@ export const agentMessages = sqliteTable(
       .default("pending"),
     // failed/need_input 时的说明
     note: text("note"),
-    expiresAt: integer("expiresAt", { mode: "timestamp_ms" }).notNull(),
+    expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },
@@ -1086,7 +1075,7 @@ export const agentMessages = sqliteTable(
   ],
 );
 
-export const canvases = sqliteTable(
+export const canvases = pgTable(
   "canvases",
   {
     id: text("id")
@@ -1097,7 +1086,7 @@ export const canvases = sqliteTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    data: text("data", { mode: "json" }).$type<unknown>(),
+    data: jsonb("data").$type<unknown>(),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },
@@ -1112,7 +1101,7 @@ export const canvases = sqliteTable(
 // widgets 保存组件当前状态（code 为当前版本内容），
 // widgetVersions 为 append-only 版本历史（回滚 = 复制目标版本为新版本）。
 
-export const widgets = sqliteTable(
+export const widgets = pgTable(
   "widgets",
   {
     id: text("id")
@@ -1125,7 +1114,7 @@ export const widgets = sqliteTable(
     name: text("name").notNull(),
     description: text("description"),
     // WidgetManifest（@saiye/shared/types/widgets）：{ apiVersion, size, permissions }
-    manifest: text("manifest", { mode: "json" }).$type<unknown>(),
+    manifest: jsonb("manifest").$type<unknown>(),
     // HTML 片段（非完整文档），只在客户端沙箱内执行，服务端永不 eval
     code: text("code").notNull(),
     status: text("status", { enum: ["draft", "enabled"] }).notNull(),
@@ -1139,7 +1128,7 @@ export const widgets = sqliteTable(
   ],
 );
 
-export const widgetVersions = sqliteTable(
+export const widgetVersions = pgTable(
   "widgetVersions",
   {
     id: text("id")
@@ -1151,7 +1140,7 @@ export const widgetVersions = sqliteTable(
       .references(() => widgets.id, { onDelete: "cascade" }),
     version: integer("version").notNull(),
     code: text("code").notNull(),
-    manifest: text("manifest", { mode: "json" }).$type<unknown>(),
+    manifest: jsonb("manifest").$type<unknown>(),
     createdAt: createdAtMsField(),
   },
   (wv) => [index("widgetVersions_widgetId_idx").on(wv.widgetId, wv.version)],
@@ -1163,7 +1152,7 @@ export const widgetVersions = sqliteTable(
 // - payload 与 C1 导出信封的 data 同构（apiKey 永不入快照）
 // - 源资产后续修改/删除不影响已分享内容
 // - revoke = 删除行（链接即失效）
-export const sharedAgentAssets = sqliteTable(
+export const sharedAgentAssets = pgTable(
   "sharedAgentAssets",
   {
     id: text("id")
@@ -1180,7 +1169,7 @@ export const sharedAgentAssets = sqliteTable(
     assetId: text("assetId").notNull(),
     shareToken: text("shareToken").notNull().unique(),
     name: text("name").notNull(),
-    payload: text("payload", { mode: "json" }).$type<unknown>().notNull(),
+    payload: jsonb("payload").$type<unknown>().notNull(),
     createdAt: createdAtMsField(),
   },
   (s) => [
@@ -1189,7 +1178,7 @@ export const sharedAgentAssets = sqliteTable(
   ],
 );
 
-export const rssFeedsTable = sqliteTable(
+export const rssFeedsTable = pgTable(
   "rssFeeds",
   {
     id: text("id")
@@ -1198,15 +1187,13 @@ export const rssFeedsTable = sqliteTable(
       .$defaultFn(() => createId()),
     name: text("name").notNull(),
     url: text("url").notNull(),
-    enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
-    importTags: integer("importTags", { mode: "boolean" })
+    enabled: boolean("enabled").notNull().default(true),
+    importTags: boolean("importTags")
       .notNull()
       .default(false),
     createdAt: createdAtField(),
-    lastFetchedAt: integer("lastFetchedAt", { mode: "timestamp" }),
-    lastSuccessfulFetchAt: integer("lastSuccessfulFetchAt", {
-      mode: "timestamp",
-    }),
+    lastFetchedAt: timestamp("lastFetchedAt", { withTimezone: true }),
+    lastSuccessfulFetchAt: timestamp("lastSuccessfulFetchAt", { withTimezone: true }),
     lastFetchedStatus: text("lastFetchedStatus", {
       enum: ["pending", "failure", "success"],
     }).default("pending"),
@@ -1217,7 +1204,7 @@ export const rssFeedsTable = sqliteTable(
   (bl) => [index("rssFeeds_userId_idx").on(bl.userId)],
 );
 
-export const webhooksTable = sqliteTable(
+export const webhooksTable = pgTable(
   "webhooks",
   {
     id: text("id")
@@ -1229,7 +1216,7 @@ export const webhooksTable = sqliteTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    events: text("events", { mode: "json" })
+    events: jsonb("events")
       .notNull()
       .$type<("created" | "edited" | "crawled" | "ai tagged" | "deleted")[]>(),
     token: text("token"),
@@ -1237,7 +1224,7 @@ export const webhooksTable = sqliteTable(
   (bl) => [index("webhooks_userId_idx").on(bl.userId)],
 );
 
-export const rssFeedImportsTable = sqliteTable(
+export const rssFeedImportsTable = pgTable(
   "rssFeedImports",
   {
     id: text("id")
@@ -1266,7 +1253,7 @@ export const rssFeedImportsTable = sqliteTable(
   ],
 );
 
-export const backupsTable = sqliteTable(
+export const backupsTable = pgTable(
   "backups",
   {
     id: text("id")
@@ -1295,19 +1282,19 @@ export const backupsTable = sqliteTable(
   ],
 );
 
-export const config = sqliteTable("config", {
+export const config = pgTable("config", {
   key: text("key").notNull().primaryKey(),
   value: text("value").notNull(),
 });
 
-export const ruleEngineRulesTable = sqliteTable(
+export const ruleEngineRulesTable = pgTable(
   "ruleEngineRules",
   {
     id: text("id")
       .notNull()
       .primaryKey()
       .$defaultFn(() => createId()),
-    enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+    enabled: boolean("enabled").notNull().default(true),
     name: text("name").notNull(),
     description: text("description"),
     event: text("event").notNull(),
@@ -1331,7 +1318,7 @@ export const ruleEngineRulesTable = sqliteTable(
   ],
 );
 
-export const ruleEngineActionsTable = sqliteTable(
+export const ruleEngineActionsTable = pgTable(
   "ruleEngineActions",
   {
     id: text("id")
@@ -1367,7 +1354,7 @@ export const ruleEngineActionsTable = sqliteTable(
   ],
 );
 
-export const invites = sqliteTable("invites", {
+export const invites = pgTable("invites", {
   id: text("id")
     .notNull()
     .primaryKey()
@@ -1375,13 +1362,13 @@ export const invites = sqliteTable("invites", {
   email: text("email").notNull(),
   token: text("token").notNull().unique(),
   createdAt: createdAtField(),
-  usedAt: integer("usedAt", { mode: "timestamp" }),
+  usedAt: timestamp("usedAt", { withTimezone: true }),
   invitedBy: text("invitedBy")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 });
 
-export const subscriptions = sqliteTable(
+export const subscriptions = pgTable(
   "subscriptions",
   {
     id: text("id")
@@ -1412,11 +1399,9 @@ export const subscriptions = sqliteTable(
       .notNull()
       .default("free"),
     priceId: text("priceId"),
-    cancelAtPeriodEnd: integer("cancelAtPeriodEnd", {
-      mode: "boolean",
-    }).default(false),
-    startDate: integer("startDate", { mode: "timestamp" }),
-    endDate: integer("endDate", { mode: "timestamp" }),
+    cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false),
+    startDate: timestamp("startDate", { withTimezone: true }),
+    endDate: timestamp("endDate", { withTimezone: true }),
     createdAt: createdAtField(),
     modifiedAt: modifiedAtField(),
   },
@@ -1426,7 +1411,7 @@ export const subscriptions = sqliteTable(
   ],
 );
 
-export const importSessions = sqliteTable(
+export const importSessions = pgTable(
   "importSessions",
   {
     id: text("id")
@@ -1454,8 +1439,8 @@ export const importSessions = sqliteTable(
     })
       .notNull()
       .default("staging"),
-    lastProcessedAt: integer("lastProcessedAt", { mode: "timestamp" }),
-    completedAt: integer("completedAt", { mode: "timestamp" }),
+    lastProcessedAt: timestamp("lastProcessedAt", { withTimezone: true }),
+    completedAt: timestamp("completedAt", { withTimezone: true }),
     totalBookmarks: integer("totalBookmarks").notNull().default(0),
     completedBookmarks: integer("completedBookmarks").notNull().default(0),
     failedBookmarks: integer("failedBookmarks").notNull().default(0),
@@ -1474,7 +1459,7 @@ export const importSessions = sqliteTable(
   ],
 );
 
-export const importSessionBookmarks = sqliteTable(
+export const importSessionBookmarks = pgTable(
   "importSessionBookmarks",
   {
     id: text("id")
@@ -1495,7 +1480,7 @@ export const importSessionBookmarks = sqliteTable(
   ],
 );
 
-export const importStagingBookmarks = sqliteTable(
+export const importStagingBookmarks = pgTable(
   "importStagingBookmarks",
   {
     id: text("id")
@@ -1512,10 +1497,10 @@ export const importStagingBookmarks = sqliteTable(
     title: text("title"),
     content: text("content"),
     note: text("note"),
-    tags: text("tags", { mode: "json" }).$type<string[]>(),
-    listIds: text("listIds", { mode: "json" }).$type<string[]>(),
-    sourceAddedAt: integer("sourceAddedAt", { mode: "timestamp" }),
-    archived: integer("archived", { mode: "boolean" }),
+    tags: jsonb("tags").$type<string[]>(),
+    listIds: jsonb("listIds").$type<string[]>(),
+    sourceAddedAt: timestamp("sourceAddedAt", { withTimezone: true }),
+    archived: boolean("archived"),
 
     // Processing state
     status: text("status", {
@@ -1523,9 +1508,7 @@ export const importStagingBookmarks = sqliteTable(
     })
       .notNull()
       .default("pending"),
-    processingStartedAt: integer("processingStartedAt", {
-      mode: "timestamp",
-    }),
+    processingStartedAt: timestamp("processingStartedAt", { withTimezone: true }),
 
     // Result (for observability)
     result: text("result", {
@@ -1537,7 +1520,7 @@ export const importStagingBookmarks = sqliteTable(
     }),
 
     createdAt: createdAtField(),
-    completedAt: integer("completedAt", { mode: "timestamp" }),
+    completedAt: timestamp("completedAt", { withTimezone: true }),
   },
   (isb) => [
     index("importStaging_session_status_idx").on(
