@@ -313,8 +313,9 @@ describe("概念页全链路集成", () => {
       expect(doc).toContain("# Rust");
       expect(doc).toContain("综述正文");
       expect(doc).toContain("## Sources");
-      expect(doc).toContain(`](../${bm1}.md)`);
-      expect(doc).toContain(`](../${bm2}.md)`);
+      // Sources 使用 Obsidian wikilink（[[id|标题]]），路径保留在 frontmatter sources
+      expect(doc).toContain(`[[${bm1}|`);
+      expect(doc).toContain(`[[${bm2}|`);
     },
   );
 
@@ -481,7 +482,7 @@ describe("概念页全链路集成", () => {
 
       const doc = await fsp.readFile(mirrorPath(userId, page.slug), "utf8");
       expect(doc).toContain("v2");
-      expect(doc).toContain(`](../${bm2}.md)`);
+      expect(doc).toContain(`[[${bm2}|`);
     },
   );
 
@@ -514,7 +515,7 @@ describe("概念页全链路集成", () => {
 
       const doc = await fsp.readFile(mirrorPath(userId, page.slug), "utf8");
       expect(doc).toContain("阅读清单");
-      expect(doc).toContain(`](../${bm}.md)`);
+      expect(doc).toContain(`[[${bm}|`);
     },
   );
 });
