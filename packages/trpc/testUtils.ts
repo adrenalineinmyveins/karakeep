@@ -8,6 +8,7 @@ import { createCallerFactory } from "./index";
 import { appRouter } from "./routers/_app";
 
 const testQueueMocks = vi.hoisted(() => ({
+  agentMessageEnqueue: vi.fn(),
   assetPreprocessingEnqueue: vi.fn(),
   conceptCompilationEnqueue: vi.fn(),
   embeddingsEnqueue: vi.fn(),
@@ -125,6 +126,9 @@ export function defaultBeforeEach(seedDB = true) {
       const mod = (await original()) as typeof import("@saiye/shared-server");
       return {
         ...mod,
+        AgentMessageQueue: {
+          enqueue: testQueueMocks.agentMessageEnqueue,
+        },
         AssetPreprocessingQueue: {
           enqueue: testQueueMocks.assetPreprocessingEnqueue,
         },

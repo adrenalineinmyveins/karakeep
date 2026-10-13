@@ -6,7 +6,9 @@ import {
   inArray,
   isNotNull,
   isNull,
+  like,
   lte,
+  or,
   sql,
 } from "drizzle-orm";
 import { z } from "zod";
@@ -24,6 +26,7 @@ import serverConfig from "@saiye/shared/config";
 import logger from "@saiye/shared/logger";
 
 import { authedProcedure, router } from "../index";
+import { AGENT_PROFILE_TYPES } from "@saiye/shared/types/agentProfiles";
 
 // F1 联邦化：运营参数挪到 serverConfig（env 可覆盖）；
 // 保留导出名，取值时机为模块加载（与 env 单例解析一致）。
@@ -60,6 +63,13 @@ const zPublicationCardSchema = zPublicationSchema.and(
     ownerName: z.string(),
     // delisting 状态下的缓冲期截止时间（published 为 null）
     graceEndsAt: z.date().nullable(),
+    // 目标 Agent 运行时（hosted = 个人 Agent，其余 = 联邦外部专家）
+    runtime: z.enum(AGENT_PROFILE_TYPES),
+    // Agent Card 专长摘要（D2 喂养生成；null = 未生成）
+    autoExpertise: z.array(z.string()).nullable(),
+    avatarAssetId: z.string().nullable(),
+    // 是否当前查看者自己的发布（前端据此隐藏咨询入口）
+    isOwn: z.boolean(),
   }),
 );
 
@@ -182,8 +192,13 @@ async function fetchOwnedPublication(db: DB, userId: string, id: string) {
   return row;
 }
 
-/** 转咨询者卡片（带所有者显示名与缓冲期截止时间） */
-async function toCard(db: DB, row: typeof agentPublications.$inferSelect) {
+/** 转咨询者卡片（带所有者显示名、缓冲期截止时间与运行时） */
+async function toCard(
+  db: DB,
+  row: typeof agentPublications.$inferSelect,
+  runtime: (typeof AGENT_PROFILE_TYPES)[number],
+  viewerId: string,
+) {
   const owner = await db.query.users.findFirst({
     where: eq(users.id, row.userId),
     columns: { name: true },
@@ -195,6 +210,8 @@ async function toCard(db: DB, row: typeof agentPublications.$inferSelect) {
       row.status === "delisting" && row.delistingAt
         ? new Date(row.delistingAt.getTime() + DELISTING_GRACE_PERIOD_MS)
         : null,
+    runtime,
+    isOwn: row.userId === viewerId,
   };
 }
 
@@ -347,17 +364,52 @@ export const agentPublicationsAppRouter = router({
       return { publications: rows };
     }),
 
-  // 咨询者：发现可咨询的专家（published + delisting 均可见，delisting 标记"下架中"）
+  // 咨询者：发现可咨询的专家（published + delisting 均可见，delisting 标记"下架中"）。
+  // 可选 query（标题/描述模糊）/ tag（标签精确）过滤。
   discover: authedProcedure
+    .input(
+      z
+        .object({
+          query: z.string().min(1).max(120).optional(),
+          tag: z.string().min(1).max(40).optional(),
+        })
+        .nullish(),
+    )
     .output(z.object({ publications: z.array(zPublicationCardSchema) }))
-    .query(async ({ ctx }) => {
+    .query(async ({ ctx, input }) => {
       await settleExpiredDelistings(ctx.db);
-      const rows = await ctx.db.query.agentPublications.findMany({
-        where: inArray(agentPublications.status, ["published", "delisting"]),
-        orderBy: (t, { desc }) => [desc(t.createdAt)],
-      });
+      const conditions = [
+        inArray(agentPublications.status, ["published", "delisting"]),
+      ];
+      if (input?.tag) {
+        // SQLite json_each；PG 迁移时换 jsonb 存在性检查
+        conditions.push(
+          sql`exists (select 1 from json_each(${agentPublications.tags}) where json_each.value = ${input.tag})`,
+        );
+      }
+      if (input?.query) {
+        const pattern = `%${input.query}%`;
+        conditions.push(
+          or(
+            like(agentPublications.title, pattern),
+            like(agentPublications.description, pattern),
+          )!,
+        );
+      }
+      const rows = await ctx.db
+        .select({ pub: agentPublications, runtime: agentProfiles.type })
+        .from(agentPublications)
+        .innerJoin(
+          agentProfiles,
+          eq(agentProfiles.id, agentPublications.agentProfileId),
+        )
+        .where(and(...conditions))
+        .orderBy(desc(agentPublications.createdAt))
+        .limit(100);
       return {
-        publications: await Promise.all(rows.map((r) => toCard(ctx.db, r))),
+        publications: await Promise.all(
+          rows.map((r) => toCard(ctx.db, r.pub, r.runtime, ctx.user.id)),
+        ),
       };
     }),
 
@@ -513,15 +565,23 @@ export const agentPublicationsAppRouter = router({
     .output(z.object({ publication: zPublicationCardSchema }))
     .query(async ({ ctx, input }) => {
       await settleExpiredDelistings(ctx.db);
-      const row = await ctx.db.query.agentPublications.findFirst({
-        where: eq(agentPublications.id, input.id),
-      });
-      if (!row || row.status === "delisted") {
+      const [row] = await ctx.db
+        .select({ pub: agentPublications, runtime: agentProfiles.type })
+        .from(agentPublications)
+        .innerJoin(
+          agentProfiles,
+          eq(agentProfiles.id, agentPublications.agentProfileId),
+        )
+        .where(eq(agentPublications.id, input.id))
+        .limit(1);
+      if (!row || row.pub.status === "delisted") {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Publication not found",
         });
       }
-      return { publication: await toCard(ctx.db, row) };
+      return {
+        publication: await toCard(ctx.db, row.pub, row.runtime, ctx.user.id),
+      };
     }),
 });

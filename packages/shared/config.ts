@@ -98,6 +98,10 @@ const allEnv = z.object({
   AGENT_DELISTING_GRACE_PERIOD_MS: z.coerce.number().int().min(0).optional(),
   // F1 联邦化：咨询会话计费封顶（credits）的全局默认，发布可单独覆盖
   AGENT_SESSION_BILLING_CAP_CREDITS: z.coerce.number().int().min(1).optional(),
+  // A2A：单个发布每小时可接收的咨询消息上限（防垃圾请求烧目标方预算）
+  AGENT_MESSAGE_HOURLY_LIMIT: z.coerce.number().int().min(1).optional(),
+  // A2A：消息有效期（ms），过期未执行则置 expired
+  AGENT_MESSAGE_EXPIRY_MS: z.coerce.number().int().min(60_000).optional(),
   // A3 三源 RAG 检索注入的可调参数（top K）
   KNOWLEDGE_BOOKMARK_TOP_K: z.coerce.number().int().min(1).max(20).optional(),
   KNOWLEDGE_CHAT_TOP_K: z.coerce.number().int().min(0).max(20).optional(),
@@ -411,6 +415,8 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
       delistingGracePeriodMs:
         val.AGENT_DELISTING_GRACE_PERIOD_MS ?? 7 * 24 * 60 * 60 * 1000,
       sessionBillingCapCredits: val.AGENT_SESSION_BILLING_CAP_CREDITS ?? 1000,
+      agentMessageHourlyLimit: val.AGENT_MESSAGE_HOURLY_LIMIT ?? 20,
+      agentMessageExpiryMs: val.AGENT_MESSAGE_EXPIRY_MS ?? 24 * 60 * 60 * 1000,
     },
     tavily: {
       apiKey: val.TAVILY_API_KEY,

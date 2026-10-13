@@ -321,17 +321,19 @@ export function createAgent(params: CreateAgentParams): AgentInterface {
     );
   }
 
-  // 模型解析：档案（openai-compatible）优先，否则服务器默认
-  const models = profile ? ensureProfileModels(profile) : ensureModels();
-  const defaultPattern = profile ? null : resolveDefaultPattern();
-  const model = profile
-    ? models.getModel(profileProviderKey(profile.id), profile.model!)
-    : models.getModel(defaultPattern!.provider, defaultPattern!.modelId);
+  // 模型解析：外部档案（openai-compatible）用档案专属 provider；
+  // 无档案或宿主型（hosted）档案用服务器默认模型
+  const useServerModel = !profile || profile.type === "hosted";
+  const models = useServerModel ? ensureModels() : ensureProfileModels(profile);
+  const defaultPattern = useServerModel ? resolveDefaultPattern() : null;
+  const model = useServerModel
+    ? models.getModel(defaultPattern!.provider, defaultPattern!.modelId)
+    : models.getModel(profileProviderKey(profile.id), profile.model!);
   if (!model) {
     throw new Error(
-      profile
-        ? `Model not found for agent profile "${profile.name}": ${profile.model}. Check profile settings.`
-        : `Model not found: ${defaultPattern!.provider}/${defaultPattern!.modelId}. Check CHAT_MODEL config.`,
+      useServerModel
+        ? `Model not found: ${defaultPattern!.provider}/${defaultPattern!.modelId}. Check CHAT_MODEL config.`
+        : `Model not found for agent profile "${profile.name}": ${profile.model}. Check profile settings.`,
     );
   }
   // 工具映射：ToolDefinition → AgentTool

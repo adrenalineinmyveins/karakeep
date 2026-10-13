@@ -2,7 +2,10 @@ import { TRPCError } from "@trpc/server";
 import { and, asc, eq, inArray } from "drizzle-orm";
 
 import { agentProfiles, agentPublications } from "@saiye/db/schema";
-import { zAgentProfileInputSchema } from "@saiye/shared/types/agentProfiles";
+import {
+  zAgentProfileInputSchema,
+  zKnowledgeScopeSchema,
+} from "@saiye/shared/types/agentProfiles";
 import {
   buildAssetExportEnvelope,
   zAssetExportEnvelopeSchema,
@@ -42,13 +45,22 @@ function toValues(input: z.infer<typeof zAgentProfileInputSchema>) {
           command: null,
           timeoutMinutes: 5,
         }
-      : {
-          baseUrl: null,
-          apiKey: null,
-          model: null,
-          command: input.command,
-          timeoutMinutes: input.timeoutMinutes ?? 5,
-        }),
+      : input.type === "hosted"
+        ? {
+            // 宿主型：无连接字段，大脑由平台推理承担
+            baseUrl: null,
+            apiKey: null,
+            model: null,
+            command: null,
+            timeoutMinutes: 5,
+          }
+        : {
+            baseUrl: null,
+            apiKey: null,
+            model: null,
+            command: input.command,
+            timeoutMinutes: input.timeoutMinutes ?? 5,
+          }),
   };
 }
 
@@ -166,6 +178,50 @@ export const agentProfilesAppRouter = router({
           ),
         );
       return { success: true };
+    }),
+
+  // 一键创建宿主型个人 Agent 并发布（档案 + 卡片单事务落库）
+  publishAsAgent: authedProcedure
+    .input(
+      z.object({
+        name: z.string().min(1).max(100),
+        systemPrompt: z.string().max(8000).nullable().optional(),
+        enableTools: z.boolean().optional(),
+        knowledgeScope: zKnowledgeScopeSchema.nullable().optional(),
+        title: z.string().min(1).max(120).optional(),
+        description: z.string().max(2000).optional(),
+        tags: z.array(z.string().min(1).max(40)).max(10).optional(),
+        pricePerCall: z.number().int().min(0).max(100_000).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.transaction(async (tx) => {
+        const [profile] = await tx
+          .insert(agentProfiles)
+          .values({
+            userId: ctx.user.id,
+            ...toValues({
+              type: "hosted",
+              name: input.name,
+              systemPrompt: input.systemPrompt,
+              enableTools: input.enableTools,
+              knowledgeScope: input.knowledgeScope,
+            }),
+          })
+          .returning({ id: agentProfiles.id });
+        const [publication] = await tx
+          .insert(agentPublications)
+          .values({
+            userId: ctx.user.id,
+            agentProfileId: profile!.id,
+            title: input.title ?? input.name,
+            description: input.description ?? null,
+            tags: input.tags ?? [],
+            pricePerCall: input.pricePerCall ?? 0,
+          })
+          .returning();
+        return { profileId: profile!.id, publication };
+      });
     }),
 
   // C1 导出：apiKey 永不导出（导入后需自行补填）
