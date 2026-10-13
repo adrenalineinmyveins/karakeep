@@ -276,6 +276,9 @@ export class OpenAIEmbeddingClient implements EmbeddingClient {
     const embedResponse = await this.openAI.embeddings.create({
       model: serverConfig.embedding.textModel,
       input: inputs,
+      // SDK 默认 base64：智谱等 OpenAI 兼容端点对 base64 的处理有兼容性问题
+      // （返回损坏的向量维度），显式用 float 保证兼容性。
+      encoding_format: "float",
       ...(serverConfig.embedding.textModelDimensionOverride !== undefined
         ? {
             dimensions: serverConfig.embedding.textModelDimensionOverride,
@@ -431,6 +434,8 @@ export class OpenAIInferenceClient implements InferenceClient {
     const embedResponse = await this.openAI.embeddings.create({
       model: model,
       input: inputs,
+      // 同 OpenAIEmbeddingClient：显式 float，避免兼容端点的 base64 维度损坏
+      encoding_format: "float",
       ...(serverConfig.embedding.textModelDimensionOverride !== undefined
         ? {
             dimensions: serverConfig.embedding.textModelDimensionOverride,
