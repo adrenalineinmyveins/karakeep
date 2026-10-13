@@ -12,6 +12,7 @@ import { canvasesAppRouter } from "./canvases";
 import { chatsAppRouter } from "./chats";
 import { configAppRouter } from "./config";
 import { conceptsAppRouter } from "./concepts";
+import { creditsRouter } from "./credits";
 import { feedsAppRouter } from "./feeds";
 import { highlightsAppRouter } from "./highlights";
 import { importSessionsRouter } from "./importSessions";
@@ -38,6 +39,7 @@ export const appRouter = router({
   agentMessages: agentMessagesAppRouter,
   agentSkills: agentSkillsAppRouter,
   canvases: canvasesAppRouter,
+  credits: creditsRouter,
   widgets: widgetsAppRouter,
   apiKeys: apiKeysAppRouter,
   users: usersAppRouter,

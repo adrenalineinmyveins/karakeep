@@ -8,6 +8,13 @@
       "when": 1791862484376,
       "tag": "0000_lame_toad_men",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791877545527,
+      "tag": "0001_credits_ledger_and_balance",
+      "breakpoints": true
     }
   ]
 }

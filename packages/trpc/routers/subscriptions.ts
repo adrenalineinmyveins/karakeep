@@ -6,7 +6,7 @@ import Stripe from "stripe";
 import { z } from "zod";
 
 import { assets, bookmarks, subscriptions, users } from "@saiye/db/schema";
-import { addLogFields, withEventLog } from "@saiye/shared-server";
+import { addLogFields, CreditsService, withEventLog } from "@saiye/shared-server";
 import serverConfig from "@saiye/shared/config";
 
 import {
@@ -323,7 +323,38 @@ async function processEvent(event: Stripe.Event, db: Context["db"]) {
     "stripe.customer_id": customerId,
   });
 
-  return await syncStripeDataToDatabase(customerId, db);
+  await syncStripeDataToDatabase(customerId, db);
+
+  // invoice.paid → 给 paid tier 用户送月度 credits
+  if (event.type === "invoice.paid") {
+    await grantMonthlyCreditsOnInvoicePaid(customerId, db);
+  }
+}
+
+async function grantMonthlyCreditsOnInvoicePaid(
+  customerId: string,
+  db: Context["db"],
+) {
+  const [sub] = await db
+    .select({
+      userId: subscriptions.userId,
+      tier: subscriptions.tier,
+    })
+    .from(subscriptions)
+    .where(eq(subscriptions.stripeCustomerId, customerId))
+    .limit(1);
+  if (!sub || sub.tier !== "paid") return;
+
+  const amount = serverConfig.consultation.creditsPerMonthPaid;
+  if (amount <= 0) return;
+
+  await CreditsService.creditCredits(
+    db,
+    sub.userId,
+    amount,
+    "subscription_grant",
+    { referenceType: "stripe_invoice", referenceId: customerId },
+  );
 }
 
 const subscriptionsProcedure = createScopedAuthedProcedure("subscriptions");

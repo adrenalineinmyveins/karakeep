@@ -71,6 +71,8 @@ export const users = pgTable("user", {
   // sync doesn't downgrade the user's entitlements; it's cleared when the
   // user gets an active Stripe subscription.
   manualTierName: text("manualTierName"),
+  // Credits 钱包余额（creditsTransactions.SUM(delta) 的冗余缓存；权威来源）
+  creditsBalance: integer("creditsBalance").notNull().default(0),
 
   // User Settings
   bookmarkClickAction: text("bookmarkClickAction", {
@@ -1006,6 +1008,48 @@ export const consultationSettlements = pgTable(
   ],
 );
 
+// ── Credits 台账（append-only ledger）──────────────
+// 所有 credits 流入流出都记一条 delta，users.creditsBalance = SUM(delta)
+// 权威来源；balanceAfter 是每条记录的快照（对账用）。
+export const creditTransactions = pgTable(
+  "creditTransactions",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    // 正数增加、负数减少
+    delta: integer("delta").notNull(),
+    // 交易类型
+    type: text("type", {
+      enum: [
+        "subscription_grant",
+        "consultation_charge",
+        "consultation_payout",
+        "refund",
+        "admin_adjust",
+      ],
+    }).notNull(),
+    // 可选关联实体（方便追溯）
+    referenceType: text("referenceType"),
+    referenceId: text("referenceId"),
+    // 交易后的余额快照（用于对账；应用层写入）
+    balanceAfter: integer("balanceAfter").notNull(),
+    createdAt: createdAtMsField(),
+  },
+  (ct) => [
+    index("creditTransactions_userId_idx").on(ct.userId),
+    index("creditTransactions_userType_idx").on(ct.userId, ct.type),
+    index("creditTransactions_reference_idx").on(
+      ct.referenceType,
+      ct.referenceId,
+    ),
+  ],
+);
+
 // ── A2A 咨询消息（agent ↔ agent 异步信箱）──────────────
 //
 // 跨用户/跨 Agent 的异步咨询信封：requester 向已发布的目标 Agent 发问，
@@ -1059,6 +1103,8 @@ export const agentMessages = pgTable(
     // failed/need_input 时的说明
     note: text("note"),
     expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+    // 本次咨询扣减的 credits（快照；send 时写入，失败时 refund 回退余额）
+    creditsCharged: integer("creditsCharged").notNull().default(0),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },

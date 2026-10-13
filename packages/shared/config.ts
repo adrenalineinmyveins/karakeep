@@ -108,6 +108,14 @@ const allEnv = z.object({
   AGENT_MESSAGE_MONTHLY_BUDGET_CREDITS: z.coerce.number().int().min(1).optional(),
   // A2A：消息有效期（ms），过期未执行则置 expired
   AGENT_MESSAGE_EXPIRY_MS: z.coerce.number().int().min(60_000).optional(),
+  // Credits 体系：paid tier 每月赠送 credits
+  CREDITS_PER_MONTH_PAID: z.coerce.number().int().min(0).optional(),
+  // Credits 体系：free tier 每月赠送 credits（默认 0，防滥用）
+  CREDITS_PER_MONTH_FREE: z.coerce.number().int().min(0).optional(),
+  // 分成：hosted agent 平台抽成（发布方分成 = 1 - ratio；默认 70/30 即 0.3）
+  HOSTED_PLATFORM_FEE_RATIO: z.coerce.number().min(0).max(1).optional(),
+  // 分成：外接 agent 平台抽成（默认 90/10 即 0.1）
+  EXTERNAL_PLATFORM_FEE_RATIO: z.coerce.number().min(0).max(1).optional(),
   // A3 三源 RAG 检索注入的可调参数（top K）
   KNOWLEDGE_BOOKMARK_TOP_K: z.coerce.number().int().min(1).max(20).optional(),
   KNOWLEDGE_CHAT_TOP_K: z.coerce.number().int().min(0).max(20).optional(),
@@ -430,6 +438,10 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
       agentMessageMonthlyBudgetCredits:
         val.AGENT_MESSAGE_MONTHLY_BUDGET_CREDITS ?? null,
       agentMessageExpiryMs: val.AGENT_MESSAGE_EXPIRY_MS ?? 24 * 60 * 60 * 1000,
+      creditsPerMonthPaid: val.CREDITS_PER_MONTH_PAID ?? 500,
+      creditsPerMonthFree: val.CREDITS_PER_MONTH_FREE ?? 0,
+      hostedPlatformFeeRatio: val.HOSTED_PLATFORM_FEE_RATIO ?? 0.3,
+      externalPlatformFeeRatio: val.EXTERNAL_PLATFORM_FEE_RATIO ?? 0.1,
     },
     tavily: {
       apiKey: val.TAVILY_API_KEY,

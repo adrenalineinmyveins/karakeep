@@ -9,9 +9,10 @@ import {
   agentPublications,
   agentSkills,
   consultationUsages,
+  creditTransactions,
 } from "@saiye/db/schema";
 import serverConfig from "@saiye/shared/config";
-import { AgentMessageQueue } from "@saiye/shared-server";
+import { AgentMessageQueue, CreditsService } from "@saiye/shared-server";
 
 import { authedProcedure, router } from "../index";
 import { settleExpiredDelistings } from "./agentPublications";
@@ -175,6 +176,7 @@ export const agentMessagesAppRouter = router({
           ownerUserId: agentPublications.userId,
           profileType: agentProfiles.type,
           profileId: agentProfiles.id,
+          pricePerCall: agentPublications.pricePerCall,
         })
         .from(agentPublications)
         .innerJoin(
@@ -267,20 +269,43 @@ export const agentMessagesAppRouter = router({
         }
       }
 
-      const [message] = await ctx.db
-        .insert(agentMessages)
-        .values({
-          requesterUserId: ctx.user.id,
-          requesterProfileId: input.requesterProfileId ?? null,
-          targetPublicationId: input.targetPublicationId,
-          skillId: input.skillId ?? null,
-          question: input.question,
-          state: "pending",
-          expiresAt: new Date(
-            Date.now() + serverConfig.consultation.agentMessageExpiryMs,
-          ),
-        })
-        .returning();
+      // 事务化：先 insert 拿到 message id，再扣 credits（引用 agentMessages.id）
+      // 免费 Agent（pricePerCall = 0）跳过扣费
+      const price = target.pricePerCall;
+      const [message] = await ctx.db.transaction(async (trx) => {
+        const [msg] = await trx
+          .insert(agentMessages)
+          .values({
+            requesterUserId: ctx.user.id,
+            requesterProfileId: input.requesterProfileId ?? null,
+            targetPublicationId: input.targetPublicationId,
+            skillId: input.skillId ?? null,
+            question: input.question,
+            state: "pending",
+            expiresAt: new Date(
+              Date.now() + serverConfig.consultation.agentMessageExpiryMs,
+            ),
+            creditsCharged: price > 0 ? price : 0,
+          })
+          .returning();
+
+        if (price > 0) {
+          const newBalance = await CreditsService.chargeCredits(
+            trx,
+            ctx.user.id,
+            price,
+            { referenceType: "agentMessages", referenceId: msg!.id },
+          );
+          if (newBalance === null) {
+            // 事务回滚，消息不会落库
+            throw new TRPCError({
+              code: "PAYMENT_REQUIRED",
+              message: `Credits 不足（需要 ${price}，请先充值）`,
+            });
+          }
+        }
+        return [msg];
+      });
 
       await AgentMessageQueue.enqueue({ messageId: message!.id });
       return { message: message! };
@@ -347,6 +372,45 @@ export const agentMessagesAppRouter = router({
           message: "Message has expired; send a new one instead",
         });
       }
+
+      // Credits 处理：免费 Agent 跳过；付费 Agent 检查是否已 refund
+      if (message.creditsCharged > 0) {
+        // 检查是否已 refund（worker 可能还没跑 refund，需要手动补）
+        const refunded = await ctx.db
+          .select({ n: count() })
+          .from(creditTransactions)
+          .where(
+            and(
+              eq(creditTransactions.userId, ctx.user.id),
+              eq(creditTransactions.referenceId, message.id),
+              eq(creditTransactions.type, "refund"),
+            ),
+          );
+        if ((refunded?.[0]?.n ?? 0) === 0) {
+          // 还没 refund，先补
+          await CreditsService.creditCredits(
+            ctx.db,
+            ctx.user.id,
+            message.creditsCharged,
+            "refund",
+            { referenceType: "agentMessages", referenceId: message.id },
+          );
+        }
+        // 重新扣费
+        const newBalance = await CreditsService.chargeCredits(
+          ctx.db,
+          ctx.user.id,
+          message.creditsCharged,
+          { referenceType: "agentMessages", referenceId: message.id },
+        );
+        if (newBalance === null) {
+          throw new TRPCError({
+            code: "PAYMENT_REQUIRED",
+            message: `Credits 不足（需要 ${message.creditsCharged}，请先充值）`,
+          });
+        }
+      }
+
       const [updated] = await ctx.db
         .update(agentMessages)
         .set({ state: "pending", note: null, modifiedAt: new Date() })
