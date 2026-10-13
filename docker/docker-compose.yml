@@ -19,6 +19,12 @@ services:
       # You almost never want to change the value of the DATA_DIR variable.
       # If you want to mount a custom directory, change the volume mapping above instead.
       DATA_DIR: /data # DON'T CHANGE THIS
+
+      # 多实例部署：接共享 PostgreSQL（注释掉则回落到内置 PGlite 单机库）
+      DATABASE_URL: postgres://saiye:saiye@postgres:5432/saiye
+    depends_on:
+      postgres:
+        condition: service_healthy
   chrome:
     image: gcr.io/zenika-hub/alpine-chrome:124
     restart: unless-stopped
@@ -40,7 +46,22 @@ services:
       MEILI_NO_ANALYTICS: "true"
     volumes:
       - meilisearch:/meili_data
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: saiye
+      POSTGRES_PASSWORD: saiye
+      POSTGRES_DB: saiye
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saiye"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   meilisearch:
+  postgres:
   data:

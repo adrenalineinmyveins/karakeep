@@ -12,7 +12,16 @@ const nextConfig = {
   // 一旦被 Turbopack 提前打进 server chunk，会在服务启动（无 window）时求值，
   // 导致 dompurify 导出空实例（"addHook is not a function"）。
   // 外部化后，tools.ts 里"先 ensureBrowserLikeEnv() 再动态 import"的顺序才能生效。
-  serverExternalPackages: ["@plait-board/mermaid-to-drawnix", "jsdom"],
+  serverExternalPackages: [
+    "@plait-board/mermaid-to-drawnix",
+    "jsdom",
+    // PGlite 通过 import.meta.url 定位 WASM 文件，被 Turbopack 打包后
+    // URL 对象经跨 realm 传递不再通过 Node fs 的 URL 校验，查询全部
+    // 报 "path argument must be string/Buffer/URL, received URL"。
+    // 外部化后从 node_modules 原生加载。
+    "@electric-sql/pglite",
+    "postgres",
+  ],
   turbopack: {
     rules: {
       "*.svg": {
