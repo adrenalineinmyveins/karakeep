@@ -39,8 +39,21 @@ beforeEach(() => {
 
 const QUERY = "Rust 异步编程";
 
+/**
+ * D2-c 后咨询默认私有：D3 咨询用例统一带激活白名单
+ * （tag-rust 覆盖 concept-rust-1 与 bm-rust-1；tag-rust-2 覆盖用例追加的概念页）
+ */
+const OWNER_SCOPE = { tagIds: ["tag-rust", "tag-rust-2"], listIds: [] };
+
 /** 以用户 0（领域专家所有者）的身份铺一组可检索知识 */
 async function seedOwnerKnowledge(db: TestDB, ownerId: string) {
+  // D2-c 后咨询默认私有：铺一个绑定 tag-rust 的白名单（书签挂载 + 概念页锚点）
+  await db.insert(bookmarkTags).values({
+    id: "tag-rust",
+    userId: ownerId,
+    name: "rust",
+  });
+
   // L1 概念页（咨询模式专属源）
   await db.insert(conceptPages).values({
     id: "concept-rust-1",
@@ -64,6 +77,12 @@ async function seedOwnerKnowledge(db: TestDB, ownerId: string) {
     id: "bm-rust-1",
     url: "https://rust.example/async",
     title: "Rust 异步编程指南",
+  });
+  // 书签挂入白名单标签（D2-c：scope 绑定后咨询可检索）
+  await db.insert(tagsOnBookmarks).values({
+    bookmarkId: "bm-rust-1",
+    tagId: "tag-rust",
+    attachedBy: "human",
   });
 
   // 私人维度：长期记忆 + 历史会话（咨询模式必须排除）
@@ -100,6 +119,7 @@ describe("retrieveKnowledgeContext — consultation (D3)", () => {
       userId: ownerId,
       query: QUERY,
       consultation: true,
+      knowledgeScope: OWNER_SCOPE,
       db: context.db,
     });
 
@@ -144,6 +164,7 @@ describe("retrieveKnowledgeContext — consultation (D3)", () => {
       userId: ownerId,
       query: QUERY,
       consultation: true,
+      knowledgeScope: OWNER_SCOPE,
       db: context.db,
     });
 
@@ -175,6 +196,7 @@ describe("retrieveKnowledgeContext — consultation (D3)", () => {
       userId: ownerId,
       query: QUERY,
       consultation: true,
+      knowledgeScope: OWNER_SCOPE,
       db: context.db,
     });
 
@@ -371,7 +393,7 @@ describe("retrieveKnowledgeContext — knowledgeScope (per-profile 隔离)", () 
     expect(chunks).toHaveLength(0);
   });
 
-  test<CustomTestContext>("scope 为空集合（两者皆空）：退化为全量语料（兼容现状）", async (context) => {
+  test<CustomTestContext>("scope 为空集合（两者皆空）：咨询零注入（D2-c 默认私有）", async (context) => {
     const ownerId = await getOwnerId(context);
     await seedScopedKnowledge(context.db, ownerId);
 
@@ -383,12 +405,11 @@ describe("retrieveKnowledgeContext — knowledgeScope (per-profile 隔离)", () 
       db: context.db,
     });
 
-    // 两侧都注入
-    expect(chunks.some((c) => c.content.includes("所有权"))).toBe(true);
-    expect(chunks.some((c) => c.content.includes("GIL"))).toBe(true);
+    // D2-c：未显式绑定语料范围 = 对外咨询不暴露任何书签/概念页
+    expect(chunks).toHaveLength(0);
   });
 
-  test<CustomTestContext>("无 scope（undefined）：全量语料，行为与旧链路一致", async (context) => {
+  test<CustomTestContext>("无 scope（undefined）：咨询零注入（D2-c 默认私有）", async (context) => {
     const ownerId = await getOwnerId(context);
     await seedScopedKnowledge(context.db, ownerId);
 
@@ -399,7 +420,22 @@ describe("retrieveKnowledgeContext — knowledgeScope (per-profile 隔离)", () 
       db: context.db,
     });
 
-    expect(chunks.some((c) => c.content.includes("所有权"))).toBe(true);
+    expect(chunks).toHaveLength(0);
+  });
+
+  test<CustomTestContext>("D2-c 不影响本人会话：非咨询模式无 scope 仍全量语料", async (context) => {
+    const ownerId = await getOwnerId(context);
+    await seedScopedKnowledge(context.db, ownerId);
+
+    const chunks = await retrieveKnowledgeContext({
+      userId: ownerId,
+      query: SCOPED_QUERY,
+      consultation: false,
+      db: context.db,
+    });
+
+    // 书签语料全量注入（概念页是咨询模式专属源，个人模式不检索）
+    expect(chunks.some((c) => c.content.includes("tokio"))).toBe(true);
     expect(chunks.some((c) => c.content.includes("GIL"))).toBe(true);
   });
 });

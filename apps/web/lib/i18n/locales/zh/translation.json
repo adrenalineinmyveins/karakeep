@@ -674,7 +674,7 @@
       "enable_tools": "启用书签工具",
       "enable_tools_hint": "关闭后仅对话，不调用书签搜索等工具",
       "knowledge_scope": "语料范围",
-      "knowledge_scope_hint": "限定此档案发布为专家后的咨询检索范围：只检索绑定标签/清单内的书签与锚定的概念页。不选 = 使用全部书签语料。",
+      "knowledge_scope_hint": "限定此档案发布为专家后的咨询检索范围：只检索绑定标签/清单内的书签与锚定的概念页。不选 = 对外咨询不注入任何书签语料（默认私有）；个人会话不受影响。",
       "knowledge_scope_tags": "标签",
       "knowledge_scope_lists": "清单",
       "knowledge_scope_no_tags": "暂无标签",

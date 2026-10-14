@@ -202,7 +202,7 @@ function ProfileFormDialog({
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // 语料范围：两者皆空 = null（全部书签语料）
+    // 语料范围：两者皆空 = null（本人会话全量语料；对外咨询默认私有，D2-c）
     const knowledgeScope: KnowledgeScope | null =
       form.scopeTagIds.length > 0 || form.scopeListIds.length > 0
         ? { tagIds: form.scopeTagIds, listIds: form.scopeListIds }

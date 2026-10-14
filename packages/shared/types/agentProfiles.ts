@@ -12,7 +12,11 @@ export const AGENT_PROFILE_TYPES = [
 ] as const;
 export type AgentProfileType = (typeof AGENT_PROFILE_TYPES)[number];
 
-/** 语料范围：绑定标签/清单；未设置或两者皆空 = 使用全部书签语料 */
+/**
+ * 语料范围：绑定标签/清单构成对外暴露面（D2-c 隐私白名单）。
+ * - 本人会话：未设置或两者皆空 = 使用全部书签语料（行为不变）
+ * - 对外咨询：未设置或两者皆空 = 默认私有，不注入任何书签/概念页语料
+ */
 export interface KnowledgeScope {
   tagIds: string[];
   listIds: string[];

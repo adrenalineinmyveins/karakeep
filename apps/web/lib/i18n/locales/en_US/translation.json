@@ -788,7 +788,7 @@
       "enable_tools": "Enable bookmark tools",
       "enable_tools_hint": "When off, chat only; bookmark search and other tools are not called",
       "knowledge_scope": "Knowledge Scope",
-      "knowledge_scope_hint": "Limits what this profile can retrieve when consulted as a published expert: only bookmarks under the bound tags/lists and concept pages anchored to them. Leave empty to use all bookmarks.",
+      "knowledge_scope_hint": "Limits what this profile can retrieve when consulted as a published expert: only bookmarks under the bound tags/lists and concept pages anchored to them. Leave empty to expose no bookmark knowledge to consultations (private by default); your own chats are unaffected.",
       "knowledge_scope_tags": "Tags",
       "knowledge_scope_lists": "Lists",
       "knowledge_scope_no_tags": "No tags yet",

@@ -751,7 +751,8 @@ export const agentProfiles = pgTable(
     timeoutMinutes: integer("timeoutMinutes").notNull().default(5),
     systemPrompt: text("systemPrompt"),
     enableTools: boolean("enableTools").notNull().default(true),
-    // per-profile 语料隔离：绑定标签/清单作为咨询语料范围；null 或两者皆空 = 全部书签语料
+    // per-profile 语料隔离（D2-c 隐私白名单）：绑定标签/清单构成对外暴露面；
+    // null 或两者皆空 = 本人会话用全部书签语料，对外咨询默认私有（零注入）
     knowledgeScope: jsonb("knowledge_scope").$type<KnowledgeScope | null>(),
     // 自主咨询预算授权：专家代理所有者为其代理批的预算上限（credits）。
     // 授权额度内代理可自主发起子咨询，无需人工逐项确认；

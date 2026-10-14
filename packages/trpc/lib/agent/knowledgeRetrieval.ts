@@ -704,6 +704,8 @@ export function applyKnowledgeBudget(
  * 个人模式（默认）：四源全开（memory/bookmark/chat/graph），片段带来源元数据。
  * 咨询模式（D3）：userId = 领域专家所有者；仅 L1 概念页 + L2 书签/图谱
  * 脱敏片段（剥离 title/url，来源对咨询者不可见）；排除 memory/chat 私人维度。
+ * D2-c 隐私白名单：咨询模式下 knowledgeScope 未激活（未绑定任何标签/清单）
+ * = 默认私有，不注入任何书签/概念页语料（本人会话不受影响）。
  */
 export async function retrieveKnowledgeContext(
   params: KnowledgeRetrievalParams,
@@ -716,6 +718,10 @@ export async function retrieveKnowledgeContext(
 
   try {
     if (params.consultation) {
+      // D2-c 隐私白名单：对外咨询零默认暴露——必须显式绑定标签/清单才注入语料
+      if (!isScopeActive(params.knowledgeScope)) {
+        return [];
+      }
       const [conceptResult, bookmarkResult] = await Promise.all([
         searchConceptPages(conn, params.userId, tokens, params.knowledgeScope),
         searchBookmarks(conn, params.userId, tokens, params.knowledgeScope),
