@@ -73,14 +73,19 @@ export const creditsRouter = router({
         eq(creditTransactions.userId, ctx.user.id),
       ];
       if (input.types?.length) {
-        whereClauses.push(or(...input.types.map((t) => eq(creditTransactions.type, t))));
+        whereClauses.push(
+          or(...input.types.map((t) => eq(creditTransactions.type, t))),
+        );
       }
 
       const rows = await ctx.db
         .select()
         .from(creditTransactions)
         .where(and(...whereClauses))
-        .orderBy(desc(creditTransactions.createdAt), desc(creditTransactions.id))
+        .orderBy(
+          desc(creditTransactions.createdAt),
+          desc(creditTransactions.id),
+        )
         .limit(limit + 1)
         .offset(offset);
 

@@ -12,6 +12,7 @@ import type {
 } from "@saiye/shared/types/agentSkills";
 import { zSkillParamValuesSchema } from "@saiye/shared/types/agentSkills";
 import {
+  agentMessages,
   agentProfiles,
   agentPublications,
   agentSkills,
@@ -24,6 +25,7 @@ import {
 } from "@saiye/db/schema";
 import { InferenceClientFactory } from "@saiye/shared/inference";
 import logger from "@saiye/shared/logger";
+import type { ConsultationGuardContext } from "@saiye/shared-server";
 import { AgentOrchestrator } from "../lib/agent/orchestrator";
 import type { AgentProfileConfig } from "../lib/agent/sdkAdapter";
 import {
@@ -96,6 +98,40 @@ async function loadAgentProfile(
     systemPrompt: profile.systemPrompt,
     enableTools: profile.enableTools,
     knowledgeScope: profile.knowledgeScope,
+    consultBudget: profile.consultBudget,
+  };
+}
+
+/**
+ * D4-3 加载自主咨询上下文：反查当前执行中的 A2A 消息（worker 建影子
+ * 会话后立即将 message.sessionId 指回本会话），得到链深度与父链入口，
+ * 连同发布 ID 与档案的 consultBudget 一起传给咨询工具集。
+ * 非咨询会话（publicationId 为空）返回 null。
+ */
+async function loadConsultationContext(
+  db: DB,
+  session: { id: string; publicationId: string | null },
+  consultBudget: number | null | undefined,
+): Promise<ConsultationGuardContext | null> {
+  if (!session.publicationId) {
+    return null;
+  }
+  let currentMessageId: string | null = null;
+  let currentDepth = 0;
+  const [message] = await db
+    .select({ id: agentMessages.id, depth: agentMessages.depth })
+    .from(agentMessages)
+    .where(eq(agentMessages.sessionId, session.id))
+    .limit(1);
+  if (message) {
+    currentMessageId = message.id;
+    currentDepth = message.depth;
+  }
+  return {
+    selfPublicationId: session.publicationId,
+    consultBudget: consultBudget ?? 0,
+    currentMessageId,
+    currentDepth,
   };
 }
 
@@ -995,12 +1031,29 @@ ${transcript}`,
         console.log("[chat.sendMessage] STEP 3: user message stored");
       }
 
+      // 3.5 加载会话绑定的 agent 档案（null = 默认助手）；
+      //     咨询会话按所有者维度加载（档案归 owner，不归咨询者）
+      const profile = await loadAgentProfile(
+        ctx.db,
+        ctx.user.id,
+        session.agentProfileId,
+        session.ownerUserId,
+      );
+
       // 3. 构建用户专属工具集（咨询会话：owner 只读知识工具——身份切为
       //     专家所有者，咨询者书签数据不出域；写操作/个人域工具禁用）
       //     P4：点选带 toolGrant 的技能时，白名单工具当轮以咨询者身份
       //     解锁（替换黑名单错误执行器，产物归属咨询者）
-      let tools = session.publicationId
-        ? await buildConsultationTools(ctx, session.ownerUserId!)
+      //     D4-3：专家档案授权 consultBudget 时，工具集额外暴露
+      //     consult_agent 自主咨询工具（预算 + 递归防护见工具内校验）。
+      const consultation = session.publicationId
+        ? await loadConsultationContext(ctx.db, session, profile?.consultBudget)
+        : null;
+      let tools = consultation
+        ? await buildConsultationTools(ctx, session.ownerUserId!, {
+            context: consultation,
+            requesterProfileId: session.agentProfileId,
+          })
         : await buildAgentTools(ctx);
       if (session.publicationId && skillToolGrant) {
         tools = await withSkillGrantedTools(
@@ -1013,15 +1066,6 @@ ${transcript}`,
       console.log(
         "[chat.sendMessage] STEP 4: tools built, count:",
         tools.length,
-      );
-
-      // 3.5 加载会话绑定的 agent 档案（null = 默认助手）；
-      //     咨询会话按所有者维度加载（档案归 owner，不归咨询者）
-      const profile = await loadAgentProfile(
-        ctx.db,
-        ctx.user.id,
-        session.agentProfileId,
-        session.ownerUserId,
       );
 
       // 3.6 A3 用户级知识注入开关。
@@ -1214,10 +1258,6 @@ ${transcript}`,
         });
       }
 
-      // 3. 流式事件聚合为一次性结果（咨询会话：owner 只读知识工具，同 sendMessage）
-      const tools = session.publicationId
-        ? await buildConsultationTools(ctx, session.ownerUserId!)
-        : await buildAgentTools(ctx);
       // 咨询会话按所有者维度加载档案（档案归 owner，不归咨询者）
       const profile = await loadAgentProfile(
         ctx.db,
@@ -1225,6 +1265,16 @@ ${transcript}`,
         session.agentProfileId,
         session.ownerUserId,
       );
+      // 3. 流式事件聚合为一次性结果（咨询会话：owner 只读知识工具，同 sendMessage）
+      const consultation = session.publicationId
+        ? await loadConsultationContext(ctx.db, session, profile?.consultBudget)
+        : null;
+      const tools = consultation
+        ? await buildConsultationTools(ctx, session.ownerUserId!, {
+            context: consultation,
+            requesterProfileId: session.agentProfileId,
+          })
+        : await buildAgentTools(ctx);
       // A3 用户级知识注入开关；D3 咨询会话按所有者维度（同 sendMessage）
       const knowledgeContextEnabled = session.publicationId
         ? await loadKnowledgeContextEnabled(ctx.db, session.ownerUserId!)
@@ -1282,6 +1332,39 @@ ${transcript}`,
           }
         }
 
+        // D4-g 反问澄清：专家调用 request_clarification → 落澄清问题为
+        // assistant 消息（供下一轮继续上下文），返回 needInput 而非回答。
+        const clarifyCall = toolCalls.find(
+          (tc) => tc.toolName === "request_clarification",
+        );
+        if (clarifyCall) {
+          const clarifyArgs = (clarifyCall.args ?? {}) as {
+            question?: unknown;
+          };
+          const question =
+            typeof clarifyArgs.question === "string"
+              ? clarifyArgs.question.trim().slice(0, 500)
+              : "";
+          if (question) {
+            await ctx.db.insert(chatMessages).values({
+              chatId: input.sessionId,
+              role: "assistant",
+              content: question,
+            });
+          }
+          await ctx.db
+            .update(chatSessions)
+            .set({ modifiedAt: new Date() })
+            .where(eq(chatSessions.id, input.sessionId));
+          return {
+            content: "",
+            toolCalls,
+            error,
+            degradations,
+            needInput: question || null,
+          };
+        }
+
         if (content) {
           // 工具调用记录（如 widget 预览卡）与 D5 降级标记持久化到
           // metadata，历史会话可恢复
@@ -1312,6 +1395,6 @@ ${transcript}`,
         );
       }
 
-      return { content, toolCalls, error, degradations };
+      return { content, toolCalls, error, degradations, needInput: null };
     }),
 });

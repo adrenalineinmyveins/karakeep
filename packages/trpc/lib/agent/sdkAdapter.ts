@@ -204,6 +204,8 @@ export interface AgentProfileConfig {
   enableTools: boolean;
   /** per-profile 语料隔离：咨询模式限定检索范围（null = 全部书签语料） */
   knowledgeScope?: KnowledgeScope | null;
+  /** D4-3 自主咨询预算授权（credits；null/0 = 未授权，不暴露 consult_agent） */
+  consultBudget?: number | null;
 }
 
 /** 档案指纹：任一字段变化即视为档案变更（用于会话缓存失效） */
@@ -220,6 +222,7 @@ export function profileFingerprint(p: AgentProfileConfig): string {
     p.systemPrompt,
     p.enableTools,
     p.knowledgeScope ?? null,
+    p.consultBudget ?? null,
   ]);
 }
 

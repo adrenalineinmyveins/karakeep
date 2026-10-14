@@ -15,6 +15,13 @@
       "when": 1791877545527,
       "tag": "0001_credits_ledger_and_balance",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791882416320,
+      "tag": "0002_agent_autonomous_consultation",
+      "breakpoints": true
     }
   ]
 }

@@ -101,11 +101,19 @@ const allEnv = z.object({
   // A2A：单个发布每小时可接收的咨询消息上限（防垃圾请求烧目标方预算）
   AGENT_MESSAGE_HOURLY_LIMIT: z.coerce.number().int().min(1).optional(),
   // A2A：单个用户每小时可发起的咨询消息总数（跨所有目标，防扫场轰炸）
-  AGENT_MESSAGE_REQUESTER_HOURLY_LIMIT: z.coerce.number().int().min(1).optional(),
+  AGENT_MESSAGE_REQUESTER_HOURLY_LIMIT: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .optional(),
   // A2A：单个用户每月可发起的咨询消息总数（P0 0 价阶段的实际防线）
   AGENT_MESSAGE_MONTHLY_LIMIT: z.coerce.number().int().min(1).optional(),
   // A2A：单个用户每月咨询消耗（credits）预算；未设置 = 不启用（定价开启后再开）
-  AGENT_MESSAGE_MONTHLY_BUDGET_CREDITS: z.coerce.number().int().min(1).optional(),
+  AGENT_MESSAGE_MONTHLY_BUDGET_CREDITS: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .optional(),
   // A2A：消息有效期（ms），过期未执行则置 expired
   AGENT_MESSAGE_EXPIRY_MS: z.coerce.number().int().min(60_000).optional(),
   // Credits 体系：paid tier 每月赠送 credits
@@ -116,6 +124,8 @@ const allEnv = z.object({
   HOSTED_PLATFORM_FEE_RATIO: z.coerce.number().min(0).max(1).optional(),
   // 分成：外接 agent 平台抽成（默认 90/10 即 0.1）
   EXTERNAL_PLATFORM_FEE_RATIO: z.coerce.number().min(0).max(1).optional(),
+  // 自主咨询：代理自主发起子咨询的最大链深度（防 A→B→A 无限递归）
+  AGENT_CONSULT_MAX_DEPTH: z.coerce.number().int().min(1).optional(),
   // A3 三源 RAG 检索注入的可调参数（top K）
   KNOWLEDGE_BOOKMARK_TOP_K: z.coerce.number().int().min(1).max(20).optional(),
   KNOWLEDGE_CHAT_TOP_K: z.coerce.number().int().min(0).max(20).optional(),
@@ -442,6 +452,7 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
       creditsPerMonthFree: val.CREDITS_PER_MONTH_FREE ?? 0,
       hostedPlatformFeeRatio: val.HOSTED_PLATFORM_FEE_RATIO ?? 0.3,
       externalPlatformFeeRatio: val.EXTERNAL_PLATFORM_FEE_RATIO ?? 0.1,
+      agentConsultMaxDepth: val.AGENT_CONSULT_MAX_DEPTH ?? 3,
     },
     tavily: {
       apiKey: val.TAVILY_API_KEY,

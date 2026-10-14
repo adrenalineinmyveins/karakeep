@@ -6,7 +6,11 @@ import Stripe from "stripe";
 import { z } from "zod";
 
 import { assets, bookmarks, subscriptions, users } from "@saiye/db/schema";
-import { addLogFields, CreditsService, withEventLog } from "@saiye/shared-server";
+import {
+  addLogFields,
+  CreditsService,
+  withEventLog,
+} from "@saiye/shared-server";
 import serverConfig from "@saiye/shared/config";
 
 import {

@@ -329,149 +329,147 @@ export const bookmarksAppRouter = router({
         }
       }
 
-      const bookmark = await ctx.db.transaction(
-        async (tx) => {
-          // Check user quota
-          const quotaResult = await QuotaService.canCreateBookmark(
-            tx,
-            ctx.user.id,
-          );
-          if (!quotaResult.result) {
-            throw new TRPCError({
-              code: "FORBIDDEN",
-              message: quotaResult.error,
-            });
-          }
-          const bookmark = (
-            await tx
-              .insert(bookmarks)
-              .values({
-                userId: ctx.user.id,
-                title: input.title,
-                type: input.type,
-                archived: input.archived,
-                favourited: input.favourited,
-                note: input.note,
-                summary: input.summary,
-                createdAt: input.createdAt,
-                source: input.source,
-                // Only links currently support summarization. Let's set the status to null for other types for now.
-                summarizationStatus:
-                  input.type === BookmarkTypes.LINK ? "pending" : null,
-              })
-              .returning()
-          )[0];
+      const bookmark = await ctx.db.transaction(async (tx) => {
+        // Check user quota
+        const quotaResult = await QuotaService.canCreateBookmark(
+          tx,
+          ctx.user.id,
+        );
+        if (!quotaResult.result) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: quotaResult.error,
+          });
+        }
+        const bookmark = (
+          await tx
+            .insert(bookmarks)
+            .values({
+              userId: ctx.user.id,
+              title: input.title,
+              type: input.type,
+              archived: input.archived,
+              favourited: input.favourited,
+              note: input.note,
+              summary: input.summary,
+              createdAt: input.createdAt,
+              source: input.source,
+              // Only links currently support summarization. Let's set the status to null for other types for now.
+              summarizationStatus:
+                input.type === BookmarkTypes.LINK ? "pending" : null,
+            })
+            .returning()
+        )[0];
 
-          let content: ZBookmarkContent;
+        let content: ZBookmarkContent;
 
-          switch (input.type) {
-            case BookmarkTypes.LINK: {
-              const link = (
-                await tx
-                  .insert(bookmarkLinks)
-                  .values({
-                    id: bookmark.id,
-                    url: input.url.trim(),
-                  })
-                  .returning()
-              )[0];
-              if (input.precrawledArchiveId) {
-                await Asset.ensureOwnership(ctx, input.precrawledArchiveId);
-                await tx
-                  .update(assets)
-                  .set({
-                    bookmarkId: bookmark.id,
-                    assetType: AssetTypes.LINK_PRECRAWLED_ARCHIVE,
-                  })
-                  .where(
-                    and(
-                      eq(assets.id, input.precrawledArchiveId),
-                      eq(assets.userId, ctx.user.id),
-                    ),
-                  );
-              }
-              content = {
-                type: BookmarkTypes.LINK,
-                ...link,
-              };
-              break;
-            }
-            case BookmarkTypes.TEXT: {
-              const text = (
-                await tx
-                  .insert(bookmarkTexts)
-                  .values({
-                    id: bookmark.id,
-                    text: input.text,
-                    sourceUrl: input.sourceUrl,
-                  })
-                  .returning()
-              )[0];
-              content = {
-                type: BookmarkTypes.TEXT,
-                text: text.text ?? "",
-                sourceUrl: text.sourceUrl,
-              };
-              break;
-            }
-            case BookmarkTypes.ASSET: {
-              const [asset] = await tx
-                .insert(bookmarkAssets)
+        switch (input.type) {
+          case BookmarkTypes.LINK: {
+            const link = (
+              await tx
+                .insert(bookmarkLinks)
                 .values({
                   id: bookmark.id,
-                  assetType: input.assetType,
-                  assetId: input.assetId,
-                  content: null,
-                  metadata: null,
-                  fileName: input.fileName ?? null,
-                  sourceUrl: input.sourceUrl ?? null,
+                  url: input.url.trim(),
                 })
-                .returning();
-              const uploadedAsset = await Asset.fromId(ctx, input.assetId);
-              uploadedAsset.ensureOwnership();
-              if (
-                !uploadedAsset.asset.contentType ||
-                !SUPPORTED_BOOKMARK_ASSET_TYPES.has(
-                  uploadedAsset.asset.contentType,
-                )
-              ) {
-                throw new TRPCError({
-                  code: "BAD_REQUEST",
-                  message: "Unsupported asset type",
-                });
-              }
+                .returning()
+            )[0];
+            if (input.precrawledArchiveId) {
+              await Asset.ensureOwnership(ctx, input.precrawledArchiveId);
               await tx
                 .update(assets)
                 .set({
                   bookmarkId: bookmark.id,
-                  assetType: AssetTypes.BOOKMARK_ASSET,
+                  assetType: AssetTypes.LINK_PRECRAWLED_ARCHIVE,
                 })
                 .where(
                   and(
-                    eq(assets.id, input.assetId),
+                    eq(assets.id, input.precrawledArchiveId),
                     eq(assets.userId, ctx.user.id),
                   ),
                 );
-              content = {
-                type: BookmarkTypes.ASSET,
-                assetType: asset.assetType,
-                assetId: asset.assetId,
-                fileName: asset.fileName,
-                sourceUrl: asset.sourceUrl,
-              };
-              break;
             }
+            content = {
+              type: BookmarkTypes.LINK,
+              ...link,
+            };
+            break;
           }
+          case BookmarkTypes.TEXT: {
+            const text = (
+              await tx
+                .insert(bookmarkTexts)
+                .values({
+                  id: bookmark.id,
+                  text: input.text,
+                  sourceUrl: input.sourceUrl,
+                })
+                .returning()
+            )[0];
+            content = {
+              type: BookmarkTypes.TEXT,
+              text: text.text ?? "",
+              sourceUrl: text.sourceUrl,
+            };
+            break;
+          }
+          case BookmarkTypes.ASSET: {
+            const [asset] = await tx
+              .insert(bookmarkAssets)
+              .values({
+                id: bookmark.id,
+                assetType: input.assetType,
+                assetId: input.assetId,
+                content: null,
+                metadata: null,
+                fileName: input.fileName ?? null,
+                sourceUrl: input.sourceUrl ?? null,
+              })
+              .returning();
+            const uploadedAsset = await Asset.fromId(ctx, input.assetId);
+            uploadedAsset.ensureOwnership();
+            if (
+              !uploadedAsset.asset.contentType ||
+              !SUPPORTED_BOOKMARK_ASSET_TYPES.has(
+                uploadedAsset.asset.contentType,
+              )
+            ) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Unsupported asset type",
+              });
+            }
+            await tx
+              .update(assets)
+              .set({
+                bookmarkId: bookmark.id,
+                assetType: AssetTypes.BOOKMARK_ASSET,
+              })
+              .where(
+                and(
+                  eq(assets.id, input.assetId),
+                  eq(assets.userId, ctx.user.id),
+                ),
+              );
+            content = {
+              type: BookmarkTypes.ASSET,
+              assetType: asset.assetType,
+              assetId: asset.assetId,
+              fileName: asset.fileName,
+              sourceUrl: asset.sourceUrl,
+            };
+            break;
+          }
+        }
 
-          return {
-            alreadyExists: false,
-            tags: [] as ZBookmarkTags[],
-            assets: [],
-            content,
-            ...bookmark,
-          };
-        },
-      );
+        return {
+          alreadyExists: false,
+          tags: [] as ZBookmarkTags[],
+          assets: [],
+          content,
+          ...bookmark,
+        };
+      });
 
       bookmarkCreationCounter.labels(input.source ?? "unknown").inc();
       addLogFields<"bookmark.create">({

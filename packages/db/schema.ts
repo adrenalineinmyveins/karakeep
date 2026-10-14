@@ -762,6 +762,10 @@ export const agentProfiles = pgTable(
       .default(true),
     // per-profile 语料隔离：绑定标签/清单作为咨询语料范围；null 或两者皆空 = 全部书签语料
     knowledgeScope: jsonb("knowledge_scope").$type<KnowledgeScope | null>(),
+    // 自主咨询预算授权：专家代理所有者为其代理批的预算上限（credits）。
+    // 授权额度内代理可自主发起子咨询，无需人工逐项确认；
+    // null/0 = 未授权（咨询工具集不暴露 consult_agent 自主咨询能力）
+    consultBudget: integer("consultBudget"),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },
@@ -1084,6 +1088,10 @@ export const agentMessages = pgTable(
     sessionId: text("sessionId").references(() => chatSessions.id, {
       onDelete: "set null",
     }),
+    // 自主发起链：父消息（专家代理自主咨询时指向触发它的那条），递归防护用
+    parentMessageId: text("parentMessageId"),
+    // 链深度：根消息=0，每层子咨询 +1（递归防护上限）
+    depth: integer("depth").notNull().default(0),
     question: text("question").notNull(),
     answer: text("answer"),
     // pending: 待执行 / dispatched: 执行中 / answered: 已回答

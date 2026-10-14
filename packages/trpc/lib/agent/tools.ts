@@ -13,10 +13,21 @@ import { zUpdateUserSettingsSchema } from "@saiye/shared/types/users";
 import { zWidgetPermissionSchema } from "@saiye/shared/types/widgets";
 import type { ZWidgetPermission } from "@saiye/shared/types/widgets";
 import { SKILL_GRANTABLE_TOOLS } from "@saiye/shared/types/agentSkills";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { users } from "@saiye/db/schema";
+import {
+  agentMessages,
+  agentProfiles,
+  agentPublications,
+  chatSessions,
+  users,
+} from "@saiye/db/schema";
+import {
+  CreditsService,
+  evaluateConsultationGuard,
+} from "@saiye/shared-server";
+import type { ConsultationGuardContext } from "@saiye/shared-server";
 import { createCallerFactory } from "../../index";
 import type { Context } from "../../index";
 import type { ToolDefinition } from "./sdkAdapter";
@@ -1601,6 +1612,10 @@ function sanitizeBookmarkDetailOutput(raw: string): string {
 export async function buildConsultationTools(
   ctx: Context,
   ownerUserId: string,
+  consult?: {
+    context: ConsultationGuardContext;
+    requesterProfileId?: string | null;
+  },
 ): Promise<ToolDefinition[]> {
   const [owner] = await ctx.db
     .select({
@@ -1619,7 +1634,7 @@ export async function buildConsultationTools(
   const ownerCtx: Context = { ...ctx, user: owner };
   const tools = await buildAgentTools(ownerCtx);
 
-  return tools.map((t) => {
+  const complete: ToolDefinition[] = tools.map((t) => {
     if (CONSULTATION_BLOCKED_TOOLS.has(t.name)) {
       return { ...t, execute: async () => CONSULTATION_BLOCKED_RESULT };
     }
@@ -1645,6 +1660,246 @@ export async function buildConsultationTools(
     }
     return t;
   });
+
+  // D4-g 反问澄清：专家在信息不足时可显式请求咨询者补充（EigenFlux
+  // need_input 契约）。sendMessageSync 检测到该工具调用后暂停本次咨询，
+  // 将结构化问题回传给请求方（不产出最终回答）。
+  complete.push(
+    zodToToolSchema(
+      "request_clarification",
+      "当咨询者提供的信息不足以可靠回答时调用，向对方提出需要澄清的具体问题。调用后本次咨询会暂停，等待对方补充信息后再继续；除非确实缺少关键信息，否则不要使用。",
+      z.object({
+        question: z
+          .string()
+          .min(1)
+          .max(500)
+          .describe("需要向咨询者澄清的具体问题（具体、可回答）"),
+      }),
+      async (args) =>
+        JSON.stringify({
+          needsClarification: true,
+          question: args.question,
+        }),
+    ),
+  );
+
+  // D4-3 自主咨询：档案所有者授权 consultBudget 时，专家可自主发起
+  // 子咨询（预算 + 递归防护在工具内校验，额度内免人工确认）。
+  if (consult && (consult.context.consultBudget ?? 0) > 0) {
+    complete.push(
+      zodToToolSchema(
+        "consult_agent",
+        "向另一位已发布的领域专家 Agent 发起一次自主咨询并等待其回答。当本专家的知识库不足以回答用户问题、需要其他领域的专业知识时使用。发起后会从所有者的 credits 账户扣费（受预算与递归深度限制），并把目标专家的完整回答整合进本次回复。",
+        z.object({
+          targetPublicationId: z
+            .string()
+            .describe("要咨询的专家发布 ID（来自 agent discovery/目录）"),
+          question: z.string().min(1).max(8000).describe("要咨询的具体问题"),
+        }),
+        async (args) =>
+          runAutonomousConsultation(
+            ctx,
+            owner,
+            consult.context,
+            consult.requesterProfileId ?? null,
+            args.targetPublicationId as string,
+            args.question as string,
+          ),
+      ),
+    );
+  }
+
+  return complete;
+}
+
+/**
+ * D4-3 自主子咨询执行：同步跑子 agent 并返回其回答。
+ * - 校验目标可达性（published / 非自身 / 非 trae-cli）
+ * - 递归防护（深度/环/预算）
+ * - 事务落 message + 扣 credits（requester = 发起专家所有者）
+ * - 建影子会话 → 指回 message.sessionId → 同步 sendMessageSync
+ * - 按回答/失败结算（answer + payout 或 failed + refund）
+ */
+async function runAutonomousConsultation(
+  ctx: Context,
+  owner: {
+    id: string;
+    name: string;
+    email: string;
+    role: "admin" | "user" | null;
+  },
+  consult: ConsultationGuardContext,
+  requesterProfileId: string | null,
+  targetPublicationId: string,
+  question: string,
+): Promise<string> {
+  const [target] = await ctx.db
+    .select({
+      publicationId: agentPublications.id,
+      status: agentPublications.status,
+      ownerUserId: agentPublications.userId,
+      pricePerCall: agentPublications.pricePerCall,
+      profileId: agentProfiles.id,
+      profileType: agentProfiles.type,
+    })
+    .from(agentPublications)
+    .innerJoin(
+      agentProfiles,
+      eq(agentProfiles.id, agentPublications.agentProfileId),
+    )
+    .where(eq(agentPublications.id, targetPublicationId))
+    .limit(1);
+  if (!target || target.status === "delisted") {
+    return JSON.stringify({ error: "目标专家已下架，无法咨询" });
+  }
+  if (target.publicationId === consult.selfPublicationId) {
+    return JSON.stringify({ error: "不能咨询自己所在的发布" });
+  }
+  if (target.profileType === "trae-cli") {
+    return JSON.stringify({
+      error: "该专家运行本地 CLI 运行时，不支持自主咨询",
+    });
+  }
+
+  const price = target.pricePerCall;
+  const guard = await evaluateConsultationGuard(
+    ctx.db,
+    consult,
+    targetPublicationId,
+    price,
+  );
+  if (!guard.ok) {
+    return JSON.stringify({ error: guard.message });
+  }
+
+  // 事务：落 message 先拿 id，再扣 credits（引用 agentMessages.id）
+  let messageId: string;
+  try {
+    const [msg] = await ctx.db.transaction(async (trx) => {
+      const [m] = await trx
+        .insert(agentMessages)
+        .values({
+          requesterUserId: owner.id,
+          requesterProfileId,
+          targetPublicationId,
+          question,
+          parentMessageId: consult.currentMessageId,
+          depth: consult.currentDepth + 1,
+          state: "dispatched",
+          expiresAt: new Date(
+            Date.now() + serverConfig.consultation.agentMessageExpiryMs,
+          ),
+          creditsCharged: price > 0 ? price : 0,
+        })
+        .returning();
+      if (price > 0) {
+        const balance = await CreditsService.chargeCredits(
+          trx,
+          owner.id,
+          price,
+          { referenceType: "agentMessages", referenceId: m!.id },
+        );
+        if (balance === null) {
+          throw new Error(`Credits 不足（需要 ${price}，请先充值）`);
+        }
+      }
+      return [m];
+    });
+    messageId = msg!.id;
+  } catch (e) {
+    return JSON.stringify({
+      error: e instanceof Error ? e.message : String(e),
+    });
+  }
+
+  // 影子会话（子 agent 执行载具，知识检索/计量沿用 sendMessageSync）
+  const [session] = await ctx.db
+    .insert(chatSessions)
+    .values({
+      userId: owner.id,
+      title: question.replace(/\s+/g, " ").trim().slice(0, 50) || "自主咨询",
+      agentProfileId: target.profileId,
+      ownerUserId: target.ownerUserId,
+      publicationId: target.publicationId,
+    })
+    .returning({ id: chatSessions.id });
+
+  // 指回消息，供子 agent 递归咨询时反查父链（loadConsultationContext）
+  await ctx.db
+    .update(agentMessages)
+    .set({ sessionId: session!.id })
+    .where(eq(agentMessages.id, messageId));
+
+  // 同步执行子 agent（以所有者身份调用 sendMessageSync，等待完整回答）
+  try {
+    const ownerCtx: Context = { ...ctx, user: owner };
+    const caller = await getCaller(ownerCtx);
+    const result = await caller.chats.sendMessageSync({
+      sessionId: session!.id,
+      content: question,
+    });
+    if (result.content) {
+      await ctx.db
+        .update(agentMessages)
+        .set({
+          state: "answered",
+          answer: result.content,
+          modifiedAt: new Date(),
+        })
+        .where(eq(agentMessages.id, messageId));
+      // 分成结算（被咨询方为宿主/外接时平台按比例抽成）
+      if (price > 0) {
+        const feeRatio =
+          target.profileType === "hosted"
+            ? serverConfig.consultation.hostedPlatformFeeRatio
+            : serverConfig.consultation.externalPlatformFeeRatio;
+        const publisherAmount = Math.round(price * (1 - feeRatio));
+        if (publisherAmount > 0) {
+          await CreditsService.creditCredits(
+            ctx.db,
+            target.ownerUserId,
+            publisherAmount,
+            "consultation_payout",
+            { referenceType: "agentMessages", referenceId: messageId },
+          );
+        }
+      }
+      return result.content;
+    }
+    const errorText = result.error ?? "目标专家返回了空回答";
+    await ctx.db
+      .update(agentMessages)
+      .set({
+        state: "failed",
+        note: errorText.slice(0, 500),
+        modifiedAt: new Date(),
+      })
+      .where(eq(agentMessages.id, messageId));
+    if (price > 0) {
+      await CreditsService.creditCredits(ctx.db, owner.id, price, "refund", {
+        referenceType: "agentMessages",
+        referenceId: messageId,
+      });
+    }
+    return JSON.stringify({ error: errorText });
+  } catch (e) {
+    const errorText = e instanceof Error ? e.message : String(e);
+    await ctx.db
+      .update(agentMessages)
+      .set({
+        state: "failed",
+        note: errorText.slice(0, 500),
+        modifiedAt: new Date(),
+      })
+      .where(eq(agentMessages.id, messageId));
+    if (price > 0) {
+      await CreditsService.creditCredits(ctx.db, owner.id, price, "refund", {
+        referenceType: "agentMessages",
+        referenceId: messageId,
+      });
+    }
+    return JSON.stringify({ error: errorText });
+  }
 }
 
 // ── P4 技能授权工具（咨询会话内受控写权限） ───────────

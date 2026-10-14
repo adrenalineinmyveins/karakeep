@@ -4,7 +4,10 @@ import type { DB, SaiyeDBTransaction } from "@saiye/db";
 import { creditTransactions, users } from "@saiye/db/schema";
 
 export class InsufficientCreditsError extends Error {
-  constructor(public readonly balance: number, public readonly required: number) {
+  constructor(
+    public readonly balance: number,
+    public readonly required: number,
+  ) {
     super(`Credits 不足：当前 ${balance}，需要 ${required}`);
     this.name = "InsufficientCreditsError";
   }
@@ -36,10 +39,7 @@ export class CreditsService {
       .update(users)
       .set({ creditsBalance: sql`${users.creditsBalance} - ${amount}` })
       .where(
-        and(
-          eq(users.id, userId),
-          sql`${users.creditsBalance} >= ${amount}`,
-        ),
+        and(eq(users.id, userId), sql`${users.creditsBalance} >= ${amount}`),
       );
 
     if (updateResult.rowCount === 0) {
@@ -100,10 +100,7 @@ export class CreditsService {
     return newBalance;
   }
 
-  static async getCreditsBalance(
-    db: DBOrTrx,
-    userId: string,
-  ): Promise<number> {
+  static async getCreditsBalance(db: DBOrTrx, userId: string): Promise<number> {
     const [row] = await db
       .select({ balance: users.creditsBalance })
       .from(users)
@@ -124,7 +121,9 @@ export class CreditsService {
       .from(users)
       .where(eq(users.id, userId));
     const [l] = await db
-      .select({ total: sql<number>`coalesce(sum(${creditTransactions.delta}), 0)` })
+      .select({
+        total: sql<number>`coalesce(sum(${creditTransactions.delta}), 0)`,
+      })
       .from(creditTransactions)
       .where(eq(creditTransactions.userId, userId));
 
