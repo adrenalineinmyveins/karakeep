@@ -75,7 +75,7 @@ COPY . .
 # Build the db migration script
 # (verify-deps-before-run=false：依赖刚装好，避免 pnpm 重新校验并触发多余的 install)
 RUN cd packages/db && \
-    pnpm --config.verify-deps-before-run=false exec ncc build migrate.ts -o /db_migrations && \
+    pnpm --config.verify-deps-before-run=false exec ncc build migrate.ts -e @electric-sql/pglite -o /db_migrations && \
     cp -R drizzle /db_migrations
 
 
@@ -194,6 +194,13 @@ ENV NEXTAUTH_URL_INTERNAL=http://localhost:${PORT}
 COPY --from=base --chown=node:node /app/apps/web/.next/standalone ./
 COPY --from=base /app/apps/web/public ./apps/web/public
 COPY --from=base /db_migrations /db_migrations
+
+# PGlite 在 ncc 打包时被 -e 外置（WASM 资源经 ncc 打包后 createRequire 动态
+# import 损坏，迁移脚本会报 "TypeError: e is not a function"），运行时需从
+# node_modules 原生加载。standalone 已含完整 PGlite 包（serverExternalPackages），
+# 直接复制到迁移目录的 node_modules 供 ESM import 解析。
+RUN mkdir -p /db_migrations/node_modules/@electric-sql && \
+    cp -R /app/node_modules/@electric-sql/pglite /db_migrations/node_modules/@electric-sql/
 
 # Turbopack standalone 对 serverExternalPackages 外部包的 tracing 有缺口：
 # 只拷贝了 @plait-board/mermaid-to-drawnix 的 package.json（缺 dist/），

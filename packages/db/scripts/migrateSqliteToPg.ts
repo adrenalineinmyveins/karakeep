@@ -85,6 +85,18 @@ function isGenerated(col: Column): boolean {
   );
 }
 
+/** SQLite 源表实际列集合；表不存在返回 null */
+function getSqliteColumns(tableName: string): Set<string> | null {
+  try {
+    const cols = sqlite.prepare(`PRAGMA table_info("${tableName}")`).all() as {
+      name: string;
+    }[];
+    return new Set(cols.map((c) => c.name));
+  } catch {
+    return null;
+  }
+}
+
 async function main() {
   // 禁用所有触发器（含 FK 强制）以任意顺序导入；PGlite 不支持
   // session_replicate_role，用 ALTER TABLE ... DISABLE TRIGGER ALL 等价
@@ -115,10 +127,14 @@ async function main() {
       continue; // 非 pgTable 导出（类型、枚举等）
     }
 
-    // 跳过 generated 列（INSERT 不允许显式赋值）
+    // 跳过 generated 列（INSERT 不允许显式赋值）；只迁移 SQLite 源里实际存在的列
+    //（旧 schema 缺 D0-D6 新增列，如 user.creditsBalance，否则整表 SELECT 失败被跳过）
+    const sqliteColumns = getSqliteColumns(name);
+    if (!sqliteColumns) continue; // SQLite 源无此表
     const insertable = Object.entries(getTableColumns(table as PgTable)).filter(
-      ([, col]) => !isGenerated(col),
+      ([, col]) => !isGenerated(col) && sqliteColumns.has(col.name),
     );
+    if (insertable.length === 0) continue;
     // INSERT 使用数据库列名（col.name，可能为 snake_case），而非 JS 属性名
     const colNames = insertable.map(([, col]) => col.name);
     const dbCols: Column[] = insertable.map(([, col]) => col);

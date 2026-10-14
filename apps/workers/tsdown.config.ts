@@ -14,6 +14,9 @@ export default defineConfig({
     // Keep native binaries external (transitive deps of bundled workspace packages)
     "better-sqlite3",
     "liteque",
+    // PGlite 打包后 WASM 资源（pglite.data/pglite.wasm）定位损坏（ncc/Turbopack 同款问题），
+    // 运行时从 node_modules 原生加载
+    "@electric-sql/pglite",
   ],
   noExternal: [
     // Bundle workspace packages (since they're not published to npm)
