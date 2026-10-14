@@ -152,6 +152,24 @@ export default function ConsultGrid() {
                   {p.description}
                 </p>
               )}
+              {/* D2 喂养画像：专家简介 + 自动专长标签（未生成则不展示） */}
+              {p.bio && (
+                <p className="line-clamp-2 rounded-md bg-muted/50 p-2 text-xs text-muted-foreground">
+                  {p.bio}
+                </p>
+              )}
+              {p.autoExpertise && p.autoExpertise.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {p.autoExpertise.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="mt-auto flex items-center justify-between gap-2 pt-1">
                 <span className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Coins className="size-4" />

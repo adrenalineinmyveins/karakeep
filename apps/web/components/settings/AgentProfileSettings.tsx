@@ -78,6 +78,10 @@ interface AgentProfileRow {
   systemPrompt: string | null;
   enableTools: boolean;
   knowledgeScope: KnowledgeScope | null;
+  bio: string | null;
+  expertiseTags: string[] | null;
+  nurtureAuto: boolean;
+  nurtureState: { lastRunAt: number; runsCount: number } | null;
   hasApiKey: boolean;
 }
 
@@ -95,6 +99,10 @@ interface ProfileFormState {
   /** per-profile 语料范围：选中的标签/清单 id（提交时组装 knowledgeScope） */
   scopeTagIds: string[];
   scopeListIds: string[];
+  /** D2 喂养画像：bio + 专长标签（逗号分隔输入）+ 自动喂养开关 */
+  bio: string;
+  expertiseTagsInput: string;
+  nurtureAuto: boolean;
 }
 
 const emptyForm: ProfileFormState = {
@@ -109,6 +117,9 @@ const emptyForm: ProfileFormState = {
   enableTools: true,
   scopeTagIds: [],
   scopeListIds: [],
+  bio: "",
+  expertiseTagsInput: "",
+  nurtureAuto: true,
 };
 
 /** trae-cli 分支的超时字段（合法整数才带上，否则走后端默认 5 分钟） */
@@ -167,6 +178,9 @@ function ProfileFormDialog({
             enableTools: profile.enableTools,
             scopeTagIds: profile.knowledgeScope?.tagIds ?? [],
             scopeListIds: profile.knowledgeScope?.listIds ?? [],
+            bio: profile.bio ?? "",
+            expertiseTagsInput: profile.expertiseTags?.join("，") ?? "",
+            nurtureAuto: profile.nurtureAuto,
           }
         : emptyForm,
     );
@@ -213,6 +227,22 @@ function ProfileFormDialog({
       enableTools: form.enableTools,
       knowledgeScope,
     };
+    // D2 喂养画像（hosted）：bio/tags 手工修改后自动停刷新（nurtureAuto 置 false）
+    const bio = form.bio.trim() || null;
+    const expertiseTags = form.expertiseTagsInput
+      .split(/[,，、]/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .slice(0, 8);
+    const nurtureManuallyEdited =
+      !!profile &&
+      (bio !== (profile.bio ?? null) ||
+        expertiseTags.join("，") !== (profile.expertiseTags ?? []).join("，"));
+    const nurtureFields = {
+      bio,
+      expertiseTags,
+      nurtureAuto: nurtureManuallyEdited ? false : form.nurtureAuto,
+    };
     const input =
       form.type === "openai-compatible"
         ? {
@@ -223,7 +253,7 @@ function ProfileFormDialog({
             ...(form.apiKey.trim() ? { apiKey: form.apiKey.trim() } : {}),
           }
         : form.type === "hosted"
-          ? { type: "hosted" as const, ...base }
+          ? { type: "hosted" as const, ...base, ...nurtureFields }
           : {
               type: "trae-cli" as const,
               ...base,
@@ -453,6 +483,56 @@ function ProfileFormDialog({
               </div>
             </div>
           </div>
+
+          {/* D2 喂养画像（仅 hosted：大脑由平台承担，喂养 worker 定期刷新） */}
+          {form.type === "hosted" && (
+            <div className="space-y-3 rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="profile-bio">{t(`${tp}.nurture_bio`)}</Label>
+                <p className="text-xs text-muted-foreground">
+                  {t(`${tp}.nurture_bio_hint`)}
+                </p>
+              </div>
+              <Textarea
+                id="profile-bio"
+                rows={3}
+                maxLength={500}
+                value={form.bio}
+                onChange={(e) => set("bio", e.target.value)}
+                placeholder={t(`${tp}.nurture_bio_placeholder`)}
+              />
+              <div className="grid gap-2">
+                <Label htmlFor="profile-expertise-tags">
+                  {t(`${tp}.nurture_tags`)}
+                </Label>
+                <Input
+                  id="profile-expertise-tags"
+                  value={form.expertiseTagsInput}
+                  onChange={(e) => set("expertiseTagsInput", e.target.value)}
+                  placeholder={t(`${tp}.nurture_tags_placeholder`)}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>{t(`${tp}.nurture_auto`)}</Label>
+                  <p className="text-xs text-muted-foreground">
+                    {t(`${tp}.nurture_auto_hint`)}
+                  </p>
+                </div>
+                <Switch
+                  checked={form.nurtureAuto}
+                  onCheckedChange={(v) => set("nurtureAuto", v)}
+                />
+              </div>
+              {profile?.nurtureState?.lastRunAt ? (
+                <p className="text-xs text-muted-foreground">
+                  {t(`${tp}.nurture_last_run`)}
+                  {": "}
+                  {new Date(profile.nurtureState.lastRunAt).toLocaleString()}
+                </p>
+              ) : null}
+            </div>
+          )}
 
           <DialogFooter>
             <Button

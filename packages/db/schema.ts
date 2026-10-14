@@ -18,7 +18,10 @@ import {
 
 import type { ZApiKeyScope } from "@saiye/shared/types/apiKeys";
 import { API_KEY_FULL_ACCESS_SCOPE } from "@saiye/shared/types/apiKeys";
-import type { KnowledgeScope } from "@saiye/shared/types/agentProfiles";
+import type {
+  AgentNurtureState,
+  KnowledgeScope,
+} from "@saiye/shared/types/agentProfiles";
 import type {
   SkillParam,
   SkillToolGrant,
@@ -758,6 +761,12 @@ export const agentProfiles = pgTable(
     // 授权额度内代理可自主发起子咨询，无需人工逐项确认；
     // null/0 = 未授权（咨询工具集不暴露 consult_agent 自主咨询能力）
     consultBudget: integer("consultBudget"),
+    // D2 喂养产物：LLM 自动生成 + 手工修正（nurtureAuto=false 后停自动刷新）
+    bio: text("bio"),
+    expertiseTags: jsonb("expertise_tags").$type<string[] | null>(),
+    nurtureAuto: boolean("nurture_auto").notNull().default(true),
+    // D2-b 增量游标：只处理游标之后变更的书签，避免全量轮询
+    nurtureState: jsonb("nurture_state").$type<AgentNurtureState | null>(),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },

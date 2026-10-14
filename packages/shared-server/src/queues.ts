@@ -488,3 +488,20 @@ export const AgentMessageQueue = createDeferredQueue<ZAgentMessageRequest>(
     keepFailedJobs: false,
   },
 );
+
+// D2 agent 喂养 worker
+// 携带 profileId；worker 从 DB 重读档案与增量游标（D2-b 只处理游标后的变更）。
+// 触发由 cron 评估入队（幂等键 nurture:{profileId} 防重复堆积）。
+export const zAgentNurtureRequestSchema = z.object({
+  profileId: z.string(),
+});
+export type ZAgentNurtureRequest = z.infer<typeof zAgentNurtureRequestSchema>;
+export const AgentNurtureQueue = createDeferredQueue<ZAgentNurtureRequest>(
+  "agent_nurture_queue",
+  {
+    defaultJobArgs: {
+      numRetries: 1,
+    },
+    keepFailedJobs: false,
+  },
+);

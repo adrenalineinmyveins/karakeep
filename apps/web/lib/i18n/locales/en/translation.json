@@ -1,4 +1,4 @@
-{
+﻿{
   "common": {
     "default": "Default",
     "id": "ID",
@@ -793,7 +793,14 @@
       "knowledge_scope_lists": "Lists",
       "knowledge_scope_no_tags": "No tags yet",
       "knowledge_scope_no_lists": "No lists yet",
-      "has_been_created": "Profile created",
+      "nurture_bio": "Expert bio (auto-nurtured)",
+      "nurture_bio_hint": "Periodically generated from your bookmarks by the nurture service; you can also edit it manually (auto-refresh then pauses)",
+      "nurture_bio_placeholder": "Not generated yet; the nurture service will fill this in",
+      "nurture_tags": "Expertise tags (comma-separated)",
+      "nurture_tags_placeholder": "e.g. Rust, async programming, systems",
+      "nurture_auto": "Auto-nurture",
+      "nurture_auto_hint": "Periodically refresh bio & expertise tags from new bookmarks and distill long-term memories",
+      "nurture_last_run": "Last nurtured",      "has_been_created": "Profile created",
       "has_been_updated": "Profile updated",
       "delete_confirm": "Are you sure you want to delete this profile? Sessions bound to it will fall back to the default assistant.",
       "details": "Details",

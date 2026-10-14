@@ -27,6 +27,10 @@ const safeColumns = {
   systemPrompt: agentProfiles.systemPrompt,
   enableTools: agentProfiles.enableTools,
   knowledgeScope: agentProfiles.knowledgeScope,
+  bio: agentProfiles.bio,
+  expertiseTags: agentProfiles.expertiseTags,
+  nurtureAuto: agentProfiles.nurtureAuto,
+  nurtureState: agentProfiles.nurtureState,
   hasApiKey: agentProfiles.apiKey,
 };
 
@@ -38,6 +42,15 @@ function toValues(input: z.infer<typeof zAgentProfileInputSchema>) {
     systemPrompt: input.systemPrompt ?? null,
     enableTools: input.enableTools ?? true,
     knowledgeScope: input.knowledgeScope ?? null,
+    // D2 喂养产物：仅在显式传入时落列（undefined 不写，防止 update 意外
+    // 把用户手工修正的 bio/标签覆盖回默认值）
+    ...(input.bio !== undefined ? { bio: input.bio } : {}),
+    ...(input.expertiseTags !== undefined
+      ? { expertiseTags: input.expertiseTags }
+      : {}),
+    ...(input.nurtureAuto !== undefined
+      ? { nurtureAuto: input.nurtureAuto }
+      : {}),
     ...(input.type === "openai-compatible"
       ? {
           baseUrl: input.baseUrl,

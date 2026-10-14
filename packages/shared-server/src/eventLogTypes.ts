@@ -124,6 +124,10 @@ type EventLogInternal =
       "agent_message.id": string;
       "agent_message.state"?: string;
     }
+  | {
+      ["event.name"]: "agentNurtureWorker.run";
+      "agent_profile.id": string;
+    }
   // Product Events
   | {
       ["event.name"]: "user.login";

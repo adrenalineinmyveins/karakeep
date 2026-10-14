@@ -28,6 +28,30 @@ export const zKnowledgeScopeSchema = z.object({
 });
 
 /**
+ * D2-b 喂养增量游标（ProfileConsumer 模式）：
+ * lastCursor = 已喂养到的书签 modifiedAt（ISO 串）——只处理游标之后的变更，
+ * 避免全量轮询；喂养批次与触发评估共用此游标。
+ */
+export interface AgentNurtureState {
+  lastCursor: string | null;
+  lastRunAt: number;
+  runsCount: number;
+}
+
+/** D2 喂养产物入参（三个 union 分支共用） */
+const zNurtureFields = {
+  // LLM 生成的第三人称能力简介；用户编辑后应同时提交 nurtureAuto: false
+  bio: z.string().max(500).nullable().optional(),
+  expertiseTags: z
+    .array(z.string().min(1).max(30))
+    .max(8)
+    .nullable()
+    .optional(),
+  // true = nurture worker 持续自动刷新 bio/专长标签；用户手工修正后置 false
+  nurtureAuto: z.boolean().optional(),
+};
+
+/**
  * 档案创建/更新入参（判别联合：按 type 分化必填字段）
  * - openai-compatible：baseUrl(url) + model 必填；apiKey 可选（更新时留空保持原值）
  * - trae-cli：command 必填；timeoutMinutes 1-60 可选
@@ -35,6 +59,7 @@ export const zKnowledgeScopeSchema = z.object({
  */
 export const zAgentProfileInputSchema = z.discriminatedUnion("type", [
   z.object({
+    ...zNurtureFields,
     type: z.literal("openai-compatible"),
     name: z.string().min(1).max(100),
     baseUrl: z.string().url(),
@@ -45,6 +70,7 @@ export const zAgentProfileInputSchema = z.discriminatedUnion("type", [
     knowledgeScope: zKnowledgeScopeSchema.nullable().optional(),
   }),
   z.object({
+    ...zNurtureFields,
     type: z.literal("trae-cli"),
     name: z.string().min(1).max(100),
     command: z.string().min(1),
@@ -54,6 +80,7 @@ export const zAgentProfileInputSchema = z.discriminatedUnion("type", [
     knowledgeScope: zKnowledgeScopeSchema.nullable().optional(),
   }),
   z.object({
+    ...zNurtureFields,
     type: z.literal("hosted"),
     name: z.string().min(1).max(100),
     systemPrompt: z.string().max(8000).nullable().optional(),

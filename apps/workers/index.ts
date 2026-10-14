@@ -5,6 +5,7 @@ import { buildServer } from "server";
 import {
   AdminMaintenanceQueue,
   AgentMessageQueue,
+  AgentNurtureQueue,
   AssetPreprocessingQueue,
   BackupQueue,
   ConceptCompilationQueue,
@@ -32,6 +33,10 @@ import logger from "@saiye/shared/logger";
 import { shutdownPromise } from "./exit";
 import { AdminMaintenanceWorker } from "./workers/adminMaintenanceWorker";
 import { AgentMessageWorker } from "./workers/agentMessageWorker";
+import {
+  AgentNurtureSchedulingWorker,
+  AgentNurtureWorker,
+} from "./workers/agentNurture/agentNurtureWorker";
 import { AssetPreprocessingWorker } from "./workers/assetPreprocessingWorker";
 import { BackupSchedulingWorker, BackupWorker } from "./workers/backupWorker";
 import { CrawlerWorker } from "./workers/crawlerWorker";
@@ -108,6 +113,10 @@ const workerBuilders = {
     await AgentMessageQueue.ensureInit();
     return AgentMessageWorker.build();
   },
+  agentNurture: async () => {
+    await AgentNurtureQueue.ensureInit();
+    return AgentNurtureWorker.build();
+  },
 } as const;
 
 type WorkerName = keyof typeof workerBuilders | "import";
@@ -156,6 +165,10 @@ async function main() {
     ConceptSchedulingWorker.start();
   }
 
+  if (workers.some((w) => w.name === "agentNurture")) {
+    AgentNurtureSchedulingWorker.start();
+  }
+
   // Start import polling worker
   let importWorker: ImportWorker | null = null;
   let importWorkerPromise: Promise<void> | null = null;
@@ -185,6 +198,9 @@ async function main() {
   }
   if (workers.some((w) => w.name === "concept")) {
     ConceptSchedulingWorker.stop();
+  }
+  if (workers.some((w) => w.name === "agentNurture")) {
+    AgentNurtureSchedulingWorker.stop();
   }
   if (importWorker) {
     importWorker.stop();

@@ -67,6 +67,8 @@ const zPublicationCardSchema = zPublicationSchema.and(
     runtime: z.enum(AGENT_PROFILE_TYPES),
     // Agent Card 专长摘要（D2 喂养生成；null = 未生成）
     autoExpertise: z.array(z.string()).nullable(),
+    // D2 喂养生成的第三人称能力简介（null = 未生成）
+    bio: z.string().nullable(),
     avatarAssetId: z.string().nullable(),
     // 是否当前查看者自己的发布（前端据此隐藏咨询入口）
     isOwn: z.boolean(),
@@ -192,11 +194,15 @@ async function fetchOwnedPublication(db: DB, userId: string, id: string) {
   return row;
 }
 
-/** 转咨询者卡片（带所有者显示名、缓冲期截止时间与运行时） */
+/** 转咨询者卡片（带所有者显示名、缓冲期截止时间、运行时与 D2 喂养画像） */
 async function toCard(
   db: DB,
   row: typeof agentPublications.$inferSelect,
-  runtime: (typeof AGENT_PROFILE_TYPES)[number],
+  profile: {
+    type: (typeof AGENT_PROFILE_TYPES)[number];
+    bio: string | null;
+    expertiseTags: string[] | null;
+  },
   viewerId: string,
 ) {
   const owner = await db.query.users.findFirst({
@@ -210,7 +216,9 @@ async function toCard(
       row.status === "delisting" && row.delistingAt
         ? new Date(row.delistingAt.getTime() + DELISTING_GRACE_PERIOD_MS)
         : null,
-    runtime,
+    runtime: profile.type,
+    bio: profile.bio,
+    autoExpertise: profile.expertiseTags,
     isOwn: row.userId === viewerId,
   };
 }
@@ -397,7 +405,12 @@ export const agentPublicationsAppRouter = router({
         );
       }
       const rows = await ctx.db
-        .select({ pub: agentPublications, runtime: agentProfiles.type })
+        .select({
+          pub: agentPublications,
+          runtime: agentProfiles.type,
+          bio: agentProfiles.bio,
+          expertiseTags: agentProfiles.expertiseTags,
+        })
         .from(agentPublications)
         .innerJoin(
           agentProfiles,
@@ -408,7 +421,18 @@ export const agentPublicationsAppRouter = router({
         .limit(100);
       return {
         publications: await Promise.all(
-          rows.map((r) => toCard(ctx.db, r.pub, r.runtime, ctx.user.id)),
+          rows.map((r) =>
+            toCard(
+              ctx.db,
+              r.pub,
+              {
+                type: r.runtime,
+                bio: r.bio,
+                expertiseTags: r.expertiseTags,
+              },
+              ctx.user.id,
+            ),
+          ),
         ),
       };
     }),
@@ -566,7 +590,12 @@ export const agentPublicationsAppRouter = router({
     .query(async ({ ctx, input }) => {
       await settleExpiredDelistings(ctx.db);
       const [row] = await ctx.db
-        .select({ pub: agentPublications, runtime: agentProfiles.type })
+        .select({
+          pub: agentPublications,
+          runtime: agentProfiles.type,
+          bio: agentProfiles.bio,
+          expertiseTags: agentProfiles.expertiseTags,
+        })
         .from(agentPublications)
         .innerJoin(
           agentProfiles,
@@ -581,7 +610,16 @@ export const agentPublicationsAppRouter = router({
         });
       }
       return {
-        publication: await toCard(ctx.db, row.pub, row.runtime, ctx.user.id),
+        publication: await toCard(
+          ctx.db,
+          row.pub,
+          {
+            type: row.runtime,
+            bio: row.bio,
+            expertiseTags: row.expertiseTags,
+          },
+          ctx.user.id,
+        ),
       };
     }),
 });
