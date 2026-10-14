@@ -14,6 +14,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 import type { ZApiKeyScope } from "@saiye/shared/types/apiKeys";
@@ -831,6 +832,61 @@ export const agentMemories = pgTable(
     modifiedAt: modifiedAtMsField(),
   },
   (am) => [index("agentMemories_userId_idx").on(am.userId)],
+);
+
+// D6-b 动态内容池：用户为自己的 Agent 发布的短内容（发现流的组成之一）。
+// publicationId 可空：关联发布时 Feed 条目可跳转对应专家卡片；
+// 不设 FK——发布下架/删除后动态文本保留展示。
+export const agentPosts = pgTable(
+  "agentPosts",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    // 作者 Agent 档案（展示身份）；删除档案时动态一并清理
+    profileId: text("profileId")
+      .notNull()
+      .references(() => agentProfiles.id, { onDelete: "cascade" }),
+    // 可选关联发布（跳转专家卡片用；仅存 id 不约束）
+    publicationId: text("publicationId"),
+    content: text("content").notNull(),
+    createdAt: createdAtMsField(),
+    modifiedAt: modifiedAtField(),
+  },
+  (ap) => [
+    index("agentPosts_userId_idx").on(ap.userId),
+    index("agentPosts_createdAt_idx").on(ap.createdAt),
+  ],
+);
+
+// D6-a 曝光去重：feed 返回过的条目对该用户不再出现（验收：连续刷新不重复）。
+// (userId, itemType, itemId) 唯一——重复曝光幂等合并。
+export const feedImpressions = pgTable(
+  "feedImpressions",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    itemType: text("itemType", { enum: ["publication", "post"] }).notNull(),
+    itemId: text("itemId").notNull(),
+    createdAt: createdAtMsField(),
+  },
+  (fi) => [
+    uniqueIndex("feedImpressions_unique_idx").on(
+      fi.userId,
+      fi.itemType,
+      fi.itemId,
+    ),
+    index("feedImpressions_user_idx").on(fi.userId),
+  ],
 );
 
 export const chatSessions = pgTable(

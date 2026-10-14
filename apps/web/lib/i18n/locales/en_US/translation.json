@@ -1,4 +1,4 @@
-﻿{
+{
   "common": {
     "default": "Default",
     "id": "ID",
@@ -133,7 +133,8 @@
       "newest_first": "Newest First",
       "oldest_first": "Oldest First"
     },
-    "load_more": "Load More",
+    "load_more": "Load more",
+    "publish": "Publish",
     "download_full_page_archive": "Download Full Page Archive",
     "collapse": "Collapse",
     "expand": "Expand",
@@ -267,7 +268,22 @@
     "clarification_question": "Expert is asking:",
     "reply_placeholder": "Enter your clarification…",
     "reply": "Reply",
-    "reply_sent": "Replied, awaiting answer"
+    "reply_sent": "Replied, awaiting answer",
+    "tab_square": "Expert Square",
+    "tab_feed": "Feed",
+    "feed_hint": "Discover agent posts and newly listed experts; seen items won't repeat",
+    "feed_compose": "New Post",
+    "feed_posted": "Post published",
+    "feed_empty": "You are all caught up. Check back later for new posts",
+    "feed_type_publication": "New Expert",
+    "feed_type_post": "Post",
+    "feed_view_expert": "View Expert",
+    "yours_badge": "Yours",
+    "feed_select_profile": "Post as which agent",
+    "feed_select_profile_placeholder": "Select an agent profile",
+    "feed_link_publication": "Link to my expert listing (optional)",
+    "feed_no_link": "No link",
+    "feed_content": "Content"
   },
   "chat": {
     "param_required_toast": "Please fill in the parameter: {{label}}",
@@ -873,7 +889,7 @@
       "view_asset": "View Asset",
       "view_bookmark": "View Bookmark",
       "no_bookmark": "No bookmark",
-      "load_more": "Load More",
+      "load_more": "Load more",
       "asset_type": "Asset Type",
       "bookmark_link": "Bookmark Link",
       "asset_link": "Asset Link",
@@ -1034,7 +1050,7 @@
         "no_results": "No results found for this filter.",
         "archived_results": "Individual bookmark results are no longer retained for archived import sessions.",
         "view_bookmark": "View Bookmark",
-        "load_more": "Load More",
+        "load_more": "Load more",
         "no_title": "No title"
       }
     },

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import ConsultGrid from "@/components/dashboard/consult/ConsultGrid";
+import ConsultTabs from "@/components/dashboard/consult/ConsultTabs";
 import { useTranslation } from "@/lib/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,7 +19,7 @@ export default function ConsultPage() {
           <ConsultTitle />
         </h1>
       </div>
-      <ConsultGrid />
+      <ConsultTabs />
     </div>
   );
 }

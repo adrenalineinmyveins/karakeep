@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Bot, Coins, Hourglass, Search, X } from "lucide-react";
@@ -25,7 +25,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/lib/i18n/client";
 
 /** 咨询广场：领域专家发布卡片，可发起同步会话或异步咨询 */
-export default function ConsultGrid() {
+export default function ConsultGrid({
+  highlightId,
+  onHighlightDone,
+}: {
+  /** D6 Feed 跳转：滚动并高亮对应卡片后回调清除 */
+  highlightId?: string | null;
+  onHighlightDone?: () => void;
+}) {
   const api = useTRPC();
   const router = useRouter();
   const { t } = useTranslation();
@@ -41,6 +48,16 @@ export default function ConsultGrid() {
   );
 
   const publications = data?.publications ?? [];
+
+  // D6：Feed 条目跳转时滚动到目标卡片并短暂高亮
+  useEffect(() => {
+    if (!highlightId) return;
+    const el = document.getElementById(`pub-${highlightId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      onHighlightDone?.();
+    }
+  }, [highlightId, publications.length, onHighlightDone]);
 
   const runtimeLabel = {
     hosted: t("consult.runtime_hosted"),
@@ -126,7 +143,10 @@ export default function ConsultGrid() {
           {publications.map((p) => (
             <div
               key={p.id}
-              className="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm"
+              id={`pub-${p.id}`}
+              className={`flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm transition-shadow ${
+                highlightId === p.id ? "ring-2 ring-primary" : ""
+              }`}
             >
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5">
