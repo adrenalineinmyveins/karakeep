@@ -75,10 +75,9 @@ export const db = getDb();
 export async function runMigrations(target: DB = db) {
   const migrationsFolder = getMigrationsFolder();
   if (serverConfig.database.url) {
-    await pgjsMigrate(
-      target as unknown as Parameters<typeof pgjsMigrate>[0],
-      { migrationsFolder },
-    );
+    await pgjsMigrate(target as unknown as Parameters<typeof pgjsMigrate>[0], {
+      migrationsFolder,
+    });
   } else {
     await pgliteMigrate(
       target as unknown as Parameters<typeof pgliteMigrate>[0],

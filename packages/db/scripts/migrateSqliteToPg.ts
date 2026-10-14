@@ -79,7 +79,10 @@ function convertValue(column: Column, v: unknown): unknown {
 
 function isGenerated(col: Column): boolean {
   // drizzle 运行时把 generatedAlwaysAs 的结果存到 col.generated
-  return "generated" in col && (col as { generated?: unknown }).generated !== undefined;
+  return (
+    "generated" in col &&
+    (col as { generated?: unknown }).generated !== undefined
+  );
 }
 
 async function main() {
@@ -106,7 +109,8 @@ async function main() {
     if (typeof table !== "object" || table === null) continue;
     let name: string;
     try {
-      name = getTableConfig(table as PgTable).name ?? getTableName(table as PgTable);
+      name =
+        getTableConfig(table as PgTable).name ?? getTableName(table as PgTable);
     } catch {
       continue; // 非 pgTable 导出（类型、枚举等）
     }

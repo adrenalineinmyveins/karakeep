@@ -164,7 +164,12 @@ class RedisRealtimeBroker implements RealtimeBroker {
       if (set.size === 0) {
         this.handlers.delete(userId);
         this.subscribed.delete(channel);
-        this.subscriber.unsubscribe(channel).catch(() => {});
+        this.subscriber.unsubscribe(channel).catch((e) => {
+          this.failOpenLog(
+            "warn",
+            `Realtime unsubscribe ${channel} failed: ${String(e)}`,
+          );
+        });
       }
     };
   }

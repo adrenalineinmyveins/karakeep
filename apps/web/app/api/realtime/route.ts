@@ -1,5 +1,7 @@
 import { getServerAuthSession } from "@/server/auth";
-import { getRealtimeBroker, type RealtimeEvent } from "@saiye/shared-server";
+import { getRealtimeBroker } from "@saiye/shared-server";
+
+import type { RealtimeEvent } from "@saiye/shared-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

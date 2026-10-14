@@ -13,7 +13,7 @@ import { zUpdateUserSettingsSchema } from "@saiye/shared/types/users";
 import { zWidgetPermissionSchema } from "@saiye/shared/types/widgets";
 import type { ZWidgetPermission } from "@saiye/shared/types/widgets";
 import { SKILL_GRANTABLE_TOOLS } from "@saiye/shared/types/agentSkills";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import {

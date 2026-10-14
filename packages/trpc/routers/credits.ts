@@ -1,7 +1,6 @@
 import { and, desc, eq, gt, or } from "drizzle-orm";
 import { z } from "zod";
 
-import type { DB } from "@saiye/db";
 import { creditTransactions } from "@saiye/db/schema";
 import serverConfig from "@saiye/shared/config";
 import { CreditsService } from "@saiye/shared-server";

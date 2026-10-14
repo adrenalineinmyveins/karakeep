@@ -88,9 +88,7 @@ export const users = pgTable("user", {
   timezone: text("timezone").default("UTC"),
 
   // Backup Settings
-  backupsEnabled: boolean("backupsEnabled")
-    .notNull()
-    .default(false),
+  backupsEnabled: boolean("backupsEnabled").notNull().default(false),
   backupsFrequency: text("backupsFrequency", {
     enum: ["daily", "weekly"],
   })
@@ -230,9 +228,7 @@ export const bookmarks = pgTable(
     modifiedAt: modifiedAtField(),
     title: text("title"),
     archived: boolean("archived").notNull().default(false),
-    favourited: boolean("favourited")
-      .notNull()
-      .default(false),
+    favourited: boolean("favourited").notNull().default(false),
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -311,9 +307,7 @@ export const bookmarkLinks = pgTable(
       enum: ["readable", "not_readable", "uncertain", "unavailable"],
     }),
     readerViewScore: integer("readerViewScore"),
-    readerViewReasons: jsonb("readerViewReasons").$type<
-      ZReaderViewReason[]
-    >(),
+    readerViewReasons: jsonb("readerViewReasons").$type<ZReaderViewReason[]>(),
     readerViewClassifierVersion: integer("readerViewClassifierVersion"),
     crawledAt: timestamp("crawledAt", { withTimezone: true }),
     crawlStatus: text("crawlStatus", {
@@ -607,10 +601,9 @@ export const bookmarkLists = pgTable(
     type: text("type", { enum: ["manual", "smart"] }).notNull(),
     // Only applicable for smart lists
     query: text("query"),
-    parentId: text("parentId").references(
-      (): AnyPgColumn => bookmarkLists.id,
-      { onDelete: "set null" },
-    ),
+    parentId: text("parentId").references((): AnyPgColumn => bookmarkLists.id, {
+      onDelete: "set null",
+    }),
     // Whoever have access to this token can read the content of this list
     rssToken: text("rssToken"),
     public: boolean("public").notNull().default(false),
@@ -757,9 +750,7 @@ export const agentProfiles = pgTable(
     command: text("command"),
     timeoutMinutes: integer("timeoutMinutes").notNull().default(5),
     systemPrompt: text("systemPrompt"),
-    enableTools: boolean("enableTools")
-      .notNull()
-      .default(true),
+    enableTools: boolean("enableTools").notNull().default(true),
     // per-profile 语料隔离：绑定标签/清单作为咨询语料范围；null 或两者皆空 = 全部书签语料
     knowledgeScope: jsonb("knowledge_scope").$type<KnowledgeScope | null>(),
     // 自主咨询预算授权：专家代理所有者为其代理批的预算上限（credits）。
@@ -797,9 +788,7 @@ export const agentSkills = pgTable(
     // 输出格式提示（拼接在模板正文之后，可空）
     outputHint: text("outputHint"),
     // P3 参数化技能：参数定义数组（null = 无参提示词模板型）
-    paramsSchema: jsonb("params_schema").$type<
-      SkillParam[] | null
-    >(),
+    paramsSchema: jsonb("params_schema").$type<SkillParam[] | null>(),
     // P2 技能级语料范围：点选技能的当轮以「档案 scope ∩ 技能 scope」
     // 交集收窄检索范围；null = 不收窄（仅档案 scope）
     knowledgeScope: jsonb("knowledge_scope").$type<KnowledgeScope | null>(),
@@ -914,14 +903,9 @@ export const agentPublications = pgTable(
     title: text("title").notNull(),
     description: text("description"),
     // 领域标签（发现/初筛用，L0 元数据）
-    tags: jsonb("tags")
-      .$type<string[]>()
-      .notNull()
-      .default([]),
+    tags: jsonb("tags").$type<string[]>().notNull().default([]),
     // Agent Card 专长摘要（D2 喂养流水线 LLM 刷新；null = 尚未生成）
-    autoExpertise: jsonb("auto_expertise").$type<
-      string[] | null
-    >(),
+    autoExpertise: jsonb("auto_expertise").$type<string[] | null>(),
     // 卡片头像资产 id（无 FK：资产删除后头像优雅降级为默认）
     avatarAssetId: text("avatarAssetId"),
     // 单次知识检索调用单价（单位：credits；P0 仅记账不结算）
@@ -1242,12 +1226,12 @@ export const rssFeedsTable = pgTable(
     name: text("name").notNull(),
     url: text("url").notNull(),
     enabled: boolean("enabled").notNull().default(true),
-    importTags: boolean("importTags")
-      .notNull()
-      .default(false),
+    importTags: boolean("importTags").notNull().default(false),
     createdAt: createdAtField(),
     lastFetchedAt: timestamp("lastFetchedAt", { withTimezone: true }),
-    lastSuccessfulFetchAt: timestamp("lastSuccessfulFetchAt", { withTimezone: true }),
+    lastSuccessfulFetchAt: timestamp("lastSuccessfulFetchAt", {
+      withTimezone: true,
+    }),
     lastFetchedStatus: text("lastFetchedStatus", {
       enum: ["pending", "failure", "success"],
     }).default("pending"),
@@ -1562,7 +1546,9 @@ export const importStagingBookmarks = pgTable(
     })
       .notNull()
       .default("pending"),
-    processingStartedAt: timestamp("processingStartedAt", { withTimezone: true }),
+    processingStartedAt: timestamp("processingStartedAt", {
+      withTimezone: true,
+    }),
 
     // Result (for observability)
     result: text("result", {
