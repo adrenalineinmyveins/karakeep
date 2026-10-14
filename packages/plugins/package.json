@@ -6,6 +6,7 @@
   "type": "module",
   "exports": {
     "./queue-liteque": "./queue-liteque/index.ts",
+    "./queue-pg": "./queue-pg/index.ts",
     "./queue-restate": "./queue-restate/index.ts",
     "./ratelimit-memory": "./ratelimit-memory/index.ts",
     "./ratelimit-redis": "./ratelimit-redis/index.ts",
@@ -26,8 +27,10 @@
     "@saiye/shared": "workspace:*",
     "async-mutex": "^0.4.1",
     "better-sqlite3": "^12.11.1",
+    "drizzle-orm": "^0.45.2",
     "liteque": "^0.8.0",
     "meilisearch": "^0.58.0",
+    "postgres": "^3.4.9",
     "redis": "^5.11.0"
   },
   "devDependencies": {

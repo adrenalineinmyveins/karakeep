@@ -25,6 +25,8 @@ export async function loadAllPlugins() {
     // Load plugins here. Order of plugin loading matter.
     // Queue provider(s)
     await import("@saiye/plugins/queue-liteque");
+    // D0-b：服务器版 PG（DATABASE_URL）时 PG 队列接管（多实例安全）
+    await import("@saiye/plugins/queue-pg");
     await import("@saiye/plugins/queue-restate");
     await import("@saiye/plugins/search-meilisearch");
     await import("@saiye/plugins/vectorstore-meilisearch");
