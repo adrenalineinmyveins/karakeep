@@ -1,0 +1,1 @@
+ALTER TABLE "agentProfiles" ADD COLUMN "online_state" jsonb;

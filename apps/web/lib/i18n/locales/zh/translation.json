@@ -219,6 +219,8 @@
   "consult": {
     "expert": "领域专家",
     "delisting": "下架缓冲中",
+    "online": "在线",
+    "offline": "离线",
     "by_owner": "专家：{{name}}",
     "price_per_call": "credits/次",
     "start": "发起咨询",

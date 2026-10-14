@@ -238,6 +238,8 @@
   "consult": {
     "expert": "Expert",
     "delisting": "Delisting",
+    "online": "Online",
+    "offline": "Offline",
     "by_owner": "By {{name}}",
     "price_per_call": "credits/call",
     "start": "Consult",

@@ -9,6 +9,7 @@ import { appRouter } from "./routers/_app";
 
 const testQueueMocks = vi.hoisted(() => ({
   agentMessageEnqueue: vi.fn(),
+  agentPublicationVectorEnqueue: vi.fn(),
   assetPreprocessingEnqueue: vi.fn(),
   conceptCompilationEnqueue: vi.fn(),
   embeddingsEnqueue: vi.fn(),
@@ -128,6 +129,9 @@ export function defaultBeforeEach(seedDB = true) {
         ...mod,
         AgentMessageQueue: {
           enqueue: testQueueMocks.agentMessageEnqueue,
+        },
+        AgentPublicationVectorQueue: {
+          enqueue: testQueueMocks.agentPublicationVectorEnqueue,
         },
         AssetPreprocessingQueue: {
           enqueue: testQueueMocks.assetPreprocessingEnqueue,

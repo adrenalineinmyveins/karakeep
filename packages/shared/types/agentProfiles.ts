@@ -38,6 +38,15 @@ export interface AgentNurtureState {
   runsCount: number;
 }
 
+/**
+ * D1 在线状态：外部大脑（openai-compatible）探活结果。
+ * hosted 型平台恒在线（不落库）；trae-cli 型运行在所有者本地（不可探，恒 unknown）。
+ */
+export interface AgentOnlineState {
+  state: "online" | "offline";
+  checkedAt: number;
+}
+
 /** D2 喂养产物入参（三个 union 分支共用） */
 const zNurtureFields = {
   // LLM 生成的第三人称能力简介；用户编辑后应同时提交 nurtureAuto: false

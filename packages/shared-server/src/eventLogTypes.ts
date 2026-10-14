@@ -128,6 +128,10 @@ type EventLogInternal =
       ["event.name"]: "agentNurtureWorker.run";
       "agent_profile.id": string;
     }
+  | {
+      ["event.name"]: "agentPublicationVectorWorker.run";
+      "agent_publication.id": string;
+    }
   // Product Events
   | {
       ["event.name"]: "user.login";

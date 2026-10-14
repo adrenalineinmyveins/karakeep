@@ -6,6 +6,7 @@ import {
   AdminMaintenanceQueue,
   AgentMessageQueue,
   AgentNurtureQueue,
+  AgentPublicationVectorQueue,
   AssetPreprocessingQueue,
   BackupQueue,
   ConceptCompilationQueue,
@@ -37,6 +38,11 @@ import {
   AgentNurtureSchedulingWorker,
   AgentNurtureWorker,
 } from "./workers/agentNurture/agentNurtureWorker";
+import {
+  AgentHealthSchedulingWorker,
+  runAgentHealthChecks,
+} from "./workers/agentPublicationHealth";
+import { AgentPublicationVectorWorker } from "./workers/agentPublicationVectorWorker";
 import { AssetPreprocessingWorker } from "./workers/assetPreprocessingWorker";
 import { BackupSchedulingWorker, BackupWorker } from "./workers/backupWorker";
 import { CrawlerWorker } from "./workers/crawlerWorker";
@@ -116,6 +122,23 @@ const workerBuilders = {
   agentNurture: async () => {
     await AgentNurtureQueue.ensureInit();
     return AgentNurtureWorker.build();
+  },
+  agentPublicationVector: async () => {
+    await AgentPublicationVectorQueue.ensureInit();
+    return AgentPublicationVectorWorker.build();
+  },
+  // D1 在线状态：无队列消费，仅探活调度（runner 常驻占位保持进程存活）
+  agentHealth: async () => {
+    await runAgentHealthChecks();
+    return {
+      run: () =>
+        new Promise<void>(() => {
+          AgentHealthSchedulingWorker.start();
+        }),
+      stop: () => {
+        AgentHealthSchedulingWorker.stop();
+      },
+    };
   },
 } as const;
 

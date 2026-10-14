@@ -23,10 +23,15 @@ import {
   users,
 } from "@saiye/db/schema";
 import serverConfig from "@saiye/shared/config";
+import { EmbeddingClientFactory } from "@saiye/shared/inference";
 import logger from "@saiye/shared/logger";
+import { AgentPublicationVectorQueue } from "@saiye/shared-server";
+import { getVectorStoreClient } from "@saiye/shared/vectorStore";
+import type { SQL } from "drizzle-orm";
 
 import { authedProcedure, router } from "../index";
 import { AGENT_PROFILE_TYPES } from "@saiye/shared/types/agentProfiles";
+import type { AgentOnlineState } from "@saiye/shared/types/agentProfiles";
 
 // F1 联邦化：运营参数挪到 serverConfig（env 可覆盖）；
 // 保留导出名，取值时机为模块加载（与 env 单例解析一致）。
@@ -69,6 +74,8 @@ const zPublicationCardSchema = zPublicationSchema.and(
     autoExpertise: z.array(z.string()).nullable(),
     // D2 喂养生成的第三人称能力简介（null = 未生成）
     bio: z.string().nullable(),
+    // D1 在线状态（hosted 恒在线；openai-compatible 探活；trae-cli 本地不可探）
+    online: z.enum(["online", "offline", "unknown"]),
     avatarAssetId: z.string().nullable(),
     // 是否当前查看者自己的发布（前端据此隐藏咨询入口）
     isOwn: z.boolean(),
@@ -194,6 +201,93 @@ async function fetchOwnedPublication(db: DB, userId: string, id: string) {
   return row;
 }
 
+/** D3-b：发布元数据/画像变更后异步向量化（增强链路，失败不阻断主流程） */
+async function enqueuePublicationVector(
+  publicationId: string,
+  mode: "upsert" | "delete",
+) {
+  try {
+    await AgentPublicationVectorQueue.enqueue(
+      { publicationId, mode },
+      { idempotencyKey: `pubvec:${mode}:${publicationId}` },
+    );
+  } catch (e) {
+    logger.warn(
+      `[publications] 向量化入队失败（discover 将退化为 ILIKE）: ${e instanceof Error ? e.message : e}`,
+    );
+  }
+}
+
+/** 卡片查询的行形状（discover/get 共用：发布 + 运行时/喂养画像/在线状态） */
+interface CardRow {
+  pub: typeof agentPublications.$inferSelect;
+  runtime: (typeof AGENT_PROFILE_TYPES)[number];
+  bio: string | null;
+  expertiseTags: string[] | null;
+  onlineState: AgentOnlineState | null;
+}
+
+async function fetchCardRows(
+  db: DB,
+  where: SQL | undefined,
+): Promise<CardRow[]> {
+  return db
+    .select({
+      pub: agentPublications,
+      runtime: agentProfiles.type,
+      bio: agentProfiles.bio,
+      expertiseTags: agentProfiles.expertiseTags,
+      onlineState: agentProfiles.onlineState,
+    })
+    .from(agentPublications)
+    .innerJoin(
+      agentProfiles,
+      eq(agentProfiles.id, agentPublications.agentProfileId),
+    )
+    .where(where)
+    .orderBy(desc(agentPublications.createdAt))
+    .limit(100);
+}
+
+/**
+ * D3-b 语义召回：query → embedding → vector store 相似检索 → 反查发布行。
+ * 任何一步不可用（无 inference/vector store 配置、无命中）返回空数组。
+ */
+async function semanticRecall(db: DB, query: string): Promise<CardRow[]> {
+  const embeddingClient = EmbeddingClientFactory.build();
+  const vectorStore = await getVectorStoreClient();
+  if (!embeddingClient || !vectorStore) {
+    return [];
+  }
+  const { embeddings } = await embeddingClient.generateEmbeddingFromText([
+    query,
+  ]);
+  const vector = embeddings?.[0];
+  if (!vector) {
+    return [];
+  }
+  const { hits } = await vectorStore.search({
+    vector,
+    limit: 10,
+    // 相似度阈值：低于它的语义弱关联不进结果（Meilisearch ranking score 0..1）
+    rankingScoreThreshold: 0.5,
+  });
+  const ids = hits
+    .map((h) => (h.id.startsWith("pub:") ? h.id.slice(4) : null))
+    .filter((v): v is string => !!v);
+  if (ids.length === 0) {
+    return [];
+  }
+  // 反查仍需过滤可见状态（向量库可能滞后于下架）
+  return fetchCardRows(
+    db,
+    and(
+      inArray(agentPublications.id, ids),
+      inArray(agentPublications.status, ["published", "delisting"]),
+    ),
+  );
+}
+
 /** 转咨询者卡片（带所有者显示名、缓冲期截止时间、运行时与 D2 喂养画像） */
 async function toCard(
   db: DB,
@@ -202,6 +296,7 @@ async function toCard(
     type: (typeof AGENT_PROFILE_TYPES)[number];
     bio: string | null;
     expertiseTags: string[] | null;
+    onlineState: AgentOnlineState | null;
   },
   viewerId: string,
 ) {
@@ -209,6 +304,14 @@ async function toCard(
     where: eq(users.id, row.userId),
     columns: { name: true },
   });
+  // D1 在线状态推导：hosted 平台恒在线；openai-compatible 看探活结果；
+  // trae-cli 运行在所有者本地，服务端不可探（unknown）
+  const online: "online" | "offline" | "unknown" =
+    profile.type === "hosted"
+      ? "online"
+      : profile.type === "openai-compatible"
+        ? (profile.onlineState?.state ?? "unknown")
+        : "unknown";
   return {
     ...row,
     ownerName: owner?.name ?? "",
@@ -219,6 +322,7 @@ async function toCard(
     runtime: profile.type,
     bio: profile.bio,
     autoExpertise: profile.expertiseTags,
+    online,
     isOwn: row.userId === viewerId,
   };
 }
@@ -280,6 +384,7 @@ export const agentPublicationsAppRouter = router({
           })
           .where(eq(agentPublications.id, existing.id))
           .returning();
+        await enqueuePublicationVector(existing.id, "upsert");
         return { publication: row };
       }
 
@@ -291,6 +396,7 @@ export const agentPublicationsAppRouter = router({
           ...values,
         })
         .returning();
+      await enqueuePublicationVector(row.id, "upsert");
       return { publication: row };
     }),
 
@@ -312,6 +418,7 @@ export const agentPublicationsAppRouter = router({
         .set({ ...rest, modifiedAt: new Date() })
         .where(eq(agentPublications.id, id))
         .returning();
+      await enqueuePublicationVector(id, "upsert");
       return { publication: updated };
     }),
 
@@ -373,7 +480,9 @@ export const agentPublicationsAppRouter = router({
     }),
 
   // 咨询者：发现可咨询的专家（published + delisting 均可见，delisting 标记"下架中"）。
-  // 可选 query（标题/描述模糊）/ tag（标签精确）过滤。
+  // D3-b 语义混合召回：query 同时走 ILIKE（精确子串）+ 向量语义（embedding
+  // 相似），并集去重（ILIKE 命中优先）；向量链路不可用时静默降级纯 ILIKE。
+  // 可选 tag（标签精确）过滤。
   discover: authedProcedure
     .input(
       z
@@ -404,21 +513,26 @@ export const agentPublicationsAppRouter = router({
           )!,
         );
       }
-      const rows = await ctx.db
-        .select({
-          pub: agentPublications,
-          runtime: agentProfiles.type,
-          bio: agentProfiles.bio,
-          expertiseTags: agentProfiles.expertiseTags,
-        })
-        .from(agentPublications)
-        .innerJoin(
-          agentProfiles,
-          eq(agentProfiles.id, agentPublications.agentProfileId),
-        )
-        .where(and(...conditions))
-        .orderBy(desc(agentPublications.createdAt))
-        .limit(100);
+      let rows = await fetchCardRows(ctx.db, and(...conditions));
+
+      // 语义补充：向量召回（仅 query 存在且未命中上限时；全程静默降级）
+      if (input?.query && rows.length < 20) {
+        const vectorRows = await semanticRecall(ctx.db, input.query).catch(
+          (e) => {
+            logger.warn(
+              `[discover] 语义召回降级为纯 ILIKE: ${e instanceof Error ? e.message : e}`,
+            );
+            return [];
+          },
+        );
+        const seen = new Set(rows.map((r) => r.pub.id));
+        for (const extra of vectorRows) {
+          if (!seen.has(extra.pub.id)) {
+            rows = [...rows, extra];
+          }
+        }
+      }
+
       return {
         publications: await Promise.all(
           rows.map((r) =>
@@ -429,6 +543,7 @@ export const agentPublicationsAppRouter = router({
                 type: r.runtime,
                 bio: r.bio,
                 expertiseTags: r.expertiseTags,
+                onlineState: r.onlineState,
               },
               ctx.user.id,
             ),
@@ -589,20 +704,10 @@ export const agentPublicationsAppRouter = router({
     .output(z.object({ publication: zPublicationCardSchema }))
     .query(async ({ ctx, input }) => {
       await settleExpiredDelistings(ctx.db);
-      const [row] = await ctx.db
-        .select({
-          pub: agentPublications,
-          runtime: agentProfiles.type,
-          bio: agentProfiles.bio,
-          expertiseTags: agentProfiles.expertiseTags,
-        })
-        .from(agentPublications)
-        .innerJoin(
-          agentProfiles,
-          eq(agentProfiles.id, agentPublications.agentProfileId),
-        )
-        .where(eq(agentPublications.id, input.id))
-        .limit(1);
+      const [row] = await fetchCardRows(
+        ctx.db,
+        eq(agentPublications.id, input.id),
+      );
       if (!row || row.pub.status === "delisted") {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -617,6 +722,7 @@ export const agentPublicationsAppRouter = router({
             type: row.runtime,
             bio: row.bio,
             expertiseTags: row.expertiseTags,
+            onlineState: row.onlineState,
           },
           ctx.user.id,
         ),

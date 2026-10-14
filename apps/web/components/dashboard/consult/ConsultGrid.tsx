@@ -159,6 +159,19 @@ export default function ConsultGrid({
                     {t("consult.delisting")}
                   </span>
                 )}
+                {/* D1 在线状态徽章：在线/离线；unknown（本地 CLI 等）不展示 */}
+                {p.online === "online" && (
+                  <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-600">
+                    <span className="size-1.5 rounded-full bg-emerald-500" />
+                    {t("consult.online")}
+                  </span>
+                )}
+                {p.online === "offline" && (
+                  <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
+                    <span className="size-1.5 rounded-full bg-muted-foreground" />
+                    {t("consult.offline")}
+                  </span>
+                )}
                 <span className="ml-auto">
                   {p.createdAt?.toLocaleDateString()}
                 </span>

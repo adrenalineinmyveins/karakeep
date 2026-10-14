@@ -21,6 +21,7 @@ import type { ZApiKeyScope } from "@saiye/shared/types/apiKeys";
 import { API_KEY_FULL_ACCESS_SCOPE } from "@saiye/shared/types/apiKeys";
 import type {
   AgentNurtureState,
+  AgentOnlineState,
   KnowledgeScope,
 } from "@saiye/shared/types/agentProfiles";
 import type {
@@ -768,6 +769,8 @@ export const agentProfiles = pgTable(
     nurtureAuto: boolean("nurture_auto").notNull().default(true),
     // D2-b 增量游标：只处理游标之后变更的书签，避免全量轮询
     nurtureState: jsonb("nurture_state").$type<AgentNurtureState | null>(),
+    // D1 在线状态：openai-compatible 探活结果（hosted 恒在线不写；trae-cli 本地运行不可探）
+    onlineState: jsonb("online_state").$type<AgentOnlineState | null>(),
     createdAt: createdAtMsField(),
     modifiedAt: modifiedAtMsField(),
   },

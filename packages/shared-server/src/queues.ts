@@ -505,3 +505,24 @@ export const AgentNurtureQueue = createDeferredQueue<ZAgentNurtureRequest>(
     keepFailedJobs: false,
   },
 );
+
+// D3-b 语义混合召回：发布元数据/喂养画像变更后的向量化任务
+// upsert = 生成 embedding 写入 vector store（id: pub:{publicationId}）；
+// delete = delist 后清向量。
+export const zAgentPublicationVectorRequestSchema = z.object({
+  publicationId: z.string(),
+  mode: z.enum(["upsert", "delete"]),
+});
+export type ZAgentPublicationVectorRequest = z.infer<
+  typeof zAgentPublicationVectorRequestSchema
+>;
+export const AgentPublicationVectorQueue =
+  createDeferredQueue<ZAgentPublicationVectorRequest>(
+    "agent_publication_vector_queue",
+    {
+      defaultJobArgs: {
+        numRetries: 2,
+      },
+      keepFailedJobs: false,
+    },
+  );
