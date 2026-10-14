@@ -12,7 +12,11 @@ import {
   creditTransactions,
 } from "@saiye/db/schema";
 import serverConfig from "@saiye/shared/config";
-import { AgentMessageQueue, CreditsService } from "@saiye/shared-server";
+import {
+  AgentMessageQueue,
+  CreditsService,
+  getRealtimeBroker,
+} from "@saiye/shared-server";
 
 import { authedProcedure, router } from "../index";
 import { settleExpiredDelistings } from "./agentPublications";
@@ -109,7 +113,8 @@ async function enforceRequesterLimits(db: DB, requesterUserId: string) {
       ),
     );
   if (
-    (hourly?.n ?? 0) >= serverConfig.consultation.agentMessageRequesterHourlyLimit
+    (hourly?.n ?? 0) >=
+    serverConfig.consultation.agentMessageRequesterHourlyLimit
   ) {
     throw new TRPCError({
       code: "TOO_MANY_REQUESTS",
@@ -308,6 +313,10 @@ export const agentMessagesAppRouter = router({
       });
 
       await AgentMessageQueue.enqueue({ messageId: message!.id });
+      // D5 实时推送：通知被咨询方（发布者）有新的咨询消息
+      await getRealtimeBroker().publish(target.ownerUserId, {
+        type: "consult_incoming",
+      });
       return { message: message! };
     }),
 
@@ -417,6 +426,81 @@ export const agentMessagesAppRouter = router({
         .where(eq(agentMessages.id, input.id))
         .returning();
       await AgentMessageQueue.enqueue({ messageId: input.id });
+      // D5 实时推送：重试后通知被咨询方
+      const [pub] = await ctx.db
+        .select({ userId: agentPublications.userId })
+        .from(agentPublications)
+        .where(eq(agentPublications.id, message.targetPublicationId))
+        .limit(1);
+      if (pub) {
+        await getRealtimeBroker().publish(pub.userId, {
+          type: "consult_incoming",
+        });
+      }
+      return { message: updated! };
+    }),
+
+  // D4-g 反问澄清回复：请求方针对 need_input（专家反向提问）补充信息，
+  // 消息回到 pending 重新入队（复用原影子会话继续，不重复计费）。
+  reply: authedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        clarification: z.string().min(1).max(8000),
+      }),
+    )
+    .output(z.object({ message: zAgentMessageSchema }))
+    .mutation(async ({ ctx, input }) => {
+      const [message] = await ctx.db
+        .select()
+        .from(agentMessages)
+        .where(
+          and(
+            eq(agentMessages.id, input.id),
+            eq(agentMessages.requesterUserId, ctx.user.id),
+          ),
+        )
+        .limit(1);
+      if (!message) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Message not found",
+        });
+      }
+      if (message.state !== "need_input") {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Only messages awaiting clarification can be replied to",
+        });
+      }
+      if (message.expiresAt.getTime() < Date.now()) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Message has expired; send a new one instead",
+        });
+      }
+
+      // 回到 pending 重新执行（不重复扣费：creditsCharged 已在 send 时锁定）
+      const [updated] = await ctx.db
+        .update(agentMessages)
+        .set({ state: "pending", note: null, modifiedAt: new Date() })
+        .where(eq(agentMessages.id, input.id))
+        .returning();
+      await AgentMessageQueue.enqueue({
+        messageId: input.id,
+        content: input.clarification,
+      });
+      // D5 实时推送：反问回复后通知被咨询方
+      const [pub] = await ctx.db
+        .select({ userId: agentPublications.userId })
+        .from(agentPublications)
+        .where(eq(agentPublications.id, message.targetPublicationId))
+        .limit(1);
+      if (pub) {
+        await getRealtimeBroker().publish(pub.userId, {
+          type: "consult_incoming",
+        });
+      }
       return { message: updated! };
     }),
 });

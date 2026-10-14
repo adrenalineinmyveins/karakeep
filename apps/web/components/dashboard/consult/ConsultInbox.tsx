@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
@@ -62,6 +63,7 @@ function MessageRow({
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const [showAnswer, setShowAnswer] = useState(false);
+  const [replyText, setReplyText] = useState("");
 
   // 重试仅发起方可调（failed/expired 且未超过 expiresAt，服务端校验）
   const retryMutation = useMutation(
@@ -70,6 +72,20 @@ function MessageRow({
         queryClient.invalidateQueries(
           api.agentMessages.listOutgoing.pathFilter(),
         ),
+      onError: (e) => toast({ description: e.message, variant: "destructive" }),
+    }),
+  );
+
+  // D4-g 反问回复：专家澄清后请求方补充信息（need_input → 重新入队）
+  const replyMutation = useMutation(
+    api.agentMessages.reply.mutationOptions({
+      onSuccess: () => {
+        setReplyText("");
+        toast({ description: t("consult.reply_sent") });
+        queryClient.invalidateQueries(
+          api.agentMessages.listOutgoing.pathFilter(),
+        );
+      },
       onError: (e) => toast({ description: e.message, variant: "destructive" }),
     }),
   );
@@ -95,6 +111,39 @@ function MessageRow({
         </span>
       </div>
       <p className="line-clamp-2 text-sm font-medium">{message.question}</p>
+      {message.state === "need_input" && canRetry && (
+        <div className="flex flex-col gap-2">
+          {message.note && (
+            <div className="rounded-md bg-amber-500/5 p-3 text-sm">
+              <span className="font-medium">
+                {t("consult.clarification_question")}
+              </span>{" "}
+              {message.note}
+            </div>
+          )}
+          <div className="flex items-start gap-2">
+            <Textarea
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder={t("consult.reply_placeholder")}
+              className="min-h-[60px] flex-1"
+            />
+            <ActionButton
+              ignoreDemoMode={true}
+              loading={replyMutation.isPending}
+              disabled={!replyText.trim()}
+              onClick={() =>
+                replyMutation.mutate({
+                  id: message.id,
+                  clarification: replyText.trim(),
+                })
+              }
+            >
+              {t("consult.reply")}
+            </ActionButton>
+          </div>
+        </div>
+      )}
       {message.answer && (
         <div className="flex flex-col gap-1">
           <Button
@@ -173,6 +222,31 @@ export default function ConsultInbox() {
   const incomingQuery = useQuery(
     api.agentMessages.listIncoming.queryOptions({}, { refetchInterval: 15000 }),
   );
+
+  const queryClient = useQueryClient();
+
+  // D5 实时推送：SSE 订阅后端事件，收到即刷新对应列表；15s 轮询仍作兜底
+  useEffect(() => {
+    const es = new EventSource("/api/realtime");
+    es.onmessage = (e) => {
+      let data: { type?: string };
+      try {
+        data = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+      if (data.type === "consult_incoming") {
+        queryClient.invalidateQueries(
+          api.agentMessages.listIncoming.pathFilter(),
+        );
+      } else if (data.type === "consult_outgoing") {
+        queryClient.invalidateQueries(
+          api.agentMessages.listOutgoing.pathFilter(),
+        );
+      }
+    };
+    return () => es.close();
+  }, [api, queryClient]);
 
   return (
     <Tabs defaultValue="outgoing">

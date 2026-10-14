@@ -244,7 +244,11 @@
     "state_expired": "已过期",
     "state_need_input": "待澄清",
     "view_answer": "查看回答",
-    "own_badge": "我的发布"
+    "own_badge": "我的发布",
+    "clarification_question": "专家想澄清：",
+    "reply_placeholder": "输入补充信息…",
+    "reply": "回复",
+    "reply_sent": "已回复，等待回答"
   },
   "chat": {
     "param_required_toast": "请填写参数：{{label}}",

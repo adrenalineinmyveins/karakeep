@@ -470,10 +470,13 @@ export const BackupQueue = createDeferredQueue<ZBackupRequest>("backup_queue", {
 });
 
 // A2A 咨询消息 worker
-// 仅携带 messageId，worker 从 DB 重读全量状态（含过期惰性结算）；
+// 携带 messageId，worker 从 DB 重读全量状态（含过期惰性结算）；
+// content 可选：D4-g 反问澄清后重新入队时携带请求方补充的新一轮内容
+//（否则 worker 用 message.question 原始问题执行）。
 // 重试由状态机自管（避免同一条消息被重复执行/重复计费），队列层不重试。
 export const zAgentMessageRequestSchema = z.object({
   messageId: z.string(),
+  content: z.string().optional(),
 });
 export type ZAgentMessageRequest = z.infer<typeof zAgentMessageRequestSchema>;
 export const AgentMessageQueue = createDeferredQueue<ZAgentMessageRequest>(

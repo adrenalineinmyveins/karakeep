@@ -15,6 +15,7 @@ import {
   addLogFields,
   AgentMessageQueue,
   CreditsService,
+  getRealtimeBroker,
   zAgentMessageRequestSchema,
 } from "@saiye/shared-server";
 import logger from "@saiye/shared/logger";
@@ -108,6 +109,10 @@ async function runAgentMessage(job: DequeuedJob<ZAgentMessageRequest>) {
       await safeRefund(db, message);
     }
     logger.info(`[agentMessage][${jobId}] message expired before dispatch`);
+    // D5 实时推送：通知请求方结果（过期）
+    await getRealtimeBroker().publish(message.requesterUserId, {
+      type: "consult_outgoing",
+    });
     return;
   }
 
@@ -130,6 +135,9 @@ async function runAgentMessage(job: DequeuedJob<ZAgentMessageRequest>) {
   if (!target || target.publicationStatus === "delisted") {
     await failMessage(db, messageId, "Target agent is no longer available");
     if (message.creditsCharged > 0) await safeRefund(db, message);
+    await getRealtimeBroker().publish(message.requesterUserId, {
+      type: "consult_outgoing",
+    });
     return;
   }
   if (target.profileType === "trae-cli") {
@@ -139,6 +147,9 @@ async function runAgentMessage(job: DequeuedJob<ZAgentMessageRequest>) {
       "This expert runs a local CLI runtime and does not support async consultation",
     );
     if (message.creditsCharged > 0) await safeRefund(db, message);
+    await getRealtimeBroker().publish(message.requesterUserId, {
+      type: "consult_outgoing",
+    });
     return;
   }
 
@@ -147,31 +158,66 @@ async function runAgentMessage(job: DequeuedJob<ZAgentMessageRequest>) {
     .set({ state: "dispatched", modifiedAt: new Date() })
     .where(eq(agentMessages.id, messageId));
 
-  // 影子会话：复用 sendMessageSync 的咨询执行链（owner 知识检索 + 计量）
-  const [session] = await db
-    .insert(chatSessions)
-    .values({
-      userId: message.requesterUserId,
-      title: shadowTitle(message.question),
-      agentProfileId: target.profileId,
-      ownerUserId: target.publicationUserId,
-      publicationId: target.publicationId,
-    })
-    .returning({ id: chatSessions.id });
+  // 影子会话：复用 sendMessageSync 的咨询执行链（owner 知识检索 + 计量）。
+  // D4-g 反问后重新入队时 message.sessionId 已存在，直接复用以便
+  // 保留「原始问题 → 澄清问题」的会话上下文。
+  let sessionId = message.sessionId;
+  if (!sessionId) {
+    const [session] = await db
+      .insert(chatSessions)
+      .values({
+        userId: message.requesterUserId,
+        title: shadowTitle(message.question),
+        agentProfileId: target.profileId,
+        ownerUserId: target.publicationUserId,
+        publicationId: target.publicationId,
+      })
+      .returning({ id: chatSessions.id });
+    sessionId = session!.id;
+
+    // D4-3 立即将 message.sessionId 指回影子会话：使 loadConsultationContext
+    // 能反查当前执行中的 A2A 消息，串联 parentMessageId 链（否则根消息
+    // M0 反查不到 → 子咨询 M1 的 parentMessageId 断开 → 环检测 A→B→A 失效）。
+    await db
+      .update(agentMessages)
+      .set({ sessionId, modifiedAt: new Date() })
+      .where(eq(agentMessages.id, messageId));
+  }
 
   try {
     const client = await buildImpersonatingTRPCClient(message.requesterUserId);
+    // D4-g 反问后重新入队携带请求方补充内容；首问用原始问题
+    const prompt = job.data.content ?? message.question;
     const result = await client.chats.sendMessageSync({
-      sessionId: session!.id,
-      content: message.question,
+      sessionId,
+      content: prompt,
     });
+    // D4-g 反问澄清：专家请求补充信息 → 置 need_input 等待请求方回复（不结算）
+    if (result.needInput) {
+      await db
+        .update(agentMessages)
+        .set({
+          state: "need_input",
+          note: result.needInput.slice(0, 500),
+          modifiedAt: new Date(),
+        })
+        .where(eq(agentMessages.id, messageId));
+      logger.info(
+        `[agentMessage][${jobId}] message ${messageId} needs input: ${result.needInput}`,
+      );
+      // D5 实时推送：通知请求方待补充信息
+      await getRealtimeBroker().publish(message.requesterUserId, {
+        type: "consult_outgoing",
+      });
+      return;
+    }
     if (result.content) {
       await db
         .update(agentMessages)
         .set({
           state: "answered",
           answer: result.content,
-          sessionId: session!.id,
+          sessionId,
           modifiedAt: new Date(),
         })
         .where(eq(agentMessages.id, messageId));
@@ -201,14 +247,14 @@ async function runAgentMessage(job: DequeuedJob<ZAgentMessageRequest>) {
         );
       }
       logger.info(
-        `[agentMessage][${jobId}] message ${messageId} answered (session=${session!.id})`,
+        `[agentMessage][${jobId}] message ${messageId} answered (session=${sessionId})`,
       );
     } else {
       await failMessage(
         db,
         messageId,
         result.error ?? "Target agent returned an empty answer",
-        session!.id,
+        sessionId,
       );
       if (message.creditsCharged > 0) await safeRefund(db, message);
     }
@@ -218,10 +264,14 @@ async function runAgentMessage(job: DequeuedJob<ZAgentMessageRequest>) {
       db,
       messageId,
       e instanceof Error ? e.message : String(e),
-      session!.id,
+      sessionId,
     );
     if (message.creditsCharged > 0) await safeRefund(db, message);
   }
+  // D5 实时推送：answered / failed（含 empty answer、catch 抛错）都会走到这里
+  await getRealtimeBroker().publish(message.requesterUserId, {
+    type: "consult_outgoing",
+  });
 }
 
 async function failMessage(

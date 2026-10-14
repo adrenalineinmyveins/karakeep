@@ -263,7 +263,11 @@
     "state_expired": "Expired",
     "state_need_input": "Needs clarification",
     "view_answer": "View answer",
-    "own_badge": "Your publication"
+    "own_badge": "Your publication",
+    "clarification_question": "Expert is asking:",
+    "reply_placeholder": "Enter your clarification…",
+    "reply": "Reply",
+    "reply_sent": "Replied, awaiting answer"
   },
   "chat": {
     "param_required_toast": "Please fill in the parameter: {{label}}",
